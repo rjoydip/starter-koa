@@ -1,7 +1,7 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
 import { safeParse } from 'valibot'
-import { getUser, getUsers, isDBUp, setUser } from './db'
+import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import logger from './logger'
 import { UserSchema } from './schema'
 
@@ -102,6 +102,61 @@ export const routers: IRouter[] = [
     },
   },
   {
+    name: 'PutUser',
+    path: '/user/:id',
+    method: 'PUT',
+    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
+      const payload = ctx.request.body
+      const _id = ctx.params.id
+      const result = safeParse(UserSchema, { _id, ...payload })
+      if (result.success) {
+        const isValidUser = await getUser(_id)
+        if (isValidUser) {
+          await next()
+        }
+        else {
+          ctx.status = 401
+          ctx.body = {
+            message: 'User Invalid',
+            data: {},
+            error: {},
+          }
+        }
+      }
+      else {
+        ctx.status = 422
+        ctx.body = {
+          message: 'User Data Invalid',
+          data: {},
+          error: result.issues,
+        }
+      }
+    }],
+    handler: async (ctx: Koa.Context) => {
+      try {
+        const user = await updateUser(ctx.params.id, ctx.request.body)
+        ctx.status = 200
+        ctx.body = {
+          message: 'User updated successfully',
+          data: user,
+          error: {},
+        }
+      }
+      catch (error) {
+        ctx.status = 204
+        ctx.body = {
+          message: 'User updates failed',
+          data: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error,
+          },
+        }
+      }
+    },
+  },
+  {
     name: 'PostUser',
     path: '/user',
     method: 'POST',
@@ -130,6 +185,48 @@ export const routers: IRouter[] = [
       }
     },
   },
+  {
+    name: 'DeleteUser',
+    path: '/user/:id',
+    method: 'DELETE',
+    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
+      const isValidUser = await getUser(ctx.params.id)
+      if (isValidUser) {
+        await next()
+      }
+      else {
+        ctx.status = 401
+        ctx.body = {
+          message: 'User Invalid',
+          data: {},
+          error: {},
+        }
+      }
+    }],
+    handler: async (ctx: Koa.Context) => {
+      try {
+        const user = await deleteUser(ctx.params.id)
+        ctx.status = 200
+        ctx.body = {
+          message: 'User deleted successfully',
+          data: user,
+          error: {},
+        }
+      }
+      catch (error) {
+        ctx.status = 204
+        ctx.body = {
+          message: 'User updates failed',
+          data: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error,
+          },
+        }
+      }
+    },
+  },
 ]
 
 export function getRouter(route: string): IRouter | null {
@@ -141,16 +238,15 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router is empty')
   }
 
-  // Validate required properties
-  if (!router.name || typeof router.name !== 'string') {
+  if (!router.name) {
     throw new Error('Router name must be a non-empty string')
   }
 
-  if (!router.path || typeof router.path !== 'string' || !router.path.startsWith('/')) {
-    throw new Error('Router path must be a valid URL path starting with "/"')
+  if (!router.path) {
+    throw new Error('Router path must be a non-empty string')
   }
 
-  if (!router.method || typeof router.method !== 'string') {
+  if (!['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'].includes(router.method.toUpperCase())) {
     throw new Error('Router method must be a valid HTTP method')
   }
 
@@ -158,8 +254,7 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router handler must be a function')
   }
 
-  // Validate optional properties
-  if (router.middleware && !Array.isArray(router.middleware)) {
+  if (!router.middleware && !Array.isArray(router.middleware)) {
     throw new Error('Router middleware must be an array')
   }
 

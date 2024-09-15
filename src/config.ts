@@ -1,6 +1,6 @@
-import type { RuntimeName } from 'std-env'
 import type { IConfig, Services } from './types'
 import defu from 'defu'
+import { nodeENV, type RuntimeName } from 'std-env'
 
 export function defineConfig(config?: IConfig): IConfig {
   return defu(config, {
@@ -9,7 +9,9 @@ export function defineConfig(config?: IConfig): IConfig {
       port: 3000,
     },
     app: {
-      env: {},
+      env: {
+        NODE_ENV: nodeENV,
+      },
       log_level: 3,
       services: ['db', 'redis'] as Services[],
       ratelimit: 60000,

@@ -15,6 +15,7 @@ import { getRegisteredRoutes } from './utils'
 const db = new Map()
 const app = new Koa({
   asyncLocalStorage: false,
+  env: config.app?.env?.NODE_ENV,
 })
 const router = new Router()
 
@@ -30,6 +31,7 @@ app.use(ip({
   blacklist: ['192.168.0.*', '8.8.8.[0-3]'],
   handler: async (ctx: Koa.Context) => {
     ctx.status = 422
+    ctx.body = 'Forbidden!!!'
   },
 }))
 app.use(ratelimit({
@@ -97,9 +99,6 @@ routers.forEach((r: IRouter) => {
       break
     case 'delete':
       router.delete(r.name, r.path, ...r.middleware ?? [], r.handler)
-      break
-    case 'all':
-      router.all(r.name, r.path, ...r.middleware ?? [], r.handler)
       break
   }
 })

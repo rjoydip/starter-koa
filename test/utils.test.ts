@@ -7,13 +7,13 @@ describe('❯ Validate utils', () => {
     const registeredRoutes = ['/', '/status', '/health', '/users', '/user/:id', '/user']
     const routes = getRegisteredRoutes(router)
     const paths = routes.map(i => i.path)
-    expect(paths).toStrictEqual(registeredRoutes)
+    expect([...new Set(paths)]).toStrictEqual(registeredRoutes)
   })
 
   it('● should validated invalid regestered routes', async () => {
     const registeredRoutes = ['/', '/health', '/users', '/user/:id', '/user']
     const routes = getRegisteredRoutes(router)
     const paths = routes.map(i => i.path)
-    expect(paths).not.equal(registeredRoutes)
+    expect([...new Set(paths)]).not.equal(registeredRoutes)
   })
 })
