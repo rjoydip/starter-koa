@@ -1,0 +1,90 @@
+{
+  "name": "starter-koa",
+  "type": "module",
+  "version": "0.0.0",
+  "packageManager": "bun@1.2.8",
+  "description": "Koa application starter",
+  "author": "Joydip Roy <joydipand@gmail.com>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/rjoydip",
+  "homepage": "https://github.com/rjoydip/starter-koa#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rjoydip/starter-koa.git"
+  },
+  "bugs": "https://github.com/rjoydip/starter-koa/issues",
+  "keywords": [],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "_update": "taze -w -i -u -f",
+    "build": "unbuild",
+    "build:dev": "unbuild --stub",
+    "lint": "eslint . --fix",
+    "start": "dotenvx run -f .env.prodduction -- bun build/index.js",
+    "dev": "dotenvx run -f .env.dev -- esno watch src/index.ts",
+    "test": "dotenvx run -f .env.test -- vitest run --typecheck",
+    "typecheck": "tsc --noEmit",
+    "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.14.1",
+    "@electric-sql/pglite": "^0.2.7",
+    "@lukeed/uuid": "^2.0.1",
+    "defu": "^6.1.4",
+    "koa": "^2.15.3",
+    "koa-body": "^6.0.1",
+    "koa-helmet": "^7.0.2",
+    "koa-ip": "^2.1.3",
+    "koa-json": "^2.0.2",
+    "koa-ratelimit": "^5.1.0",
+    "koa-router": "^13.0.1",
+    "std-env": "^3.7.0",
+    "valibot": "^0.41.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^3.6.0",
+    "@types/koa": "^2.15.0",
+    "@types/koa-json": "^2.0.23",
+    "@types/koa-ratelimit": "^5.0.5",
+    "@types/koa-router": "^7.4.8",
+    "@types/node": "^22.5.5",
+    "@types/supertest": "^6.0.2",
+    "consola": "^3.2.3",
+    "eslint": "^9.10.0",
+    "esno": "^4.7.0",
+    "lint-staged": "^15.2.10",
+    "simple-git-hooks": "^2.11.1",
+    "supertest": "^7.0.0",
+    "taze": "^0.16.9",
+    "typescript": "^5.6.2",
+    "unbuild": "^2.0.0",
+    "vitest": "^2.1.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}
