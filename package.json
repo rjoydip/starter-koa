@@ -37,6 +37,7 @@
     "dist"
   ],
   "scripts": {
+    "all": "nr _update && nr lint && nr typecheck && nr build && nr test",
     "_update": "taze -w -i -u -f",
     "build": "unbuild",
     "build:dev": "unbuild --stub",
@@ -63,7 +64,7 @@
     "valibot": "^0.41.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.6.0",
+    "@antfu/eslint-config": "^3.6.2",
     "@types/koa": "^2.15.0",
     "@types/koa-json": "^2.0.23",
     "@types/koa-ratelimit": "^5.0.5",

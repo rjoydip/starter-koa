@@ -25,7 +25,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● should validated / route', async () => {
-      expect(validate('Root')).toBeTruthy()
+      expect(validate('Index')).toBeTruthy()
     })
 
     it('● should validated /status route', async () => {
@@ -43,7 +43,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        message: 'Root',
+        message: 'Index',
         data: {},
         error: {},
       })

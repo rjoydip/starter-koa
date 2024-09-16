@@ -1,6 +1,6 @@
 import type { IRouter } from './types'
 import Koa from 'koa'
-import { koaBody } from 'koa-body'
+import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
 import ip from 'koa-ip'
 import json from 'koa-json'
@@ -87,17 +87,17 @@ app.use(async (_, next) => {
 // Custom routers
 routers.forEach((r: IRouter) => {
   // TODO: Change it to dynamic method calling
-  switch (r.method.toLowerCase()) {
-    case 'get':
+  switch (r.method) {
+    case HttpMethodEnum.GET:
       router.get(r.name, r.path, ...r.middleware ?? [], r.handler)
       break
-    case 'post':
+    case HttpMethodEnum.POST:
       router.post(r.name, r.path, ...r.middleware ?? [], r.handler)
       break
-    case 'put':
+    case HttpMethodEnum.PUT:
       router.put(r.name, r.path, ...r.middleware ?? [], r.handler)
       break
-    case 'delete':
+    case HttpMethodEnum.DELETE:
       router.delete(r.name, r.path, ...r.middleware ?? [], r.handler)
       break
   }
