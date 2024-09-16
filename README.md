@@ -5,13 +5,37 @@
 
 Koa application starter
 
-## Sponsors
+## Setup
 
-<p align="center">
-  <a href="https://cdn.jsdelivr.net/gh/rjoydip/static/sponsors.svg">
-    <img src='https://cdn.jsdelivr.net/gh/rjoydip/static/sponsors.svg'/>
-  </a>
-</p>
+For install
+
+```sh
+bun install # or nci
+```
+
+For build
+
+```sh
+bun run build # or nr build
+```
+
+For lint
+
+```sh
+bun run lint # or nr lint
+```
+
+For test
+
+```sh
+bun test # or nr test
+```
+
+For all scripts
+
+```sh
+bun run all # or nr all
+```
 
 ## License
 
