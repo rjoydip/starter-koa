@@ -315,7 +315,7 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router path must be a non-empty string')
   }
 
-  if (![HttpMethodEnum.GET, HttpMethodEnum.PATCH, HttpMethodEnum.POST, HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.HEAD].includes(router.method.toUpperCase())) {
+  if (![HttpMethodEnum.GET, HttpMethodEnum.PATCH, HttpMethodEnum.POST, HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.HEAD].includes(router.method)) {
     throw new Error('Router method must be a valid HTTP method')
   }
 
