@@ -5,7 +5,6 @@ import type { IRegisteredRoutes } from './types'
 export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
   return router.stack.map((layer) => {
     return {
-      method: layer.methods,
       path: layer.path,
       regexp: layer.regexp,
     }

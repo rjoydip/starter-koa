@@ -11,7 +11,7 @@ describe('⬢ Validate app', () => {
 
       expect(res.status).toBe(200)
       expect(res.body).toStrictEqual({
-        message: 'Root',
+        message: 'Index',
         data: {},
         error: {},
       })
@@ -24,7 +24,7 @@ describe('⬢ Validate app', () => {
 
       expect(res.status).toBe(200)
       expect(res.body).toStrictEqual({
-        message: 'Root',
+        message: 'Index',
         data: {},
         error: {},
       })

@@ -1,20 +1,21 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
 import * as Sentry from '@sentry/bun'
+import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import { UserSchema } from './schema'
 
 export const routers: IRouter[] = [
   {
-    name: 'Root',
+    name: 'Index',
     path: '/',
-    method: 'GET',
+    method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       ctx.status = 200
       ctx.body = {
-        message: 'Root',
+        message: 'Index',
         data: {},
         error: {},
       }
@@ -23,7 +24,7 @@ export const routers: IRouter[] = [
   {
     name: 'Status',
     path: '/status',
-    method: 'GET',
+    method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       ctx.status = 200
@@ -39,40 +40,25 @@ export const routers: IRouter[] = [
   {
     name: 'Health',
     path: '/health',
-    method: 'GET',
+    method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      try {
-        const _isDBUp = await isDBUp()
-        ctx.status = 200
-        ctx.body = {
-          message: 'Health',
-          data: {
-            db: !!_isDBUp,
-            redis: false,
-          },
-          error: {},
-        }
-      }
-      catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'Fetch db details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
-        Sentry.captureException(error)
+      const _isDBUp = await isDBUp()
+      ctx.status = 200
+      ctx.body = {
+        message: 'Health',
+        data: {
+          db: !!_isDBUp,
+          redis: false,
+        },
+        error: {},
       }
     },
   },
   {
     name: 'GetUsers',
     path: '/users',
-    method: 'GET',
+    method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       try {
@@ -102,7 +88,7 @@ export const routers: IRouter[] = [
   {
     name: 'GetUser',
     path: '/user/:id',
-    method: 'GET',
+    method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       try {
@@ -146,7 +132,7 @@ export const routers: IRouter[] = [
   {
     name: 'PutUser',
     path: '/user/:id',
-    method: 'PUT',
+    method: HttpMethodEnum.PUT,
     middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
       const _id = ctx.params.id
       try {
@@ -205,7 +191,7 @@ export const routers: IRouter[] = [
   {
     name: 'PostUser',
     path: '/user',
-    method: 'POST',
+    method: HttpMethodEnum.POST,
     middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
       const payload = ctx.request.body
       const result = safeParse(UserSchema, { _id: '', ...payload })
@@ -249,7 +235,7 @@ export const routers: IRouter[] = [
   {
     name: 'DeleteUser',
     path: '/user/:id',
-    method: 'DELETE',
+    method: HttpMethodEnum.DELETE,
     middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
       try {
         const isValidUser = await getUser(ctx.params.id)
@@ -323,7 +309,7 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router path must be a non-empty string')
   }
 
-  if (!['GET', 'PATCH', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'].includes(router.method.toUpperCase())) {
+  if (![HttpMethodEnum.GET, HttpMethodEnum.PATCH, HttpMethodEnum.POST, HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.HEAD].includes(router.method)) {
     throw new Error('Router method must be a valid HTTP method')
   }
 
