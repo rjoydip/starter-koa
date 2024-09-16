@@ -43,7 +43,7 @@
     "lint": "eslint . --fix",
     "start": "dotenvx run -f .env.prodduction -- bun build/index.js",
     "dev": "dotenvx run -f .env.dev -- esno watch src/index.ts",
-    "test": "dotenvx run -f .env.test -- vitest run --typecheck --coverage",
+    "test": "vitest run --typecheck --coverage",
     "typecheck": "tsc --noEmit",
     "prepare": "simple-git-hooks"
   },
