@@ -51,6 +51,7 @@
     "@dotenvx/dotenvx": "^1.14.1",
     "@electric-sql/pglite": "^0.2.7",
     "@lukeed/uuid": "^2.0.1",
+    "@sentry/bun": "^8.30.0",
     "defu": "^6.1.4",
     "koa": "^2.15.3",
     "koa-body": "^6.0.1",

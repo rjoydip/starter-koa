@@ -1,5 +1,6 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
+import * as Sentry from '@sentry/bun'
 import { safeParse } from 'valibot'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import { UserSchema } from './schema'
@@ -64,6 +65,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
@@ -93,6 +95,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
@@ -136,6 +139,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
@@ -170,6 +174,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
@@ -193,6 +198,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
@@ -236,6 +242,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
@@ -269,6 +276,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
@@ -292,6 +300,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
+        Sentry.captureException(error)
       }
     },
   },
