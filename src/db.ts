@@ -24,14 +24,20 @@ async function tablesCreate(): Promise<void> {
 }
 
 export async function tablesDrop(): Promise<void> {
-  await db.exec(`
-    DROP TABLE if exists healths;
-    DROP TABLE if exists users;
-  `)
+  const _isDBUp = await isDBUp()
+  if (_isDBUp) {
+    await db.exec(`
+      DROP TABLE if exists healths;
+      DROP TABLE if exists users;
+    `)
+  }
 }
 
 export async function initDB(): Promise<void> {
-  await tablesCreate()
+  const _isDBUp = await isDBUp()
+  if (_isDBUp) {
+    await tablesCreate()
+  }
 }
 
 export async function dbDown(): Promise<void> {
@@ -40,6 +46,7 @@ export async function dbDown(): Promise<void> {
 }
 
 export async function isDBUp(): Promise<boolean> {
+  await db.waitReady
   return await db.ready
 }
 

@@ -8,7 +8,6 @@ import type { UserSchema } from './schema'
 export type Services = 'db' | 'redis'
 export type User = InferOutput<typeof UserSchema>
 export interface IRegisteredRoutes {
-  method: string[]
   path: string
   regexp: RegExp
 }

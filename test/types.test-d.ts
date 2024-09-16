@@ -1,6 +1,7 @@
 import type { Context, Next } from 'koa'
 import type { EnvObject, RuntimeName } from 'std-env'
 import type { IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
+import { HttpMethodEnum } from 'koa-body'
 import { describe, expectTypeOf, it } from 'vitest'
 
 describe('⬢ Validate types', () => {
@@ -10,7 +11,7 @@ describe('⬢ Validate types', () => {
   })
 
   it('● should validated interfaces', () => {
-    expectTypeOf({ method: ['GET'], path: '/', regexp: /^(\?:\/)(?:\/\$)?$/ }).toMatchTypeOf<IRegisteredRoutes>()
+    expectTypeOf({ method: [HttpMethodEnum.GET], path: '/', regexp: /^(\?:\/)(?:\/\$)?$/ }).toMatchTypeOf<IRegisteredRoutes>()
 
     expectTypeOf({
       id: 'x',
@@ -40,7 +41,7 @@ describe('⬢ Validate types', () => {
     expectTypeOf({
       name: 'x',
       path: '/',
-      method: 'GET',
+      method: HttpMethodEnum.GET,
       middleware: [],
       handler: (_ctx: Context, _next: Next) => Promise.resolve(),
     }).toMatchTypeOf<IRouter>()

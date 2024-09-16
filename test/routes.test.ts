@@ -1,3 +1,5 @@
+import type { HttpMethod } from 'koa-body'
+import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import app from '../src/app'
@@ -25,7 +27,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● should validated / route', async () => {
-      expect(validate('Root')).toBeTruthy()
+      expect(validate('Index')).toBeTruthy()
     })
 
     it('● should validated /status route', async () => {
@@ -43,7 +45,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        message: 'Root',
+        message: 'Index',
         data: {},
         error: {},
       })
@@ -265,7 +267,7 @@ describe('⬢ Validate routes', () => {
         await tablesDrop()
       })
 
-      it('● GET /users error', async () => {
+      it('● GET /users 500', async () => {
         const { headers, status } = await request(app.callback())
           .get('/users')
           .set('Accept', 'application/json')
@@ -273,7 +275,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● GET /user/:id error', async () => {
+      it('● GET /user/:id 500', async () => {
         const { headers, status } = await request(app.callback())
           .get(`/user/${_id}`)
           .set('Accept', 'application/json')
@@ -281,7 +283,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● POST /user error', async () => {
+      it('● POST /user 500', async () => {
         const { headers, status } = await request(app.callback())
           .post('/user/')
           .send({
@@ -296,9 +298,9 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● PUT /user/:id error', async () => {
+      it('● PUT /user/:id 500', async () => {
         const { headers, status } = await request(app.callback())
-          .put(`/user/${_id}`)
+          .delete(`/user/${_id}`)
           .send({
             _id: 'xxxx',
             name: 'Benedicte Smans Marlou Schaminée',
@@ -311,7 +313,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● DELETE /user:/:id', async () => {
+      it('● DELETE /user:/:id 500', async () => {
         const deleteUserResponse = await request(app.callback())
           .delete(`/user/${_id}`)
           .set('Accept', 'application/json')
@@ -326,7 +328,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: '',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router name must be a non-empty string')
@@ -335,7 +337,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router path must be a non-empty string')
@@ -344,7 +346,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'FOO',
+        method: 'FOO' as HttpMethod,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router method must be a valid HTTP method')
@@ -353,7 +355,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: null as any,
         handler: () => Promise.resolve(),
       })).toThrow('Router middleware must be an array')
@@ -362,7 +364,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: null as any,
       })).toThrow('Router handler must be a function')
