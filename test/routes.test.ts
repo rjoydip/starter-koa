@@ -267,7 +267,7 @@ describe('⬢ Validate routes', () => {
         await tablesDrop()
       })
 
-      it('● GET /users error', async () => {
+      it('● GET /users 500', async () => {
         const { headers, status } = await request(app.callback())
           .get('/users')
           .set('Accept', 'application/json')
@@ -275,7 +275,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● GET /user/:id error', async () => {
+      it('● GET /user/:id 500', async () => {
         const { headers, status } = await request(app.callback())
           .get(`/user/${_id}`)
           .set('Accept', 'application/json')
@@ -283,7 +283,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● POST /user error', async () => {
+      it('● POST /user 500', async () => {
         const { headers, status } = await request(app.callback())
           .post('/user/')
           .send({
@@ -298,9 +298,9 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● PUT /user/:id error', async () => {
+      it('● PUT /user/:id 500', async () => {
         const { headers, status } = await request(app.callback())
-          .put(`/user/${_id}`)
+          .delete(`/user/${_id}`)
           .send({
             _id: 'xxxx',
             name: 'Benedicte Smans Marlou Schaminée',
@@ -313,7 +313,7 @@ describe('⬢ Validate routes', () => {
         expect(status).toEqual(500)
       })
 
-      it('● DELETE /user:/:id', async () => {
+      it('● DELETE /user:/:id 500', async () => {
         const deleteUserResponse = await request(app.callback())
           .delete(`/user/${_id}`)
           .set('Accept', 'application/json')

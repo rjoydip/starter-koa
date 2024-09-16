@@ -42,29 +42,15 @@ export const routers: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      try {
-        const _isDBUp = await isDBUp()
-        ctx.status = 200
-        ctx.body = {
-          message: 'Health',
-          data: {
-            db: !!_isDBUp,
-            redis: false,
-          },
-          error: {},
-        }
-      }
-      catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'Fetch db details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+      const _isDBUp = await isDBUp()
+      ctx.status = 200
+      ctx.body = {
+        message: 'Health',
+        data: {
+          db: !!_isDBUp,
+          redis: false,
+        },
+        error: {},
       }
     },
   },
