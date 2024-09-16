@@ -16,8 +16,10 @@ export async function startServer(): Promise<Server> {
   return server
 }
 
+/* v8 ignore start */
 if (require.main === module) {
   startServer()
     .then(() => logger.ready('Server started successfully'))
     .catch(err => logger.error('Error starting server', err))
+  /* v8 ignore start */
 }

@@ -1,3 +1,4 @@
+import type { HttpMethod } from 'koa-body'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -345,7 +346,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'FOO',
+        method: 'FOO' as HttpMethod,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router method must be a valid HTTP method')
