@@ -67,9 +67,9 @@ app.use(async (ctx, next) => {
   const registeredRoutes = getRegisteredRoutes(router)
 
   // Check if the requested URL matches any route regex pattern
-  const routeMatched = registeredRoutes.some(route => route.regexp.test(requestedUrl))
+  const hasMatchedRoutes = registeredRoutes.some(route => route.regexp.test(requestedUrl))
 
-  if (!routeMatched) {
+  if (!hasMatchedRoutes) {
     ctx.status = 404
     ctx.body = { message: 'Route Not Found' }
   }

@@ -4,11 +4,7 @@ import { v4 as secure } from '@lukeed/uuid/secure'
 
 const db = new PGlite()
 
-export async function dbClose(): Promise<void> {
-  await db.close()
-}
-
-export async function dbUP(): Promise<void> {
+async function tablesCreate(): Promise<void> {
   await db.exec(`
     CREATE TABLE IF NOT EXISTS healths (
       id SERIAL PRIMARY KEY,
@@ -18,24 +14,33 @@ export async function dbUP(): Promise<void> {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       _id TEXT,
-      name VARCHAR(100),
+      name VARCHAR(30),
       email VARCHAR(200),
-      phone VARCHAR(100),
+      phone VARCHAR(20),
       address TEXT
     );
     INSERT INTO healths (service, up) VALUES ('db', true);
   `)
 }
 
-export async function dbDown(): Promise<void> {
+export async function tablesDrop(): Promise<void> {
   await db.exec(`
-    DROP SCHEMA if exists healths;
-    DROP SCHEMA if exists users;
+    DROP TABLE if exists healths;
+    DROP TABLE if exists users;
   `)
 }
 
-export async function isDBUp(): Promise<unknown> {
-  return (await db.query('SELECT 1;')).rows[0]
+export async function initDB(): Promise<void> {
+  await tablesCreate()
+}
+
+export async function dbDown(): Promise<void> {
+  await tablesDrop()
+  await db.close()
+}
+
+export async function isDBUp(): Promise<boolean> {
+  return await db.ready
 }
 
 /* User Queries - Start */
@@ -45,28 +50,24 @@ export async function getUser(id: string): Promise<User> {
 }
 
 export async function getUsers(): Promise<User[]> {
-  return (await db.query<User>(`SELECT _id, name, email, phone, address from users`, [])).rows
+  const { rows } = await db.query<User>(`SELECT _id, name, email, phone, address from users`, [])
+  return rows
 }
 
 export async function setUser(user: User): Promise<User | undefined> {
   const _id = secure()
   return await db.transaction(async (tx) => {
     await tx.query<User>(`INSERT INTO users (_id, name, email, phone, address) VALUES ($1, $2, $3, $4, $5)`, [_id, user.name, user.email, user.phone, user.address])
-    const { rows } = (await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [_id]))
+    const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [_id])
     return rows[0]
   })
 }
 
 export async function updateUser(id: string, user: User): Promise<User | undefined | []> {
   return await db.transaction(async (tx) => {
-    const result = await tx.query<User>(`UPDATE users SET name = $2, email = $3, phone = $4, address = $5 WHERE _id = $1;`, [id, user.name, user.email, user.phone, user.address])
-    if (result.affectedRows) {
-      const { rows } = (await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [id]))
-      return rows[0] ?? []
-    }
-    else {
-      return []
-    }
+    await tx.query<User>(`UPDATE users SET name = $2, email = $3, phone = $4, address = $5 WHERE _id = $1;`, [id, user.name, user.email, user.phone, user.address])
+    const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [id])
+    return rows[0]
   })
 }
 

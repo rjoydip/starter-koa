@@ -2,7 +2,6 @@ import type Koa from 'koa'
 import type { IRouter } from './types'
 import { safeParse } from 'valibot'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
-import logger from './logger'
 import { UserSchema } from './schema'
 
 export const routers: IRouter[] = [
@@ -42,15 +41,29 @@ export const routers: IRouter[] = [
     method: 'GET',
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      const db = await isDBUp()
-      ctx.status = 200
-      ctx.body = {
-        message: 'Health',
-        data: {
-          db: !!db,
-          redis: false,
-        },
-        error: {},
+      try {
+        const _isDBUp = await isDBUp()
+        ctx.status = 200
+        ctx.body = {
+          message: 'Health',
+          data: {
+            db: !!_isDBUp,
+            redis: false,
+          },
+          error: {},
+        }
+      }
+      catch (error: any) {
+        ctx.status = 500
+        ctx.body = {
+          message: 'Fetch db details failed',
+          data: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error.message,
+          },
+        }
       }
     },
   },
@@ -60,12 +73,26 @@ export const routers: IRouter[] = [
     method: 'GET',
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      const users = await getUsers()
-      ctx.status = 200
-      ctx.body = {
-        message: 'All users',
-        data: users,
-        error: {},
+      try {
+        const users = await getUsers()
+        ctx.status = 200
+        ctx.body = {
+          message: 'All users',
+          data: users,
+          error: {},
+        }
+      }
+      catch (error: any) {
+        ctx.status = 500
+        ctx.body = {
+          message: 'Fetch users details failed',
+          data: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error.message,
+          },
+        }
       }
     },
   },
@@ -73,29 +100,40 @@ export const routers: IRouter[] = [
     name: 'GetUser',
     path: '/user/:id',
     method: 'GET',
-    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      await next()
-      logger.info('USER ID: ', ctx.params.id)
-    }],
+    middleware: [],
     handler: async (ctx: Koa.Context) => {
-      const user = await getUser(ctx.params.id)
-      if (user) {
-        ctx.status = 200
-        ctx.body = {
-          message: 'User data',
-          data: user,
-          error: {},
+      try {
+        const user = await getUser(ctx.params.id)
+        if (user) {
+          ctx.status = 200
+          ctx.body = {
+            message: 'User data',
+            data: user,
+            error: {},
+          }
+        }
+        else {
+          ctx.status = 422
+          ctx.body = {
+            message: 'User ID Not Valid',
+            data: {},
+            error: {
+              kind: 'response',
+              type: 'string',
+              message: 'Invalid user id',
+            },
+          }
         }
       }
-      else {
-        ctx.status = 422
+      catch (error: any) {
+        ctx.status = 500
         ctx.body = {
-          message: 'User ID Not Valid',
+          message: 'Fetch user details failed',
           data: {},
           error: {
             kind: 'response',
             type: 'string',
-            message: 'Invalid user id',
+            message: error.message,
           },
         }
       }
@@ -106,10 +144,8 @@ export const routers: IRouter[] = [
     path: '/user/:id',
     method: 'PUT',
     middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      const payload = ctx.request.body
       const _id = ctx.params.id
-      const result = safeParse(UserSchema, { _id, ...payload })
-      if (result.success) {
+      try {
         const isValidUser = await getUser(_id)
         if (isValidUser) {
           await next()
@@ -123,12 +159,16 @@ export const routers: IRouter[] = [
           }
         }
       }
-      else {
-        ctx.status = 422
+      catch (error: any) {
+        ctx.status = 500
         ctx.body = {
-          message: 'User Data Invalid',
+          message: 'Fetch user details failed',
           data: {},
-          error: result.issues,
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error.message,
+          },
         }
       }
     }],
@@ -142,15 +182,15 @@ export const routers: IRouter[] = [
           error: {},
         }
       }
-      catch (error) {
-        ctx.status = 204
+      catch (error: any) {
+        ctx.status = 500
         ctx.body = {
           message: 'User updates failed',
           data: {},
           error: {
             kind: 'response',
             type: 'string',
-            message: error,
+            message: error.message,
           },
         }
       }
@@ -169,19 +209,33 @@ export const routers: IRouter[] = [
       else {
         ctx.status = 422
         ctx.body = {
-          message: 'User Data Invalid',
+          message: 'User Invalid',
           data: {},
           error: result.issues,
         }
       }
     }],
     handler: async (ctx: Koa.Context) => {
-      const payload = await setUser(ctx.request.body)
-      ctx.status = 200
-      ctx.body = {
-        message: 'User Data Stored',
-        data: payload,
-        error: {},
+      try {
+        const payload = await setUser(ctx.request.body)
+        ctx.status = 200
+        ctx.body = {
+          message: 'User stored successfully',
+          data: payload,
+          error: {},
+        }
+      }
+      catch (error: any) {
+        ctx.status = 500
+        ctx.body = {
+          message: 'User stored failed',
+          data: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error.message,
+          },
+        }
       }
     },
   },
@@ -190,16 +244,30 @@ export const routers: IRouter[] = [
     path: '/user/:id',
     method: 'DELETE',
     middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      const isValidUser = await getUser(ctx.params.id)
-      if (isValidUser) {
-        await next()
+      try {
+        const isValidUser = await getUser(ctx.params.id)
+        if (isValidUser) {
+          await next()
+        }
+        else {
+          ctx.status = 401
+          ctx.body = {
+            message: 'User Invalid',
+            data: {},
+            error: {},
+          }
+        }
       }
-      else {
-        ctx.status = 401
+      catch (error: any) {
+        ctx.status = 500
         ctx.body = {
-          message: 'User Invalid',
+          message: 'Fetch user details failed',
           data: {},
-          error: {},
+          error: {
+            kind: 'response',
+            type: 'string',
+            message: error.message,
+          },
         }
       }
     }],
@@ -208,20 +276,20 @@ export const routers: IRouter[] = [
         const user = await deleteUser(ctx.params.id)
         ctx.status = 200
         ctx.body = {
-          message: 'User deleted successfully',
+          message: 'User delete successfully',
           data: user,
           error: {},
         }
       }
-      catch (error) {
-        ctx.status = 204
+      catch (error: any) {
+        ctx.status = 500
         ctx.body = {
-          message: 'User updates failed',
+          message: 'User delete failed',
           data: {},
           error: {
             kind: 'response',
             type: 'string',
-            message: error,
+            message: error.message,
           },
         }
       }

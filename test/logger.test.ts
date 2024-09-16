@@ -2,7 +2,7 @@ import consola from 'consola'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import logger from '../src/logger'
 
-describe('❯ Validate logger', () => {
+describe('⬢ Validate logger', () => {
   const infoSpy = vi.spyOn(logger, 'info').mockImplementation(() => {})
   const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
 

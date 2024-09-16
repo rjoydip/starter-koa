@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { defineConfig } from '../src/config'
 
-describe('❯ Validate config', () => {
+describe('⬢ Validate config', () => {
   it('● should validated config', async () => {
     const config = defineConfig({
       server: {

@@ -3,7 +3,7 @@ import type { EnvObject, RuntimeName } from 'std-env'
 import type { IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
 import { describe, expectTypeOf, it } from 'vitest'
 
-describe('❯ Validate types', () => {
+describe('⬢ Validate types', () => {
   it('● should validated types', async () => {
     expectTypeOf<Services>().toMatchTypeOf<'db' | 'redis'>()
     expectTypeOf<User>().toMatchTypeOf<{ _id: string, name: string, email: string, phone: string, address: string }>()

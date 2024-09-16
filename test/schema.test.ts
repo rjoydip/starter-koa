@@ -2,7 +2,7 @@ import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
 import { UserSchema } from '../src/schema'
 
-describe('❯ Validate schema', () => {
+describe('⬢ Validate schema', () => {
   const playload = {
     _id: 'x',
     name: 'test user',

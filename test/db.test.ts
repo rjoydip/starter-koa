@@ -1,6 +1,6 @@
 import type { User } from '../src/types'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { dbClose, dbDown, dbUP, getUser, getUsers, isDBUp, setUser } from '../src/db'
+import { dbDown, getUser, getUsers, initDB, isDBUp, setUser } from '../src/db'
 
 const user: User = {
   _id: '',
@@ -10,19 +10,17 @@ const user: User = {
   address: '123 Main St',
 }
 
-describe('❯ Validate db', () => {
+describe('⬢ Validate db', () => {
   beforeAll(async () => {
-    await dbUP()
+    await initDB()
   })
 
   afterAll(async () => {
     await dbDown()
-    await dbClose()
   })
 
   it('● should check if the database is up', async () => {
-    const result = await isDBUp()
-    expect(result).toBeDefined()
+    expect(await isDBUp()).toBeTruthy()
   })
 
   it('● should insert and retrieve a user', async () => {
