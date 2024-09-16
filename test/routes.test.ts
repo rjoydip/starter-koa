@@ -1,3 +1,4 @@
+import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import app from '../src/app'
@@ -326,7 +327,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: '',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router name must be a non-empty string')
@@ -335,7 +336,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: () => Promise.resolve(),
       })).toThrow('Router path must be a non-empty string')
@@ -353,7 +354,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: null as any,
         handler: () => Promise.resolve(),
       })).toThrow('Router middleware must be an array')
@@ -362,7 +363,7 @@ describe('⬢ Validate routes', () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/',
-        method: 'GET',
+        method: HttpMethodEnum.GET,
         middleware: [],
         handler: null as any,
       })).toThrow('Router handler must be a function')

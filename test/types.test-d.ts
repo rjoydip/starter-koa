@@ -11,7 +11,7 @@ describe('⬢ Validate types', () => {
   })
 
   it('● should validated interfaces', () => {
-    expectTypeOf({ method: ['GET'], path: '/', regexp: /^(\?:\/)(?:\/\$)?$/ }).toMatchTypeOf<IRegisteredRoutes>()
+    expectTypeOf({ method: [HttpMethodEnum.GET], path: '/', regexp: /^(\?:\/)(?:\/\$)?$/ }).toMatchTypeOf<IRegisteredRoutes>()
 
     expectTypeOf({
       id: 'x',
