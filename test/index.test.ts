@@ -4,9 +4,9 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { startServer } from '../src'
 import logger from '../src/logger'
 
-let server: Server
-
 describe('⬢ Validate server', () => {
+  let server: Server
+
   beforeAll(async () => {
     server = await startServer()
   })
@@ -22,6 +22,8 @@ describe('⬢ Validate server', () => {
       message: 'Index',
       data: {},
       error: {},
+      status: 'success',
+      status_code: 200,
     })
   })
 

@@ -8,6 +8,7 @@ export default defineConfig({
   server: {
     port: Number(PORT),
     host: HOST,
+    isHTTPs: false,
   },
   app: {
     env,

@@ -1,8 +1,9 @@
 import type Router from 'koa-router'
-import type { IRegisteredRoutes } from './types'
+import type { BuildResponse, IRegisteredRoutes } from './types'
 import process from 'node:process'
 import * as Sentry from '@sentry/node'
 import invariant from 'tiny-invariant'
+import { ERROR_MESSAGE } from './constants'
 import logger from './logger'
 
 export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
@@ -42,4 +43,59 @@ export function isProduction(): boolean {
 
 export function environment(): string {
   return process.env.NODE_ENV || 'development'
+}
+
+function buildResponse({
+  status,
+  status_code,
+  message,
+  data = {},
+  error,
+  meta = null,
+}: BuildResponse): BuildResponse {
+  const response: BuildResponse = {
+    status: status || 'success',
+    status_code: status_code || 200,
+    message: message || 'Request successful',
+    data,
+  }
+
+  if (error) {
+    response.status = 'failure'
+    response.message = message || 'Request failed'
+    response.status_code = status_code ?? 500
+    response.data = {}
+    response.error = {
+      code: error.code || ERROR_MESSAGE.INTERNAL_ERROR,
+      type: error.type || ERROR_MESSAGE.RESPONSE_ERROR,
+      message: error.message || 'An error occurred',
+    }
+  }
+  else {
+    response.error = {}
+  }
+
+  if (meta) {
+    response.meta = meta
+  }
+
+  return response
+}
+
+export function successResponse({
+  data,
+  status_code,
+  message,
+  meta,
+}: BuildResponse): BuildResponse {
+  return buildResponse({ message, status_code, data, meta })
+}
+
+export function errorResponse({
+  error,
+  status_code,
+  message,
+  meta,
+}: BuildResponse): BuildResponse {
+  return buildResponse({ message, status_code, error, meta })
 }

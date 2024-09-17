@@ -1,4 +1,6 @@
 import type { Server } from 'node:http'
+import http from 'node:http'
+import https from 'node:https'
 import process, { env } from 'node:process'
 import { setTimeout } from 'node:timers/promises'
 import * as Sentry from '@sentry/node'
@@ -12,7 +14,13 @@ import { captureException, environment, isTest } from './utils'
 
 export async function startServer(): Promise<Server> {
   const port = config?.server?.port || 3000
-  const server = app.listen(port, () => {
+  const isHTTPs = config?.server?.isHTTPs || false
+  /* v8 ignore start */
+  const serverInstace = isHTTPs
+    ? https.createServer(app.callback())
+    : http.createServer(app.callback())
+  /* v8 ignore stop */
+  const server = serverInstace.listen(port, () => {
     logger.ready(`Server running on port ${port}`)
   })
   return server
@@ -43,7 +51,7 @@ process.on('SIGTERM', shutdownGracefully)
 process.on('SIGINT', shutdownGracefully)
 
 /* v8 ignore start */
-;(async () => {
+; (async () => {
   try {
     Sentry.init({
       dsn: env.SENTRY_DNS,
@@ -62,4 +70,4 @@ process.on('SIGINT', shutdownGracefully)
     logger.error('Error starting server', error)
   }
 })()
-/* v8 ignore start */
+/* v8 ignore stop */
