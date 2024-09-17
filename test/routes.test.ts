@@ -46,6 +46,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
         message: 'Index',
+        status: 'success',
+        status_code: 200,
         data: {},
         error: {},
       })
@@ -59,6 +61,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toEqual({
         message: 'Status',
+        status: 'success',
+        status_code: 200,
         data: {
           status: 'up',
         },
@@ -85,6 +89,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toEqual({
         message: 'Health',
+        status: 'success',
+        status_code: 200,
         data: {
           db: true,
           redis: false,
@@ -117,7 +123,33 @@ describe('⬢ Validate routes', () => {
 
     let _id: string
 
-    it.sequential('● POST /user', async () => {
+    it('● PUT /user:/:wrong-id', async () => {
+      const { headers, status, body } = await request(app.callback())
+        .put('/user/wrong-id')
+        .send({
+          _id: 'xxxx',
+          name: 'Benedicte Smans',
+          email: 'BenedicteSmans1@armyspy.com',
+          address: 'Skolspåret 81, 533 18  LUNDSBRUNN',
+          phone: '+(46)0511-7158851',
+        })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(422)
+      expect(body).toStrictEqual({
+        message: 'User Invalid',
+        data: {},
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'User Invalid',
+          type: 'AUTH_ERROR',
+        },
+        status: 'failure',
+        status_code: 422,
+      })
+    })
+
+    it('● POST /user', async () => {
       const validResponse = await request(app.callback())
         .post('/user')
         .send({
@@ -130,7 +162,7 @@ describe('⬢ Validate routes', () => {
       expect(validResponse.headers['content-type']).toMatch(/json/)
       expect(validResponse.status).toEqual(200)
       expect(validResponse.body.data).toBeDefined()
-      expect(Object.keys(validResponse.body)).toStrictEqual(['message', 'data', 'error'])
+      expect(Object.keys(validResponse.body)).toStrictEqual(['status', 'status_code', 'message', 'data', 'error'])
       expect(Object.keys(validResponse.body.data)).toStrictEqual(['_id', 'name', 'email', 'phone', 'address'])
 
       _id = validResponse.body.data._id
@@ -146,8 +178,12 @@ describe('⬢ Validate routes', () => {
         .set('Accept', 'application/json')
       expect(invalidResponse.headers['content-type']).toMatch(/json/)
       expect(invalidResponse.status).toEqual(422)
-      expect(invalidResponse.body.error.length).toBe(1)
-      expect(invalidResponse.body.error[0].input).toStrictEqual('Test')
+      expect(invalidResponse.body.error).toBeDefined()
+      expect(invalidResponse.body.error).toStrictEqual({
+        code: 'INTERNAL_ERROR',
+        message: 'User Invalid',
+        type: 'USER_DATA_ERROR',
+      })
     })
 
     it.sequential('● GET /user:/:id', async () => {
@@ -178,26 +214,6 @@ describe('⬢ Validate routes', () => {
       expect(body.data.phone).toStrictEqual('+(46)0511-7158851')
     })
 
-    it('● PUT /user:/:wrong-id', async () => {
-      const { headers, status, body } = await request(app.callback())
-        .put('/user/wrong-id')
-        .send({
-          _id: 'xxxx',
-          name: 'Benedicte Smans',
-          email: 'BenedicteSmans1@armyspy.com',
-          address: 'Skolspåret 81, 533 18  LUNDSBRUNN',
-          phone: '+(46)0511-7158851',
-        })
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(401)
-      expect(body).toStrictEqual({
-        message: 'User Invalid',
-        data: {},
-        error: {},
-      })
-    })
-
     it.sequential('● PUT /user:/:throw', async () => {
       const { headers, status, body } = await request(app.callback())
         .put(`/user/${_id}`)
@@ -212,11 +228,13 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
       expect(headers['content-type']).toMatch(/json/)
       expect(body).toStrictEqual({
-        message: 'User updates failed',
+        message: 'User details updates failed',
+        status: 'failure',
+        status_code: 500,
         data: {},
         error: {
-          kind: 'response',
-          type: 'string',
+          code: 'INTERNAL_ERROR',
+          type: 'DB_ERROR',
           message: 'value too long for type character varying(30)',
         },
       })
@@ -248,9 +266,9 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(422)
       expect(body.data).toStrictEqual({})
       expect(body.error).toStrictEqual({
-        kind: 'response',
-        type: 'string',
-        message: 'Invalid user id',
+        code: 'INTERNAL_ERROR',
+        message: 'User Invalid',
+        type: 'AUTH_ERROR',
       })
     })
 
@@ -259,7 +277,7 @@ describe('⬢ Validate routes', () => {
         .delete('/user/wrong-id')
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)
-      expect(deleteUserResponse.status).toEqual(401)
+      expect(deleteUserResponse.status).toEqual(422)
     })
 
     describe('⬢ Validate users when table non-exists', () => {

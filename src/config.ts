@@ -7,6 +7,7 @@ export function defineConfig(config?: IConfig): IConfig {
     server: {
       host: 'localhost',
       port: 3000,
+      isHTTPs: false,
     },
     app: {
       env: {

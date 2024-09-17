@@ -2,8 +2,10 @@ import type Koa from 'koa'
 import type { IRouter } from './types'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
+import { ERROR_MESSAGE, HTTP_STATUS_CODE } from './constants'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import { UserSchema } from './schema'
+import { captureException, errorResponse, successResponse } from './utils'
 
 export const routers: IRouter[] = [
   {
@@ -12,12 +14,8 @@ export const routers: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      ctx.status = 200
-      ctx.body = {
-        message: 'Index',
-        data: {},
-        error: {},
-      }
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = successResponse({ message: 'Index', data: {} })
     },
   },
   {
@@ -26,14 +24,8 @@ export const routers: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
-      ctx.status = 200
-      ctx.body = {
-        message: 'Status',
-        data: {
-          status: 'up',
-        },
-        error: {},
-      }
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = successResponse({ message: 'Status', data: { status: 'up' } })
     },
   },
   {
@@ -43,15 +35,11 @@ export const routers: IRouter[] = [
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       const _isDBUp = await isDBUp()
-      ctx.status = 200
-      ctx.body = {
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = successResponse({
         message: 'Health',
-        data: {
-          db: !!_isDBUp,
-          redis: false,
-        },
-        error: {},
-      }
+        data: { db: !!_isDBUp, redis: false },
+      })
     },
   },
   {
@@ -62,24 +50,19 @@ export const routers: IRouter[] = [
     handler: async (ctx: Koa.Context) => {
       try {
         const users = await getUsers()
-        ctx.status = 200
-        ctx.body = {
-          message: 'All users',
-          data: users,
-          error: {},
-        }
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = successResponse({
+          message: 'Fetched all user details successfully',
+          data: users ?? [],
+        })
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'Fetch users details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'Fetched all users details failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     },
   },
@@ -92,37 +75,28 @@ export const routers: IRouter[] = [
       try {
         const user = await getUser(ctx.params.id)
         if (user) {
-          ctx.status = 200
-          ctx.body = {
-            message: 'User data',
+          ctx.status = HTTP_STATUS_CODE[200]
+          ctx.body = successResponse({
+            message: 'Fetched user details successfully',
             data: user,
-            error: {},
-          }
+          })
         }
         else {
-          ctx.status = 422
-          ctx.body = {
-            message: 'User ID Not Valid',
-            data: {},
-            error: {
-              kind: 'response',
-              type: 'string',
-              message: 'Invalid user id',
-            },
-          }
+          ctx.status = HTTP_STATUS_CODE[422]
+          ctx.body = errorResponse({
+            message: 'User Invalid',
+            status_code: HTTP_STATUS_CODE[422],
+            error: { type: ERROR_MESSAGE.AUTH_ERROR, message: 'User Invalid' },
+          })
         }
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'Fetch user details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'Fetched user details failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     },
   },
@@ -138,48 +112,40 @@ export const routers: IRouter[] = [
           await next()
         }
         else {
-          ctx.status = 401
-          ctx.body = {
+          ctx.status = HTTP_STATUS_CODE[422]
+          ctx.body = errorResponse({
             message: 'User Invalid',
-            data: {},
-            error: {},
-          }
+            status_code: HTTP_STATUS_CODE[422],
+            error: { type: ERROR_MESSAGE.AUTH_ERROR, message: 'User Invalid' },
+          })
+          captureException('User Invalid')
         }
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'Fetch user details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'Update user details failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
       try {
         const user = await updateUser(ctx.params.id, ctx.request.body)
-        ctx.status = 200
-        ctx.body = {
-          message: 'User updated successfully',
-          data: user,
-          error: {},
-        }
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = successResponse({
+          message: 'User details updates successfully',
+          data: user ?? [],
+        })
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'User updates failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'User details updates failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     },
   },
@@ -194,35 +160,30 @@ export const routers: IRouter[] = [
         await next()
       }
       else {
-        ctx.status = 422
-        ctx.body = {
+        ctx.status = HTTP_STATUS_CODE[422]
+        ctx.body = errorResponse({
           message: 'User Invalid',
-          data: {},
-          error: result.issues,
-        }
+          status_code: HTTP_STATUS_CODE[422],
+          error: { type: ERROR_MESSAGE.USER_DATA_ERROR, message: 'User Invalid' },
+        })
       }
     }],
     handler: async (ctx: Koa.Context) => {
       try {
         const payload = await setUser(ctx.request.body)
-        ctx.status = 200
-        ctx.body = {
-          message: 'User stored successfully',
-          data: payload,
-          error: {},
-        }
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = successResponse({
+          message: 'User details stored successfully',
+          data: payload ?? [],
+        })
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'User stored failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'User details stored failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     },
   },
@@ -237,48 +198,36 @@ export const routers: IRouter[] = [
           await next()
         }
         else {
-          ctx.status = 401
-          ctx.body = {
+          ctx.status = HTTP_STATUS_CODE[422]
+          ctx.body = errorResponse({
             message: 'User Invalid',
-            data: {},
-            error: {},
-          }
+            status_code: HTTP_STATUS_CODE[422],
+            error: { type: ERROR_MESSAGE.USER_DATA_ERROR, message: 'User Invalid' },
+          })
         }
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
           message: 'Fetch user details failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
       try {
         const user = await deleteUser(ctx.params.id)
-        ctx.status = 200
-        ctx.body = {
-          message: 'User delete successfully',
-          data: user,
-          error: {},
-        }
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = successResponse({ message: 'User delete successfully', data: user })
       }
       catch (error: any) {
-        ctx.status = 500
-        ctx.body = {
-          message: 'User delete failed',
-          data: {},
-          error: {
-            kind: 'response',
-            type: 'string',
-            message: error.message,
-          },
-        }
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = errorResponse({
+          message: 'User data deletetion failed',
+          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+        })
+        captureException(error)
       }
     },
   },

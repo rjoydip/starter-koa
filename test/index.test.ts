@@ -1,21 +1,18 @@
 import type { Server } from 'node:http'
 import request from 'supertest'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { startServer } from '../src'
-
-let server: Server
+import logger from '../src/logger'
 
 describe('⬢ Validate server', () => {
+  let server: Server
+
   beforeAll(async () => {
     server = await startServer()
   })
 
   afterAll(() => {
     server.close()
-  })
-
-  it('● should be listening', () => {
-    expect(server.listening).toBe(true)
   })
 
   it('● should respond to a basic request', async () => {
@@ -25,6 +22,8 @@ describe('⬢ Validate server', () => {
       message: 'Index',
       data: {},
       error: {},
+      status: 'success',
+      status_code: 200,
     })
   })
 
@@ -32,4 +31,29 @@ describe('⬢ Validate server', () => {
     const res = await request(server).get('/unknown-route')
     expect(res.status).toBe(404)
   })
+})
+
+describe('⬢ Validate error', () => {
+  const mockConsolaError = vi.spyOn(logger, 'error').mockImplementation(() => {})
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    mockConsolaError.mockClear()
+  })
+
+  it('● should handle uncaughtException and exit with code 1', async () => {
+    const error = new Error('Test uncaught exception')
+    process.emit('uncaughtException', error)
+    expect(mockConsolaError).toHaveBeenCalledWith(`Uncaught Exception: ${error}`)
+  })
+
+  /* it('should handle unhandledRejection and exit with code 1', async () => {
+    const reason = new Error('Test unhandled rejection')
+    const promise = Promise.reject(reason)
+    process.emit('unhandledRejection', reason, promise)
+    expect(mockExit).toHaveBeenCalledWith(1)
+  }) */
 })

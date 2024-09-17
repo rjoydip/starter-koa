@@ -20,6 +20,7 @@ export interface IConfig {
   server?: {
     host?: string
     port?: number
+    isHTTPs?: boolean
   }
   app?: {
     env?: EnvObject
@@ -38,4 +39,20 @@ export interface IRouter {
   method: HttpMethod
   middleware: Middleware[]
   handler: (ctx: Context, next: Next) => Promise<void>
+}
+export interface BuildResponse {
+  status?: string
+  status_code?: number
+  message?: string
+  data?: {
+    [x in string]: any
+  }
+  error?: {
+    code?: string | null
+    type?: string | null
+    message?: string | null
+  }
+  meta?: null | {
+    [x in string]: any
+  }
 }
