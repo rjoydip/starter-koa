@@ -1,4 +1,5 @@
 import type { IRouter } from './types'
+import * as Sentry from '@sentry/node'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
@@ -18,6 +19,7 @@ const app = new Koa({
   env: config.app?.env?.NODE_ENV,
 })
 const router = new Router()
+Sentry.setupKoaErrorHandler(app)
 
 /* External middleware - [START] */
 app.use(json({

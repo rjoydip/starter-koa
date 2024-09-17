@@ -11,12 +11,12 @@ describe('⬢ Validate schema', () => {
     address: 'test address',
   }
 
-  it('● should validated UserSchema for correct user details', async () => {
+  it('● should validated UserSchema for correct user details', () => {
     const result = safeParse(UserSchema, playload)
     expect(result.success).toBeTruthy()
   })
 
-  it('● should validated UserSchema for incorrect user public _id', async () => {
+  it('● should validated UserSchema for incorrect user public _id', () => {
     const result = safeParse(UserSchema, { ...playload, _id: null })
     expect(result.success).toBeFalsy()
     expect(result.issues?.length).toBeGreaterThan(0)
@@ -25,7 +25,7 @@ describe('⬢ Validate schema', () => {
     })
   })
 
-  it('● should validated UserSchema for incorrect user name', async () => {
+  it('● should validated UserSchema for incorrect user name', () => {
     const result = safeParse(UserSchema, { ...playload, name: 'test' })
     expect(result.success).toBeFalsy()
     expect(result.issues?.length).toBeGreaterThan(0)

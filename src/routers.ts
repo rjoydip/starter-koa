@@ -1,10 +1,10 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
-import * as Sentry from '@sentry/bun'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import { UserSchema } from './schema'
+import { captureException } from './utils'
 
 export const routers: IRouter[] = [
   {
@@ -81,7 +81,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     },
   },
@@ -125,7 +125,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     },
   },
@@ -160,7 +160,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
@@ -184,7 +184,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     },
   },
@@ -228,7 +228,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     },
   },
@@ -262,7 +262,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     }],
     handler: async (ctx: Koa.Context) => {
@@ -286,7 +286,7 @@ export const routers: IRouter[] = [
             message: error.message,
           },
         }
-        Sentry.captureException(error)
+        captureException(error)
       }
     },
   },
