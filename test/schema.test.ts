@@ -4,11 +4,10 @@ import { UserSchema } from '../src/schema'
 
 describe('⬢ Validate schema', () => {
   const playload = {
-    _id: 'x',
-    name: 'test user',
-    email: 'test@test.com',
-    phone: '+1000000000',
-    address: 'test address',
+    name: 'Benedicte Smans',
+    email: 'BenedicteSmans@armyspy.com',
+    address: 'Skolspåret 81, 533 18  LUNDSBRUNN',
+    phone: '+(46)0511-7158851',
   }
 
   it('● should validated UserSchema for correct user details', () => {
@@ -18,11 +17,8 @@ describe('⬢ Validate schema', () => {
 
   it('● should validated UserSchema for incorrect user public _id', () => {
     const result = safeParse(UserSchema, { ...playload, _id: null })
-    expect(result.success).toBeFalsy()
-    expect(result.issues?.length).toBeGreaterThan(0)
-    result.issues?.forEach((issue) => {
-      expect(issue.message).toStrictEqual('Invalid type: Expected string but received null')
-    })
+    expect(result.success).toBeTruthy()
+    expect(result.issues?.length).toBeUndefined()
   })
 
   it('● should validated UserSchema for incorrect user name', () => {

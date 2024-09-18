@@ -3,7 +3,7 @@ import type { BuildResponse, IRegisteredRoutes } from './types'
 import process from 'node:process'
 import * as Sentry from '@sentry/node'
 import invariant from 'tiny-invariant'
-import { ERROR_MESSAGE } from './constants'
+import { MESSAGE } from './constants'
 import logger from './logger'
 
 export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
@@ -66,8 +66,8 @@ function buildResponse({
     response.status_code = status_code ?? 500
     response.data = {}
     response.error = {
-      code: error.code || ERROR_MESSAGE.INTERNAL_ERROR,
-      type: error.type || ERROR_MESSAGE.RESPONSE_ERROR,
+      code: error.code || MESSAGE.INTERNAL_ERROR,
+      type: error.type || MESSAGE.RESPONSE_ERROR,
       message: error.message || 'An error occurred',
     }
   }

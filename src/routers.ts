@@ -2,10 +2,71 @@ import type Koa from 'koa'
 import type { IRouter } from './types'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
-import { ERROR_MESSAGE, HTTP_STATUS_CODE } from './constants'
+import { HTTP_STATUS_CODE, MESSAGE } from './constants'
 import { deleteUser, getUser, getUsers, isDBUp, setUser, updateUser } from './db'
 import { UserSchema } from './schema'
 import { captureException, errorResponse, successResponse } from './utils'
+
+export function requestValidatorMiddleware(schema: any) {
+  return async function (ctx: Koa.Context, next: Koa.Next): Promise<void> {
+    if (!ctx.request.body) {
+      ctx.status = HTTP_STATUS_CODE[422]
+      ctx.body = errorResponse({
+        message: 'Missing request data',
+        status_code: HTTP_STATUS_CODE[422],
+        error: { type: MESSAGE.MISSIG_REQUEST_DATA_ERROR, message: 'Missing request data' },
+      })
+    }
+    else {
+      const result = safeParse(schema, ctx.request.body)
+      if (result.success) {
+        await next()
+      }
+      else {
+        ctx.status = HTTP_STATUS_CODE[422]
+        ctx.body = errorResponse({
+          message: 'Missing request data',
+          status_code: HTTP_STATUS_CODE[422],
+          error: { type: MESSAGE.USER_DATA_ERROR, message: 'Missing request data' },
+        })
+      }
+    }
+  }
+}
+
+export function userValidatorMiddleware() {
+  return async function (ctx: Koa.Context, next: Koa.Next): Promise<void> {
+    try {
+      if (ctx.params.id) {
+        const user = await getUser(ctx.params.id)
+        if (user) {
+          ctx.state.user = user
+          await next()
+        }
+        else {
+          ctx.status = HTTP_STATUS_CODE[422]
+          ctx.body = errorResponse({
+            message: 'User Invalid',
+            status_code: HTTP_STATUS_CODE[422],
+            error: { type: MESSAGE.AUTH_ERROR, message: 'User Invalid' },
+          })
+          captureException('User Invalid')
+        }
+      }
+      else {
+        await next()
+      }
+    }
+    catch (error: any) {
+      ctx.status = HTTP_STATUS_CODE[500]
+      ctx.body = errorResponse({
+        message: 'Update user details failed',
+        error: { type: MESSAGE.DB_ERROR, message: error.message },
+      })
+      captureException(error)
+    }
+  }
+}
 
 export const routers: IRouter[] = [
   {
@@ -53,14 +114,14 @@ export const routers: IRouter[] = [
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = successResponse({
           message: 'Fetched all user details successfully',
-          data: users ?? [],
+          data: users,
         })
       }
       catch (error: any) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = errorResponse({
           message: 'Fetched all users details failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+          error: { type: MESSAGE.DB_ERROR, message: error.message },
         })
         captureException(error)
       }
@@ -70,31 +131,36 @@ export const routers: IRouter[] = [
     name: 'GetUser',
     path: '/user/:id',
     method: HttpMethodEnum.GET,
-    middleware: [],
+    middleware: [userValidatorMiddleware()],
+    handler: async (ctx: Koa.Context) => {
+      const user = ctx.state.user
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = successResponse({
+        message: 'Fetched user details successfully',
+        data: user,
+      })
+      ctx.state = undefined
+    },
+  },
+  {
+    name: 'PostUser',
+    path: '/user',
+    method: HttpMethodEnum.POST,
+    middleware: [requestValidatorMiddleware(UserSchema), userValidatorMiddleware()],
     handler: async (ctx: Koa.Context) => {
       try {
-        const user = await getUser(ctx.params.id)
-        if (user) {
-          ctx.status = HTTP_STATUS_CODE[200]
-          ctx.body = successResponse({
-            message: 'Fetched user details successfully',
-            data: user,
-          })
-        }
-        else {
-          ctx.status = HTTP_STATUS_CODE[422]
-          ctx.body = errorResponse({
-            message: 'User Invalid',
-            status_code: HTTP_STATUS_CODE[422],
-            error: { type: ERROR_MESSAGE.AUTH_ERROR, message: 'User Invalid' },
-          })
-        }
+        const payload = await setUser(ctx.request.body)
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = successResponse({
+          message: 'User details stored successfully',
+          data: payload,
+        })
       }
       catch (error: any) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = errorResponse({
-          message: 'Fetched user details failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+          message: 'User details stored failed',
+          error: { type: MESSAGE.DB_ERROR, message: error.message },
         })
         captureException(error)
       }
@@ -104,84 +170,21 @@ export const routers: IRouter[] = [
     name: 'PutUser',
     path: '/user/:id',
     method: HttpMethodEnum.PUT,
-    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      const _id = ctx.params.id
-      try {
-        const isValidUser = await getUser(_id)
-        if (isValidUser) {
-          await next()
-        }
-        else {
-          ctx.status = HTTP_STATUS_CODE[422]
-          ctx.body = errorResponse({
-            message: 'User Invalid',
-            status_code: HTTP_STATUS_CODE[422],
-            error: { type: ERROR_MESSAGE.AUTH_ERROR, message: 'User Invalid' },
-          })
-          captureException('User Invalid')
-        }
-      }
-      catch (error: any) {
-        ctx.status = HTTP_STATUS_CODE[500]
-        ctx.body = errorResponse({
-          message: 'Update user details failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
-        })
-        captureException(error)
-      }
-    }],
+    middleware: [requestValidatorMiddleware(UserSchema), userValidatorMiddleware()],
     handler: async (ctx: Koa.Context) => {
       try {
         const user = await updateUser(ctx.params.id, ctx.request.body)
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = successResponse({
           message: 'User details updates successfully',
-          data: user ?? [],
+          data: user,
         })
       }
       catch (error: any) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = errorResponse({
           message: 'User details updates failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
-        })
-        captureException(error)
-      }
-    },
-  },
-  {
-    name: 'PostUser',
-    path: '/user',
-    method: HttpMethodEnum.POST,
-    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      const payload = ctx.request.body
-      const result = safeParse(UserSchema, { _id: '', ...payload })
-      if (result.success) {
-        await next()
-      }
-      else {
-        ctx.status = HTTP_STATUS_CODE[422]
-        ctx.body = errorResponse({
-          message: 'User Invalid',
-          status_code: HTTP_STATUS_CODE[422],
-          error: { type: ERROR_MESSAGE.USER_DATA_ERROR, message: 'User Invalid' },
-        })
-      }
-    }],
-    handler: async (ctx: Koa.Context) => {
-      try {
-        const payload = await setUser(ctx.request.body)
-        ctx.status = HTTP_STATUS_CODE[200]
-        ctx.body = successResponse({
-          message: 'User details stored successfully',
-          data: payload ?? [],
-        })
-      }
-      catch (error: any) {
-        ctx.status = HTTP_STATUS_CODE[500]
-        ctx.body = errorResponse({
-          message: 'User details stored failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+          error: { type: MESSAGE.DB_ERROR, message: error.message },
         })
         captureException(error)
       }
@@ -191,30 +194,7 @@ export const routers: IRouter[] = [
     name: 'DeleteUser',
     path: '/user/:id',
     method: HttpMethodEnum.DELETE,
-    middleware: [async (ctx: Koa.Context, next: Koa.Next) => {
-      try {
-        const isValidUser = await getUser(ctx.params.id)
-        if (isValidUser) {
-          await next()
-        }
-        else {
-          ctx.status = HTTP_STATUS_CODE[422]
-          ctx.body = errorResponse({
-            message: 'User Invalid',
-            status_code: HTTP_STATUS_CODE[422],
-            error: { type: ERROR_MESSAGE.USER_DATA_ERROR, message: 'User Invalid' },
-          })
-        }
-      }
-      catch (error: any) {
-        ctx.status = HTTP_STATUS_CODE[500]
-        ctx.body = errorResponse({
-          message: 'Fetch user details failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
-        })
-        captureException(error)
-      }
-    }],
+    middleware: [userValidatorMiddleware()],
     handler: async (ctx: Koa.Context) => {
       try {
         const user = await deleteUser(ctx.params.id)
@@ -225,7 +205,7 @@ export const routers: IRouter[] = [
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = errorResponse({
           message: 'User data deletetion failed',
-          error: { type: ERROR_MESSAGE.DB_ERROR, message: error.message },
+          error: { type: MESSAGE.DB_ERROR, message: error.message },
         })
         captureException(error)
       }
