@@ -26,26 +26,21 @@ export async function startServer(): Promise<Server> {
   return server
 }
 
-async function shutdownGracefully(): Promise<void> {
+export async function shutdownGracefully(): Promise<void> {
   logger.log('Shutting down server...')
-  await setTimeout(10000, () => {
+  /* v8 ignore start */
+  await setTimeout(1000, () => {
     logger.error('Forcing shutdown after timeout')
     captureException('Shutting down server (Forcing shutdow)')
     !isTest() && process.exit(1)
   })
+  /* v8 ignore stop */
 }
 
 process.on('uncaughtException', async (error) => {
   logger.error(`Uncaught Exception: ${error}`)
   captureException(`Uncaught Exception: ${error}`)
-  !isTest() && process.exit(1)
 })
-
-/* process.on('unhandledRejection', async (reason, promise: Promise<unknown>) => {
-  logger.error(`Unhandled Rejection at: ${await promise.catch(e => e)} reason: ${reason}`)
-  captureException(`Unhandled Rejection at: ${await promise.catch(e => e)} reason: ${reason}`)
-  process.exit(1)
-}) */
 
 process.on('SIGTERM', shutdownGracefully)
 process.on('SIGINT', shutdownGracefully)
