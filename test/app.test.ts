@@ -47,19 +47,20 @@ describe('⬢ Validate app', () => {
         const res = await request.agent(app.callback())
           .host('192.168.0.5')
           .get('/')
-        expect(res.status).toBe(422)
+        expect(res.status).toBe(403)
       })
 
       it.skip('● should block access from blacklisted IP range', async () => {
+        app.proxy = true
         app.use((ctx, next) => {
-          ctx.request.ip = '8.8.8.2'
+          ctx.request.ip = '192.168.0.5'
           return next()
         })
         const res = await request.agent(app.callback())
           .host('192.168.0.5')
           .get('/')
-
-        expect(res.status).toBe(422)
+        expect(res.status).toBe(403)
+        expect(res.text).toBe('Forbidden!!!')
       })
     })
   })

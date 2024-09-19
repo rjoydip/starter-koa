@@ -1,11 +1,16 @@
 import type { User } from './types'
 import { PGlite } from '@electric-sql/pglite'
-import { v4 as secure } from '@lukeed/uuid/secure'
+import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp'
 
-const db = new PGlite()
+const db = new PGlite({
+  extensions: {
+    uuid_ossp,
+  },
+})
 
 async function tablesCreate(): Promise<void> {
   await db.exec(`
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";  
     CREATE TABLE IF NOT EXISTS healths (
       id SERIAL PRIMARY KEY,
       service TEXT,
@@ -13,10 +18,10 @@ async function tablesCreate(): Promise<void> {
     );
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
-      _id TEXT,
-      name VARCHAR(30),
-      email VARCHAR(200),
-      phone VARCHAR(20),
+      _id uuid DEFAULT uuid_generate_v4() NOT NULL,
+      name VARCHAR(30) NOT NULL,
+      email VARCHAR(200) NOT NULL,
+      phone VARCHAR(20) NOT NULL,
       address TEXT
     );
     INSERT INTO healths (service, up) VALUES ('db', true);
@@ -62,10 +67,9 @@ export async function getUsers(): Promise<User[]> {
 }
 
 export async function setUser(user: User): Promise<User | undefined> {
-  const _id = secure()
   return await db.transaction(async (tx) => {
-    await tx.query<User>(`INSERT INTO users (_id, name, email, phone, address) VALUES ($1, $2, $3, $4, $5)`, [_id, user.name, user.email, user.phone, user.address])
-    const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [_id])
+    const insert = await tx.query<User>(`INSERT INTO users (name, email, phone, address) VALUES ($1, $2, $3, $4) RETURNING _id`, [user.name, user.email, user.phone, user.address])
+    const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [insert.rows[0]._id])
     return rows[0]
   })
 }

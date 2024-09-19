@@ -1,13 +1,13 @@
 import type { Context, Next } from 'koa'
 import type { EnvObject, RuntimeName } from 'std-env'
-import type { IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
+import type { BuildResponse, IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
 import { HttpMethodEnum } from 'koa-body'
 import { describe, expectTypeOf, it } from 'vitest'
 
 describe('⬢ Validate types', () => {
   it('● should validated types', async () => {
     expectTypeOf<Services>().toMatchTypeOf<'db' | 'redis'>()
-    expectTypeOf<User>().toMatchTypeOf<{ _id: string, name: string, email: string, phone: string, address: string }>()
+    expectTypeOf<User>().toMatchTypeOf<{ name: string, email: string, phone: string, address: string }>()
   })
 
   it('● should validated interfaces', () => {
@@ -22,7 +22,7 @@ describe('⬢ Validate types', () => {
     expectTypeOf({
       server: {
         host: 'host',
-        port: 1111,
+        port: 0,
       },
       app: {
         env: {
@@ -30,13 +30,26 @@ describe('⬢ Validate types', () => {
         } as EnvObject,
         log_level: 3,
         services: ['db'] as Services[],
-        ratelimit: 100,
+        ratelimit: 0,
       },
       system: {
         platform: 'linux' as NodeJS.Platform,
         runtime: '' as RuntimeName,
       },
     }).toMatchTypeOf<IConfig>()
+
+    expectTypeOf<BuildResponse>({
+      status: 'success',
+      status_code: 200,
+      message: 'Request failed',
+      data: {},
+      error: {
+        code: 'INTERNAL_ERROR',
+        type: 'RESPONSE_ERROR',
+        message: 'An error occurred',
+      },
+      meta: {},
+    }).toMatchTypeOf()
 
     expectTypeOf({
       name: 'x',

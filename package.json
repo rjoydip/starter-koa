@@ -51,7 +51,6 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.14.1",
     "@electric-sql/pglite": "^0.2.7",
-    "@lukeed/uuid": "^2.0.1",
     "@sentry/node": "^8.30.0",
     "@sentry/profiling-node": "^8.30.0",
     "defu": "^6.1.4",

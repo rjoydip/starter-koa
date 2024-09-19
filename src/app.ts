@@ -1,3 +1,4 @@
+import type { Context } from 'koa'
 import type { IRouter } from './types'
 import * as Sentry from '@sentry/node'
 import Koa from 'koa'
@@ -31,8 +32,8 @@ app.use(koaBody())
 app.use(ip({
   whitelist: ['127.0.0.1'],
   blacklist: ['192.168.0.*', '8.8.8.[0-3]'],
-  handler: async (ctx: Koa.Context) => {
-    ctx.status = 422
+  handler: async (ctx: Context) => {
+    ctx.status = 403
     ctx.body = 'Forbidden!!!'
   },
 }))

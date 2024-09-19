@@ -1,26 +1,26 @@
 import { describe, expect, it } from 'vitest'
-import { ERROR_MESSAGE, HTTP_STATUS_CODE } from '../src/constants'
+import { HTTP_STATUS_CODE, MESSAGE } from '../src/constants'
 
 describe('⬢ Validate constants', () => {
-  describe('⬢ ERROR_MESSAGE constants', () => {
+  describe('⬢ MESSAGE constants', () => {
     it('● should have the correct AUTH_ERROR message', () => {
-      expect(ERROR_MESSAGE.AUTH_ERROR).toBe('AUTH_ERROR')
+      expect(MESSAGE.AUTH_ERROR).toBe('AUTH_ERROR')
     })
 
     it('● should have the correct DB_ERROR message', () => {
-      expect(ERROR_MESSAGE.DB_ERROR).toBe('DB_ERROR')
+      expect(MESSAGE.DB_ERROR).toBe('DB_ERROR')
     })
 
     it('● should have the correct RESPONSE_ERROR message', () => {
-      expect(ERROR_MESSAGE.RESPONSE_ERROR).toBe('RESPONSE_ERROR')
+      expect(MESSAGE.RESPONSE_ERROR).toBe('RESPONSE_ERROR')
     })
 
     it('● should have the correct INTERNAL_ERROR message', () => {
-      expect(ERROR_MESSAGE.INTERNAL_ERROR).toBe('INTERNAL_ERROR')
+      expect(MESSAGE.INTERNAL_ERROR).toBe('INTERNAL_ERROR')
     })
 
     it('● should have the correct USER_DATA_ERROR message', () => {
-      expect(ERROR_MESSAGE.USER_DATA_ERROR).toBe('USER_DATA_ERROR')
+      expect(MESSAGE.USER_DATA_ERROR).toBe('USER_DATA_ERROR')
     })
   })
 

@@ -1,7 +1,7 @@
-import { email, maxLength, minLength, object, pipe, regex, string } from 'valibot'
+import { email, maxLength, minLength, nullish, object, pipe, regex, string, uuid } from 'valibot'
 
 export const UserSchema = object({
-  _id: string(),
+  _id: nullish(pipe(string(), uuid())),
   name: pipe(string(), minLength(8)),
   email: pipe(string(), email()),
   phone: pipe(string(), regex(/^\+(?:[0-9-()/.]\s?){6,15}\d$/)),

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '../src/app'
-import { ERROR_MESSAGE } from '../src/constants'
+import { MESSAGE } from '../src/constants'
 import logger from '../src/logger'
 import { captureException, environment, errorResponse, getRegisteredRoutes, successResponse } from '../src/utils'
 
@@ -95,8 +95,8 @@ describe('⬢ Validate utils', () => {
 
     it('● should return an error response with default error message', () => {
       const error = {
-        code: ERROR_MESSAGE.AUTH_ERROR,
-        type: ERROR_MESSAGE.DB_ERROR,
+        code: MESSAGE.AUTH_ERROR,
+        type: MESSAGE.DB_ERROR,
         message: 'Database connection failed',
       }
 
@@ -108,8 +108,8 @@ describe('⬢ Validate utils', () => {
         message: 'Request failed',
         data: {},
         error: {
-          code: ERROR_MESSAGE.AUTH_ERROR,
-          type: ERROR_MESSAGE.DB_ERROR,
+          code: MESSAGE.AUTH_ERROR,
+          type: MESSAGE.DB_ERROR,
           message: 'Database connection failed',
         },
       })
@@ -117,8 +117,8 @@ describe('⬢ Validate utils', () => {
 
     it('● should return an error response with custom error message', () => {
       const error = {
-        code: ERROR_MESSAGE.DB_ERROR,
-        type: ERROR_MESSAGE.RESPONSE_ERROR,
+        code: MESSAGE.DB_ERROR,
+        type: MESSAGE.RESPONSE_ERROR,
         message: 'Database error occurred',
       }
 
@@ -130,8 +130,8 @@ describe('⬢ Validate utils', () => {
         message: 'Custom error message',
         data: {},
         error: {
-          code: ERROR_MESSAGE.DB_ERROR,
-          type: ERROR_MESSAGE.RESPONSE_ERROR,
+          code: MESSAGE.DB_ERROR,
+          type: MESSAGE.RESPONSE_ERROR,
           message: 'Database error occurred',
         },
       })
@@ -168,8 +168,8 @@ describe('⬢ Validate utils', () => {
         message: 'Request failed',
         data: {},
         error: {
-          code: ERROR_MESSAGE.INTERNAL_ERROR,
-          type: ERROR_MESSAGE.RESPONSE_ERROR,
+          code: MESSAGE.INTERNAL_ERROR,
+          type: MESSAGE.RESPONSE_ERROR,
           message: 'An error occurred',
         },
       })
