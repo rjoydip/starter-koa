@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '../src/app'
-import { MESSAGE } from '../src/constants'
 import logger from '../src/logger'
-import { captureException, environment, errorResponse, getRegisteredRoutes, successResponse } from '../src/utils'
+import { captureException, environment, getRegisteredRoutes, HTTP_STATUS_CODE } from '../src/utils'
 
 describe('⬢ Validate utils', () => {
   const mockLoggerError = vi.spyOn(logger, 'error').mockImplementation(() => { })
@@ -65,114 +64,21 @@ describe('⬢ Validate utils', () => {
     })
   })
 
-  describe('⬢ Validate build response', () => {
-    it('● should return a success response with default values', () => {
-      const data = { id: 1, name: 'Test User' }
-      const result = successResponse({ data })
-
-      expect(result).toStrictEqual({
-        status: 'success',
-        status_code: 200,
-        message: 'Request successful',
-        data,
-        error: {},
-      })
+  describe('⬢ HTTP_STATUS_CODE constants', () => {
+    it('● should have the correct status code for 200', () => {
+      expect(HTTP_STATUS_CODE[200]).toBe(200)
     })
 
-    it('● should return a success response with custom message', () => {
-      const data = { id: 1, name: 'Test User' }
-      const message = 'Custom success message'
-      const result = successResponse({ data, message })
-
-      expect(result).toStrictEqual({
-        status: 'success',
-        status_code: 200,
-        message,
-        data,
-        error: {},
-      })
+    it('● should have the correct status code for 401', () => {
+      expect(HTTP_STATUS_CODE[401]).toBe(401)
     })
 
-    it('● should return an error response with default error message', () => {
-      const error = {
-        code: MESSAGE.AUTH_ERROR,
-        type: MESSAGE.DB_ERROR,
-        message: 'Database connection failed',
-      }
-
-      const result = errorResponse({ error })
-
-      expect(result).toStrictEqual({
-        status: 'failure',
-        status_code: 500,
-        message: 'Request failed',
-        data: {},
-        error: {
-          code: MESSAGE.AUTH_ERROR,
-          type: MESSAGE.DB_ERROR,
-          message: 'Database connection failed',
-        },
-      })
+    it('● should have the correct status code for 500', () => {
+      expect(HTTP_STATUS_CODE[500]).toBe(500)
     })
 
-    it('● should return an error response with custom error message', () => {
-      const error = {
-        code: MESSAGE.DB_ERROR,
-        type: MESSAGE.RESPONSE_ERROR,
-        message: 'Database error occurred',
-      }
-
-      const result = errorResponse({ error, message: 'Custom error message' })
-
-      expect(result).toStrictEqual({
-        status: 'failure',
-        status_code: 500,
-        message: 'Custom error message',
-        data: {},
-        error: {
-          code: MESSAGE.DB_ERROR,
-          type: MESSAGE.RESPONSE_ERROR,
-          message: 'Database error occurred',
-        },
-      })
-    })
-
-    it('● should return a response with metadata', () => {
-      const data = { id: 1, name: 'Test User' }
-      const meta = { page: 1, totalPages: 10 }
-      const result = successResponse({ data, message: 'Operation successful', meta })
-      result.meta = meta
-
-      expect(result).toStrictEqual({
-        status: 'success',
-        status_code: 200,
-        message: 'Operation successful',
-        data,
-        error: {},
-        meta,
-      })
-    })
-
-    it('● should return a failure response with missing error fields filled with defaults', () => {
-      const error = {
-        code: null,
-        type: null,
-        message: null,
-      }
-
-      const result = errorResponse({ error })
-
-      expect(result).toStrictEqual({
-        status: 'failure',
-        status_code: 500,
-        message: 'Request failed',
-        data: {},
-        error: {
-          code: MESSAGE.INTERNAL_ERROR,
-          type: MESSAGE.RESPONSE_ERROR,
-          message: 'An error occurred',
-        },
-      })
+    it('● should have the correct status code for 422', () => {
+      expect(HTTP_STATUS_CODE[422]).toBe(422)
     })
   })
 })

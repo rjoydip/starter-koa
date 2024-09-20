@@ -10,6 +10,7 @@ import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
 import config from '../app.config'
 import logger from './logger'
+import { createError } from './message'
 import { routers } from './routers'
 import { getRegisteredRoutes } from './utils'
 
@@ -34,7 +35,7 @@ app.use(ip({
   blacklist: ['192.168.0.*', '8.8.8.[0-3]'],
   handler: async (ctx: Context) => {
     ctx.status = 403
-    ctx.body = 'Forbidden!!!'
+    ctx.body = createError({ status: 403, message: 'Forbidden!!!' })
   },
 }))
 app.use(ratelimit({
@@ -74,7 +75,7 @@ app.use(async (ctx, next) => {
 
   if (!hasMatchedRoutes) {
     ctx.status = 404
-    ctx.body = { message: 'Route Not Found' }
+    ctx.body = createError({ status: 404, message: 'Route Not Found' })
   }
   else {
     await next()
