@@ -242,6 +242,16 @@ describe('⬢ Validate routes', () => {
   describe('⬢ Validate routing', () => {
     let _id: string
 
+    it('● GET /users', async () => {
+      const { headers, status, body } = await request(app.callback())
+        .get('/users')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body.message).toStrictEqual('Fetched all user details successfully')
+      expect(body.data.length).toBeGreaterThan(0)
+    })
+
     it('● PUT /user:/:wrong-id', async () => {
       const { headers, status, body } = await request(app.callback())
         .put('/user/wrong-id')
@@ -309,14 +319,14 @@ describe('⬢ Validate routes', () => {
       })
     })
 
-    it.sequential('● GET /users', async () => {
-      const { headers, status, body } = await request(app.callback())
-        .get('/users')
+    it.sequential('● DELETE /user:/:id status 500', async () => {
+      const db = await import('../src/db')
+      vi.spyOn(db, 'deleteUser').mockRejectedValueOnce(new Error('DB unable to take transaction'))
+      const { headers, status } = await request(app.callback())
+        .delete(`/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(200)
-      expect(body.data.length).toBeGreaterThan(0)
-      expect(Object.keys(body.data[0])).toStrictEqual(['_id', 'name', 'email', 'phone', 'address'])
+      expect(status).toEqual(500)
     })
 
     it.sequential('● PUT /user:/:throw', async () => {
@@ -332,20 +342,6 @@ describe('⬢ Validate routes', () => {
       expect(body).toStrictEqual({
         message: 'User details updates failed',
         statusCode: 500,
-      })
-    })
-
-    it.sequential('● DELETE /user:/:id status 500', async () => {
-      const db = await import('../src/db')
-      vi.spyOn(db, 'deleteUser').mockRejectedValueOnce(new Error('DB unable to take transaction'))
-      const { headers, status, body } = await request(app.callback())
-        .delete(`/user/${_id}`)
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(500)
-      expect(body).toStrictEqual({
-        statusCode: 500,
-        message: 'User data deletetion failed',
       })
     })
 

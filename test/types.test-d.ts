@@ -1,6 +1,6 @@
 import type { Context, Next } from 'koa'
 import type { EnvObject, RuntimeName } from 'std-env'
-import type { SuccessPayload } from '../src/message'
+import type { IMessage } from '../src/message'
 import type { IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
 import { HttpMethodEnum } from 'koa-body'
 import { describe, expectTypeOf, it } from 'vitest'
@@ -39,12 +39,12 @@ describe('⬢ Validate types', () => {
       },
     }).toMatchTypeOf<IConfig>()
 
-    expectTypeOf<SuccessPayload>({
+    expectTypeOf<IMessage>({
       statusCode: 200,
       message: 'Request success',
       data: {},
     }).toMatchTypeOf()
-    expectTypeOf<SuccessPayload>({
+    expectTypeOf<IMessage>({
       status: 200,
       statusMessage: 'Request success',
       data: {},
