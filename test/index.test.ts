@@ -23,9 +23,7 @@ describe('⬢ Validate server', () => {
     expect(body).toStrictEqual({
       message: 'Index',
       data: {},
-      error: {},
-      status: 'success',
-      status_code: 200,
+      statusCode: 200,
     })
   })
 

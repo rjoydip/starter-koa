@@ -31,10 +31,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
         message: 'Index',
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         data: {},
-        error: {},
       })
     })
 
@@ -49,15 +47,8 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(422)
       expect(body).toStrictEqual({
-        status: 'failure',
-        status_code: 422,
+        statusCode: 422,
         message: 'Missing request data',
-        data: {},
-        error: {
-          code: 'INTERNAL_ERROR',
-          type: 'USER_DATA_ERROR',
-          message: 'Missing request data',
-        },
       })
     })
 
@@ -70,7 +61,7 @@ describe('⬢ Validate routes', () => {
       expect(requestOne.headers['content-type']).toMatch(/json/)
       expect(requestOne.status).toEqual(200)
       expect(requestOne.body.data).toBeDefined()
-      expect(Object.keys(requestOne.body)).toStrictEqual(['status', 'status_code', 'message', 'data', 'error'])
+      expect(Object.keys(requestOne.body)).toStrictEqual(['data', 'statusCode', 'message'])
       expect(Object.keys(requestOne.body.data)).toStrictEqual(['_id', 'name', 'email', 'phone', 'address'])
 
       const requestTwo = await request(app.callback())
@@ -79,15 +70,9 @@ describe('⬢ Validate routes', () => {
       expect(requestTwo.headers['content-type']).toMatch(/json/)
       expect(requestTwo.status).toBe(422)
       expect(requestTwo.body).toStrictEqual({
-        status: 'failure',
-        status_code: 422,
+        statusCode: 422,
         message: 'Missing request data',
         data: {},
-        error: {
-          code: 'INTERNAL_ERROR',
-          type: 'MISSIG_REQUEST_DATA_ERROR',
-          message: 'Missing request data',
-        },
       })
     })
 
@@ -99,11 +84,9 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(200)
       expect(body).toStrictEqual({
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         message: 'User details stored successfully',
         data: body.data,
-        error: {},
       })
     })
   })
@@ -207,10 +190,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
         message: 'Index',
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         data: {},
-        error: {},
       })
     })
 
@@ -222,12 +203,10 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toEqual({
         message: 'Status',
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         data: {
           status: 'up',
         },
-        error: {},
       })
     })
 
@@ -238,6 +217,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(404)
       expect(body).toEqual({
+        statusCode: 404,
         message: 'Route Not Found',
       })
     })
@@ -250,13 +230,11 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body).toEqual({
         message: 'Health',
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         data: {
           db: true,
           redis: false,
         },
-        error: {},
       })
     })
   })
@@ -273,14 +251,7 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
       expect(body).toStrictEqual({
         message: 'Update user details failed',
-        data: {},
-        error: {
-          code: 'INTERNAL_ERROR',
-          message: 'invalid input syntax for type uuid: \"wrong-id\"',
-          type: 'DB_ERROR',
-        },
-        status: 'failure',
-        status_code: 500,
+        statusCode: 500,
       })
     })
 
@@ -295,8 +266,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         message: 'User details stored successfully',
         data: {
           _id: expect.anything(),
@@ -305,7 +275,6 @@ describe('⬢ Validate routes', () => {
           phone: '+(46)0511-7158851',
           address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
         },
-        error: {},
       })
       _id = body.data._id
     })
@@ -328,8 +297,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         message: 'User details updates successfully',
         data: {
           _id: expect.anything(),
@@ -338,7 +306,6 @@ describe('⬢ Validate routes', () => {
           phone: '+(46)0511-7158851',
           address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
         },
-        error: {},
       })
     })
 
@@ -364,14 +331,7 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(body).toStrictEqual({
         message: 'User details updates failed',
-        status: 'failure',
-        status_code: 500,
-        data: {},
-        error: {
-          code: 'INTERNAL_ERROR',
-          type: 'DB_ERROR',
-          message: 'value too long for type character varying(30)',
-        },
+        statusCode: 500,
       })
     })
 
@@ -384,15 +344,8 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(500)
       expect(body).toStrictEqual({
-        status: 'failure',
-        status_code: 500,
+        statusCode: 500,
         message: 'User data deletetion failed',
-        data: {},
-        error: {
-          code: 'INTERNAL_ERROR',
-          type: 'DB_ERROR',
-          message: 'DB unable to take transaction',
-        },
       })
     })
 
@@ -403,11 +356,9 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        status: 'success',
-        status_code: 200,
+        statusCode: 200,
         message: 'User delete successfully',
-        data: {},
-        error: {},
+        data: expect.anything(),
       })
     })
 
@@ -417,11 +368,9 @@ describe('⬢ Validate routes', () => {
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(422)
-      expect(body.data).toStrictEqual({})
-      expect(body.error).toStrictEqual({
-        code: 'INTERNAL_ERROR',
+      expect(body).toStrictEqual({
+        statusCode: 422,
         message: 'User Invalid',
-        type: 'AUTH_ERROR',
       })
     })
 
