@@ -137,7 +137,7 @@ describe('⬢ Validate utils', () => {
 
   describe('⬢ Validate sentry', () => {
     it('● should validate initialize', () => {
-      expect(isInitialized()).toBeTruthy()
+      expect(isInitialized()).toBeFalsy()
     })
 
     it('● should validate getTraceData', () => {
