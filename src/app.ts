@@ -1,33 +1,27 @@
 import type { Context } from 'koa'
 import type { IRouter } from './types'
-import * as Sentry from '@sentry/node'
+import { setupKoaErrorHandler } from '@sentry/node'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
 import ip from 'koa-ip'
-import json from 'koa-json'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
 import config from '../app.config'
 import logger from './logger'
 import { createError } from './message'
 import { routers } from './routers'
-import { getRegisteredRoutes } from './utils'
+import { environment, getRegisteredRoutes } from './utils'
 
 // Aapplication instances
-const db = new Map()
 const app = new Koa({
   asyncLocalStorage: false,
-  env: config.app?.env?.NODE_ENV,
+  env: environment(),
 })
 const router = new Router()
-Sentry.setupKoaErrorHandler(app)
+setupKoaErrorHandler(app)
 
 /* External middleware - [START] */
-app.use(json({
-  pretty: true,
-  spaces: 2,
-}))
 app.use(helmet())
 app.use(koaBody())
 app.use(ip({
@@ -40,8 +34,8 @@ app.use(ip({
 }))
 app.use(ratelimit({
   driver: 'memory',
-  db,
-  duration: config?.app?.ratelimit,
+  db: new Map(),
+  duration: config?.duration,
   errorMessage: 'Sometimes You Just Have to Slow Down.',
   id: (ctx: Koa.Context) => ctx.ip,
   headers: {
@@ -49,7 +43,7 @@ app.use(ratelimit({
     reset: 'Rate-Limit-Reset',
     total: 'Rate-Limit-Total',
   },
-  max: 100,
+  max: config.ratelimit,
   disableHeader: false,
 }))
 /* External middleware - [END] */

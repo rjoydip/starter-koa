@@ -1,16 +1,28 @@
 import type { Server } from 'node:http'
+import consola from 'consola'
 import request from 'supertest'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { shutdownGracefully, startServer } from '../src'
 import logger from '../src/logger'
 
 describe('⬢ Validate server', () => {
   let server: Server
-  const mockConsolaLog = vi.spyOn(logger, 'log').mockImplementation(() => { })
+  let originalEnv: NodeJS.ProcessEnv
+  const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { })
 
   beforeAll(async () => {
     process.exit = vi.fn(() => 1 as never)
     server = await startServer()
+  })
+
+  beforeEach(() => {
+    consola.mockTypes(() => vi.fn())
+    originalEnv = { ...process.env }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
@@ -32,8 +44,9 @@ describe('⬢ Validate server', () => {
     expect(res.status).toBe(404)
   })
 
-  it('● should log shutdown and force exit after timeout', async () => {
-    await shutdownGracefully()
-    expect(mockConsolaLog).toHaveBeenCalledWith('Shutting down server...')
+  it('● should log shutdown for non-prod', async () => {
+    process.env.NODE_ENV = 'development'
+    expect(() => shutdownGracefully()).not.throw()
+    expect(errorSpy).toBeCalledTimes(0)
   })
 })

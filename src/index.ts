@@ -2,19 +2,17 @@ import type { Server } from 'node:http'
 import http from 'node:http'
 import https from 'node:https'
 import process, { env } from 'node:process'
-import { setTimeout } from 'node:timers/promises'
-import * as Sentry from '@sentry/node'
+import { init } from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
-import { isProduction } from 'std-env'
 import config from '../app.config'
 import { app } from './app'
 import { initDB } from './db'
 import logger from './logger'
-import { captureException, environment, isTest } from './utils'
+import { captureException, environment, isProd, isTest } from './utils'
 
 export async function startServer(): Promise<Server> {
-  const port = config?.server?.port || 3000
-  const isHTTPs = config?.server?.isHTTPs || false
+  const port = config?.port || 3000
+  const isHTTPs = config?.isHTTPs || false
   /* v8 ignore start */
   const serverInstace = isHTTPs
     ? https.createServer(app.callback())
@@ -26,20 +24,17 @@ export async function startServer(): Promise<Server> {
   return server
 }
 
-export async function shutdownGracefully(): Promise<void> {
-  logger.log('Shutting down server...')
+export function shutdownGracefully(): void {
   /* v8 ignore start */
-  await setTimeout(1000, () => {
-    logger.error('Forcing shutdown after timeout')
-    captureException('Shutting down server (Forcing shutdow)')
-    !isTest() && process.exit(1)
-  })
+  captureException('Shutting down server (Forcing shutdown)')
+  !isTest() && process.exit(1)
   /* v8 ignore stop */
 }
 
 process.on('uncaughtException', async (error) => {
-  logger.error(`Uncaught Exception: ${error}`)
   captureException(`Uncaught Exception: ${error}`)
+  captureException(`Uncaught Exception: ${error}`)
+  !isTest() && process.exit(1)
 })
 
 process.on('SIGTERM', shutdownGracefully)
@@ -48,10 +43,10 @@ process.on('SIGINT', shutdownGracefully)
 /* v8 ignore start */
 ; (async () => {
   try {
-    Sentry.init({
+    init({
       dsn: env.SENTRY_DNS,
       environment: environment(),
-      enabled: isProduction,
+      enabled: isProd(),
       integrations: [
         nodeProfilingIntegration(),
       ],
@@ -62,7 +57,7 @@ process.on('SIGINT', shutdownGracefully)
     await startServer()
   }
   catch (error: any) {
-    logger.error('Error starting server', error)
+    captureException(`Error starting server: ${error}`)
   }
 })()
 /* v8 ignore stop */
