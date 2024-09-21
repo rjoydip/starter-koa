@@ -1,7 +1,8 @@
 import type { Context, Next } from 'koa'
 import type { EnvObject, RuntimeName } from 'std-env'
+import type { IConfig } from '../src/config'
 import type { IMessage } from '../src/message'
-import type { IConfig, IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
+import type { IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
 import { HttpMethodEnum } from 'koa-body'
 import { describe, expectTypeOf, it } from 'vitest'
 
@@ -22,8 +23,9 @@ describe('⬢ Validate types', () => {
 
     expectTypeOf({
       server: {
-        host: 'host',
+        host: '127.0.0.1',
         port: 0,
+        isHTTPs: false,
       },
       app: {
         env: {
@@ -32,6 +34,7 @@ describe('⬢ Validate types', () => {
         log_level: 3,
         services: ['db'] as Services[],
         ratelimit: 0,
+        duration: 0,
       },
       system: {
         platform: 'linux' as NodeJS.Platform,

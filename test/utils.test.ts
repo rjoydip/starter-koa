@@ -1,9 +1,11 @@
+import { getTraceData, init, isInitialized, captureException as sentryCaptureException } from '@sentry/node'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '../src/app'
 import logger from '../src/logger'
-import { captureException, environment, getRegisteredRoutes, HTTP_STATUS_CODE } from '../src/utils'
+import { captureException, environment, getRegisteredRoutes, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
 
 describe('⬢ Validate utils', () => {
+  const MY_APP_DSN = 'http://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001'
   const mockLoggerError = vi.spyOn(logger, 'error').mockImplementation(() => { })
   let originalEnv: NodeJS.ProcessEnv
 
@@ -32,16 +34,42 @@ describe('⬢ Validate utils', () => {
     })
 
     it('● should validated captureException for non-prod', async () => {
-      expect(() => captureException('testing message')).not.throw()
+      expect(() => captureException('testing message')).not.toThrowError()
       expect(mockLoggerError).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('⬢ Validate utilities', () => {
+    it('● should validated invariant for prod', async () => {
+      process.env.NODE_ENV = 'production'
+      expect(() => invariant(false, 'production message')).toThrowError('Invariant failed')
+      expect(mockLoggerError).toHaveBeenCalledTimes(0)
+    })
+
+    it('● should validated invariant for no-prod', async () => {
+      process.env.NODE_ENV = 'development'
+      expect(() => invariant(true, 'development message')).not.throw()
+      expect(mockLoggerError).toHaveBeenCalledTimes(0)
+    })
+
     it('● should validated captureException for prod', async () => {
       process.env.NODE_ENV = 'production'
-      expect(() => captureException('production message')).toThrowError('Invariant failed: production message')
+      expect(() => captureException('production message')).toThrowError('Invariant failed')
+      expect(mockLoggerError).toBeCalledWith('production message')
       expect(mockLoggerError).toHaveBeenCalledTimes(1)
+    })
+
+    it('● should validated sentry exception ', async () => {
+      process.env.NODE_ENV = 'production'
+      expect(() => captureException('production message')).toThrowError('Invariant failed')
+      expect(mockLoggerError).toBeCalledWith('production message')
+      expect(mockLoggerError).toHaveBeenCalledTimes(1)
+    })
+
+    it('● should validated captureException for non-prod', async () => {
+      process.env.NODE_ENV = 'development'
+      expect(() => captureException('development message')).not.throw()
+      expect(mockLoggerError).toHaveBeenCalledTimes(0)
     })
 
     it('● should validated test environment', async () => {
@@ -62,9 +90,34 @@ describe('⬢ Validate utils', () => {
       delete process.env.NODE_ENV
       expect(environment()).toStrictEqual('development')
     })
+
+    it('● should validated isDev', async () => {
+      delete process.env.NODE_ENV
+      expect(isDev()).toBeTruthy()
+      process.env.NODE_ENV = 'development'
+      expect(isDev()).toBeTruthy()
+      process.env.NODE_ENV = 'dev'
+      expect(isDev()).toBeTruthy()
+    })
+
+    it('● should validated isTest', async () => {
+      expect(isTest()).toBeTruthy()
+      process.env.NODE_ENV = 'test'
+      expect(isTest()).toBeTruthy()
+      process.env.NODE_ENV = 'testing'
+      expect(isTest()).toBeTruthy()
+    })
+
+    it('● should validated isProd', async () => {
+      expect(isProd()).toBeFalsy()
+      process.env.NODE_ENV = 'production'
+      expect(isProd()).toBeTruthy()
+      process.env.NODE_ENV = 'prod'
+      expect(isProd()).toBeTruthy()
+    })
   })
 
-  describe('⬢ HTTP_STATUS_CODE constants', () => {
+  describe('⬢ Validate HTTP_STATUS_CODE constants', () => {
     it('● should have the correct status code for 200', () => {
       expect(HTTP_STATUS_CODE[200]).toBe(200)
     })
@@ -79,6 +132,27 @@ describe('⬢ Validate utils', () => {
 
     it('● should have the correct status code for 422', () => {
       expect(HTTP_STATUS_CODE[422]).toBe(422)
+    })
+  })
+
+  describe('⬢ Validate sentry', () => {
+    it('● should validate initialize', () => {
+      expect(isInitialized()).toBeTruthy()
+    })
+
+    it('● should validate getTraceData', () => {
+      process.env.NODE_ENV = 'test'
+      init({
+        dsn: MY_APP_DSN,
+        environment: environment(),
+      })
+      sentryCaptureException('oh no')
+      const traceData = getTraceData()
+      const traceDataSplitted = traceData.baggage?.split(',') ?? []
+      expect(traceData).toBeDefined()
+      expect(Object.keys(traceData)).toStrictEqual(['sentry-trace', 'baggage'])
+      expect(traceDataSplitted.length).toBeGreaterThan(0)
+      expect(traceDataSplitted[0]).toStrictEqual('sentry-environment=test')
     })
   })
 })

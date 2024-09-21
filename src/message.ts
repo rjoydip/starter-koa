@@ -1,12 +1,10 @@
-import { decodeUnicodeEscapes } from 'unicode-escapes'
-
 /**
  * Make sure the status message is safe to use in a response.
  *
  * Allowed characters: horizontal tabs, spaces or visible ascii characters: https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2
  */
 export function sanitizeStatusMessage(statusMessage = ''): string {
-  return decodeUnicodeEscapes(statusMessage)
+  return statusMessage.replaceAll(/\\u\{([\da-f]{1,6})\}|\\u([\da-f]{4})/gi, (_, p1, p2) => String.fromCodePoint(Number.parseInt(p1 ?? p2, 16)))
 }
 
 /**

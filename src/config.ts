@@ -1,25 +1,22 @@
-import type { IConfig, Services } from './types'
-import defu from 'defu'
-import { nodeENV, type RuntimeName } from 'std-env'
+import type { LogLevel } from 'consola'
+import type { RuntimeName } from 'std-env'
+import type { Services } from './types'
 
-export function defineConfig(config?: IConfig): IConfig {
-  return defu(config, {
-    server: {
-      host: 'localhost',
-      port: 3000,
-      isHTTPs: false,
-    },
-    app: {
-      env: {
-        NODE_ENV: nodeENV,
-      },
-      log_level: 3,
-      services: ['db', 'redis'] as Services[],
-      ratelimit: 60000,
-    },
-    system: {
-      platform: 'aix' as NodeJS.Platform,
-      runtime: 'bun' as RuntimeName,
-    },
-  })
+export interface IConfig {
+  host?: string
+  port?: number
+  isHTTPs?: boolean
+  log_level?: LogLevel
+  services?: Services[]
+  ratelimit?: number
+  duration?: number
+  enable_cache?: boolean
+  system: {
+    platform: NodeJS.Platform
+    runtime: RuntimeName
+  }
+}
+
+export function defineConfig(config: IConfig): IConfig {
+  return config
 }

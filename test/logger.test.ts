@@ -1,8 +1,10 @@
 import consola from 'consola'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import logger from '../src/logger'
+import { captureException } from '../src/utils'
 
 describe('⬢ Validate logger', () => {
+  let originalEnv: NodeJS.ProcessEnv
   const infoSpy = vi.spyOn(logger, 'info').mockImplementation(() => {})
   const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {})
 
@@ -12,21 +14,29 @@ describe('⬢ Validate logger', () => {
 
   beforeEach(() => {
     consola.mockTypes(() => vi.fn())
+    originalEnv = { ...process.env }
   })
 
   afterEach(() => {
+    process.env = originalEnv
     vi.clearAllMocks()
   })
 
   it('● should call consola.info with correct message', () => {
     const message = 'This is an info message'
-    logger.info(message)
+    expect(() => logger.info(message)).not.throw()
+    expect(infoSpy).toBeCalledTimes(1)
     expect(infoSpy).toHaveBeenCalledWith(message)
   })
 
   it('● should call consola.error with correct error message', () => {
-    const errorMessage = 'This is an error message'
-    logger.error(errorMessage)
-    expect(errorSpy).toHaveBeenCalledWith(errorMessage)
+    const errMsg = 'This is an error message'
+    process.env.NODE_ENV = 'production'
+    expect(() => captureException(errMsg)).toThrowError()
+
+    process.env.NODE_ENV = 'development'
+    expect(() => captureException(errMsg)).not.throw()
+    expect(errorSpy).toBeCalledTimes(1)
+    expect(errorSpy).toHaveBeenCalledWith(errMsg)
   })
 })

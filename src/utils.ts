@@ -1,9 +1,21 @@
 import type Router from 'koa-router'
 import type { IRegisteredRoutes } from './types'
 import process from 'node:process'
-import * as Sentry from '@sentry/node'
-import invariant from 'tiny-invariant'
+import { captureException as sentryCaptureException } from '@sentry/node'
 import logger from './logger'
+
+const prefix: string = 'Invariant failed'
+
+export function invariant(condition: boolean, message?: string | (() => string)): Error | undefined {
+  if (condition) {
+    return
+  }
+
+  const provided: string | undefined = typeof message === 'function' ? message() : message
+
+  const value: string = provided ? `${prefix}: ${provided}` : prefix
+  throw new Error(value)
+}
 
 export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
   return router.stack.map((layer) => {
@@ -16,28 +28,29 @@ export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
 
 export function captureException(errorMessage: Error | string): void {
   const errMsg = errorMessage instanceof Error ? errorMessage.message : errorMessage
-  if (isProduction()) {
-    invariant(false, () => {
-      Sentry.captureException(errMsg)
-      logger.error(errMsg)
-      return errMsg
-    })
-  }
-  else {
-    invariant(isDevelopment() || isTest(), errMsg)
-  }
+  const showError = !isProd() // false = show error
+  invariant(showError, () => {
+    logger.error(errMsg)
+    try {
+      sentryCaptureException(errMsg)
+    }
+    catch (e: unknown) {
+      logger.error(e)
+    }
+    return errMsg
+  })
 }
 
-export function isDevelopment(): boolean {
-  return environment() === 'development'
+export function isDev(): boolean {
+  return environment() === 'development' || environment() === 'dev'
 }
 
 export function isTest(): boolean {
-  return environment() === 'test'
+  return environment() === 'test' || environment() === 'testing'
 }
 
-export function isProduction(): boolean {
-  return environment() === 'production'
+export function isProd(): boolean {
+  return environment() === 'production' || environment() === 'prod'
 }
 
 export function environment(): string {

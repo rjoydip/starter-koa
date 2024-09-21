@@ -1,59 +1,44 @@
+import type { IConfig } from '../src/config'
 import { describe, expect, it } from 'vitest'
 import { defineConfig } from '../src/config'
 
 describe('⬢ Validate config', () => {
+  const defaultConfig: IConfig = {
+    host: '127.0.0.1',
+    port: 8080,
+    log_level: 3,
+    services: ['db', 'redis'],
+    ratelimit: 100,
+    system: {
+      platform: 'aix',
+      runtime: 'bun',
+    },
+    isHTTPs: false,
+    duration: 0,
+    enable_cache: false,
+  }
   it('● should validated config', async () => {
-    const config = defineConfig({
-      server: {
-        host: 'xxxxx',
-        port: 1111,
-      },
-      app: {
-        env: {
-          NODE_ENV: 'test',
-        },
-        log_level: 3,
-        services: ['db'],
-        ratelimit: 1111111,
-      },
-      system: {
-        platform: 'aix',
-        runtime: 'bun',
-      },
-    })
-    expect(config?.server?.host).toStrictEqual('xxxxx')
-    expect(config?.server?.port).toStrictEqual(1111)
-    expect(config?.app?.env).toStrictEqual({ NODE_ENV: 'test' })
-    expect(config?.app?.log_level).toStrictEqual(3)
-    expect([...new Set(config?.app?.services)]).toStrictEqual(['db', 'redis'])
-    expect(config?.app?.ratelimit).toStrictEqual(1111111)
-    expect(config?.system?.platform).toStrictEqual('aix')
-    expect(config?.system?.runtime).toStrictEqual('bun')
-  })
-  it('● should validated default config', async () => {
-    const config = defineConfig()
-    expect(config?.server?.host).toStrictEqual('localhost')
-    expect(config?.server?.port).toStrictEqual(3000)
-    expect(config?.app?.env).toStrictEqual({ NODE_ENV: 'test' })
-    expect(config?.app?.log_level).toStrictEqual(3)
-    expect(config?.app?.services).toStrictEqual(['db', 'redis'])
-    expect(config?.app?.ratelimit).toStrictEqual(60000)
+    const config = defineConfig(defaultConfig)
+    expect(config?.host).toStrictEqual('127.0.0.1')
+    expect(config?.port).toStrictEqual(8080)
+    expect(config?.log_level).toStrictEqual(3)
+    expect([...new Set(config?.services)]).toStrictEqual(['db', 'redis'])
+    expect(config?.ratelimit).toStrictEqual(100)
     expect(config?.system?.platform).toStrictEqual('aix')
     expect(config?.system?.runtime).toStrictEqual('bun')
   })
 
   it('● should validated overwrite config value', async () => {
     const config = defineConfig({
-      server: {
-        port: 1000,
-      },
+      ...defaultConfig,
+      port: 1000,
+      ratelimit: 100,
     })
-    expect(config?.server?.host).toStrictEqual('localhost')
-    expect(config?.server?.port).toStrictEqual(1000)
-    expect(config?.app?.env).toStrictEqual({ NODE_ENV: 'test' })
-    expect(config?.app?.log_level).toStrictEqual(3)
-    expect(config?.app?.services).toStrictEqual(['db', 'redis'])
-    expect(config?.app?.ratelimit).toStrictEqual(60000)
+    expect(config?.host).toStrictEqual('127.0.0.1')
+    expect(config?.port).toStrictEqual(1000)
+    expect(config?.log_level).toStrictEqual(3)
+    expect(config?.services).toStrictEqual(['db', 'redis'])
+    expect(config?.ratelimit).toStrictEqual(100)
     expect(config?.system?.platform).toStrictEqual('aix')
     expect(config?.system?.runtime).toStrictEqual('bun')
   })
