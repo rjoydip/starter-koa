@@ -12,8 +12,7 @@ describe('⬢ Validate app', () => {
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual({
-          message: 'Index',
-          data: {},
+          message: 'Welcome to Koa Starter',
           statusCode: 200,
         })
       })
@@ -25,8 +24,7 @@ describe('⬢ Validate app', () => {
 
         expect(res.status).toBe(200)
         expect(res.body).toStrictEqual({
-          message: 'Index',
-          data: {},
+          message: 'Welcome to Koa Starter',
           statusCode: 200,
         })
       })
@@ -40,9 +38,9 @@ describe('⬢ Validate app', () => {
           ctx.req.headers.host = '192.168.0.5'
           return next()
         })
-        const res = await request.agent(app.callback())
-          .host('192.168.0.5')
+        const res = await request(app.callback())
           .get('/')
+          .set('Host', '192.168.0.5')
         expect(res.status).toBe(403)
       })
 

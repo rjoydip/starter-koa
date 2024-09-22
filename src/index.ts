@@ -1,50 +1,48 @@
 import type { Server } from 'node:http'
 import http from 'node:http'
 import https from 'node:https'
-import process, { env } from 'node:process'
 import { init } from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import closeWithGrace from 'close-with-grace'
 import config from '../app.config'
 import { app } from './app'
 import { initDB } from './db'
 import logger from './logger'
-import { captureException, environment, isProd, isTest } from './utils'
+import { captureException, environment, isProd } from './utils'
 
-export async function startServer(): Promise<Server> {
-  const port = config?.port || 3000
-  const isHTTPs = config?.isHTTPs || false
-  /* v8 ignore start */
-  const serverInstace = isHTTPs
+let server: Server
+
+export function startServer(): Server {
+  const port = config?.port
+  /* v8 ignore next 3 */
+  server = config?.isHTTPs
     ? https.createServer(app.callback())
     : http.createServer(app.callback())
-  /* v8 ignore stop */
-  const server = serverInstace.listen(port, () => {
-    logger.ready(`Server running on port ${port}`)
-  })
+  server.listen(port)
+  logger.ready(`Server running on port ${port}`)
   return server
 }
 
-export function shutdownGracefully(): void {
-  /* v8 ignore start */
-  captureException('Shutting down server (Forcing shutdown)')
-  !isTest() && process.exit(1)
-  /* v8 ignore stop */
+export function handleGracefulShutdown(): void {
+  closeWithGrace(
+    {
+      delay: config.graceful_delay,
+    },
+    async ({ err }) => {
+      logger.error(`[close-with-grace] ${err}`)
+      if (err) {
+        captureException(err)
+      }
+      server.close()
+    },
+  )
 }
-
-process.on('uncaughtException', async (error) => {
-  captureException(`Uncaught Exception: ${error}`)
-  captureException(`Uncaught Exception: ${error}`)
-  !isTest() && process.exit(1)
-})
-
-process.on('SIGTERM', shutdownGracefully)
-process.on('SIGINT', shutdownGracefully)
 
 /* v8 ignore start */
 ; (async () => {
   try {
     init({
-      dsn: env.SENTRY_DNS,
+      dsn: config.sentry_dsn,
       environment: environment(),
       enabled: isProd(),
       integrations: [
@@ -55,6 +53,7 @@ process.on('SIGINT', shutdownGracefully)
     })
     await initDB()
     await startServer()
+    handleGracefulShutdown()
   }
   catch (error: any) {
     captureException(`Error starting server: ${error}`)

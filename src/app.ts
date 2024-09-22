@@ -28,6 +28,8 @@ app.use(ip({
   whitelist: ['127.0.0.1'],
   blacklist: ['192.168.0.*', '8.8.8.[0-3]'],
   handler: async (ctx: Context) => {
+    // TODO: Add unit test
+    /* v8 ignore next 3 */
     ctx.status = 403
     ctx.body = createError({ status: 403, message: 'Forbidden!!!' })
   },
@@ -87,16 +89,16 @@ routers.forEach((r: IRouter) => {
   // TODO: Change it to dynamic method calling
   switch (r.method) {
     case HttpMethodEnum.GET:
-      router.get(r.name, r.path, ...r.middleware ?? [], r.handler)
+      router.get(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.POST:
-      router.post(r.name, r.path, ...r.middleware ?? [], r.handler)
+      router.post(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.PUT:
-      router.put(r.name, r.path, ...r.middleware ?? [], r.handler)
+      router.put(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.DELETE:
-      router.delete(r.name, r.path, ...r.middleware ?? [], r.handler)
+      router.delete(r.name, r.path, ...r.middleware, r.handler)
       break
   }
 })

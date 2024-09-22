@@ -30,9 +30,8 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        message: 'Index',
+        message: 'Welcome to Koa Starter',
         statusCode: 200,
-        data: {},
       })
     })
 
@@ -119,7 +118,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● should validated / route', async () => {
-      expect(validateRouter(getRouter('Index'))).toBeTruthy()
+      expect(validateRouter(getRouter('Welcome'))).toBeTruthy()
     })
 
     it('● should validated /status route', async () => {
@@ -189,9 +188,8 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toStrictEqual({
-        message: 'Index',
+        message: 'Welcome to Koa Starter',
         statusCode: 200,
-        data: {},
       })
     })
 

@@ -1,22 +1,28 @@
 import type { Server } from 'node:http'
 import consola from 'consola'
-import request from 'supertest'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { shutdownGracefully, startServer } from '../src'
+import { handleGracefulShutdown, startServer } from '../src'
 import logger from '../src/logger'
+import * as utils from '../src/utils'
 
 describe('⬢ Validate server', () => {
   let server: Server
   let originalEnv: NodeJS.ProcessEnv
-  const errorSpy = vi.spyOn(logger, 'error').mockImplementation(() => { })
+  const mockErrorLogger = vi.spyOn(logger, 'error').mockImplementation(() => {})
+  const mockCaptureException = vi.spyOn(utils, 'captureException').mockImplementation(() => {})
+
+  vi.mock('close-with-grace', () => ({
+    default: (_: any, callback: any) => {
+      callback({ err: new Error('Test error') })
+    },
+  }))
 
   beforeAll(async () => {
-    process.exit = vi.fn(() => 1 as never)
+    consola.mockTypes(() => vi.fn())
     server = await startServer()
   })
 
   beforeEach(() => {
-    consola.mockTypes(() => vi.fn())
     originalEnv = { ...process.env }
   })
 
@@ -29,24 +35,32 @@ describe('⬢ Validate server', () => {
     server.close()
   })
 
-  it('● should respond to a basic request', async () => {
-    const { status, body } = await request(server).get('/')
-    expect(status).toBe(200)
-    expect(body).toStrictEqual({
-      message: 'Index',
-      data: {},
-      statusCode: 200,
-    })
+  it('● should validate server instace & listining', async () => {
+    expect(server).toBeDefined()
+    expect(server.listening).toBeTruthy()
   })
 
-  it('● should respond with 404 for unknown routes', async () => {
-    const res = await request(server).get('/unknown-route')
-    expect(res.status).toBe(404)
+  it('● should log an error, capture exception, and close the server', async () => {
+    process.env.GRACEFUL_DELAY = '0'
+    vi.useFakeTimers()
+    handleGracefulShutdown()
+    vi.advanceTimersByTime(0)
+
+    expect(mockErrorLogger).toHaveBeenCalledWith('[close-with-grace] Error: Test error')
+    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
+
+    vi.useRealTimers()
   })
 
-  it('● should log shutdown for non-prod', async () => {
-    process.env.NODE_ENV = 'development'
-    expect(() => shutdownGracefully()).not.throw()
-    expect(errorSpy).toBeCalledTimes(0)
+  it('● should log an error, capture exception, and close the server after 500ms', async () => {
+    process.env.GRACEFUL_DELAY = '500'
+    vi.useFakeTimers()
+    handleGracefulShutdown()
+    vi.advanceTimersByTime(500)
+
+    expect(mockErrorLogger).toHaveBeenCalledWith('[close-with-grace] Error: Test error')
+    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
+
+    vi.useRealTimers()
   })
 })

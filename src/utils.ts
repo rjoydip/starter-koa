@@ -10,9 +10,7 @@ export function invariant(condition: boolean, message?: string | (() => string))
   if (condition) {
     return
   }
-
   const provided: string | undefined = typeof message === 'function' ? message() : message
-
   const value: string = provided ? `${prefix}: ${provided}` : prefix
   throw new Error(value)
 }
@@ -31,12 +29,7 @@ export function captureException(errorMessage: Error | string): void {
   const showError = !isProd() // false = show error
   invariant(showError, () => {
     logger.error(errMsg)
-    try {
-      sentryCaptureException(errMsg)
-    }
-    catch (e: unknown) {
-      logger.error(e)
-    }
+    sentryCaptureException(errMsg)
     return errMsg
   })
 }

@@ -19,101 +19,101 @@ describe('⬢ Validate utils', () => {
   })
 
   describe('⬢ Validate routes', () => {
-    it('● should validated regestered routes', async () => {
+    it('● should validated regestered routes', () => {
       const registeredRoutes = ['/', '/status', '/health', '/users', '/user/:id', '/user']
       const routes = getRegisteredRoutes(router)
       const paths = routes.map(i => i.path)
       expect([...new Set(paths)]).toStrictEqual(registeredRoutes)
     })
 
-    it('● should validated invalid regestered routes', async () => {
+    it('● should validated invalid regestered routes', () => {
       const registeredRoutes = ['/', '/health', '/users', '/user/:id', '/user']
       const routes = getRegisteredRoutes(router)
       const paths = routes.map(i => i.path)
       expect([...new Set(paths)]).not.equal(registeredRoutes)
     })
 
-    it('● should validated captureException for non-prod', async () => {
+    it('● should validated captureException for non-prod', () => {
       expect(() => captureException('testing message')).not.toThrowError()
       expect(mockLoggerError).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('⬢ Validate utilities', () => {
-    it('● should validated invariant for prod', async () => {
-      process.env.NODE_ENV = 'production'
-      expect(() => invariant(false, 'production message')).toThrowError('Invariant failed')
-      expect(mockLoggerError).toHaveBeenCalledTimes(0)
+    describe('⬢ Validate invariant', () => {
+      it('● should validated invariant for prod', () => {
+        expect(() => invariant(false, 'production message')).toThrowError('Invariant failed')
+        expect(() => invariant(false, undefined)).toThrowError('Invariant failed')
+        expect(mockLoggerError).toHaveBeenCalledTimes(0)
+      })
+
+      it('● should validated invariant for no-prod', () => {
+        expect(() => invariant(true, 'development message')).not.throw()
+        expect(mockLoggerError).toHaveBeenCalledTimes(0)
+      })
     })
 
-    it('● should validated invariant for no-prod', async () => {
-      process.env.NODE_ENV = 'development'
-      expect(() => invariant(true, 'development message')).not.throw()
-      expect(mockLoggerError).toHaveBeenCalledTimes(0)
+    describe('⬢ Validate captureException', () => {
+      it('● should validated captureException for prod', () => {
+        process.env.NODE_ENV = 'production'
+        expect(() => captureException('production message')).toThrowError('Invariant failed')
+        expect(mockLoggerError).toBeCalledWith('production message')
+        expect(mockLoggerError).toHaveBeenCalledTimes(1)
+      })
+
+      it('● should validated captureException for non-prod', () => {
+        process.env.NODE_ENV = 'development'
+        expect(() => captureException('development message')).not.throw()
+        expect(mockLoggerError).toHaveBeenCalledTimes(0)
+      })
     })
 
-    it('● should validated captureException for prod', async () => {
-      process.env.NODE_ENV = 'production'
-      expect(() => captureException('production message')).toThrowError('Invariant failed')
-      expect(mockLoggerError).toBeCalledWith('production message')
-      expect(mockLoggerError).toHaveBeenCalledTimes(1)
+    describe('⬢ Validate environment', () => {
+      it('● should validated test environment', () => {
+        expect(environment()).toStrictEqual('test')
+      })
+
+      it('● should validated production environment', () => {
+        process.env.NODE_ENV = 'production'
+        expect(environment()).toStrictEqual('production')
+      })
+
+      it('● should validated development environment', () => {
+        process.env.NODE_ENV = 'development'
+        expect(environment()).toStrictEqual('development')
+      })
+
+      it('● should validated deleted environment', () => {
+        delete process.env.NODE_ENV
+        expect(environment()).toStrictEqual('development')
+      })
     })
 
-    it('● should validated sentry exception ', async () => {
-      process.env.NODE_ENV = 'production'
-      expect(() => captureException('production message')).toThrowError('Invariant failed')
-      expect(mockLoggerError).toBeCalledWith('production message')
-      expect(mockLoggerError).toHaveBeenCalledTimes(1)
-    })
+    describe('⬢ Validate is*Env', () => {
+      it('● should validated isDev', () => {
+        delete process.env.NODE_ENV
+        expect(isDev()).toBeTruthy()
+        process.env.NODE_ENV = 'development'
+        expect(isDev()).toBeTruthy()
+        process.env.NODE_ENV = 'dev'
+        expect(isDev()).toBeTruthy()
+      })
 
-    it('● should validated captureException for non-prod', async () => {
-      process.env.NODE_ENV = 'development'
-      expect(() => captureException('development message')).not.throw()
-      expect(mockLoggerError).toHaveBeenCalledTimes(0)
-    })
+      it('● should validated isTest', () => {
+        expect(isTest()).toBeTruthy()
+        process.env.NODE_ENV = 'test'
+        expect(isTest()).toBeTruthy()
+        process.env.NODE_ENV = 'testing'
+        expect(isTest()).toBeTruthy()
+      })
 
-    it('● should validated test environment', async () => {
-      expect(environment()).toStrictEqual('test')
-    })
-
-    it('● should validated production environment', async () => {
-      process.env.NODE_ENV = 'production'
-      expect(environment()).toStrictEqual('production')
-    })
-
-    it('● should validated development environment', async () => {
-      process.env.NODE_ENV = 'development'
-      expect(environment()).toStrictEqual('development')
-    })
-
-    it('● should validated deleted environment', async () => {
-      delete process.env.NODE_ENV
-      expect(environment()).toStrictEqual('development')
-    })
-
-    it('● should validated isDev', async () => {
-      delete process.env.NODE_ENV
-      expect(isDev()).toBeTruthy()
-      process.env.NODE_ENV = 'development'
-      expect(isDev()).toBeTruthy()
-      process.env.NODE_ENV = 'dev'
-      expect(isDev()).toBeTruthy()
-    })
-
-    it('● should validated isTest', async () => {
-      expect(isTest()).toBeTruthy()
-      process.env.NODE_ENV = 'test'
-      expect(isTest()).toBeTruthy()
-      process.env.NODE_ENV = 'testing'
-      expect(isTest()).toBeTruthy()
-    })
-
-    it('● should validated isProd', async () => {
-      expect(isProd()).toBeFalsy()
-      process.env.NODE_ENV = 'production'
-      expect(isProd()).toBeTruthy()
-      process.env.NODE_ENV = 'prod'
-      expect(isProd()).toBeTruthy()
+      it('● should validated isProd', () => {
+        expect(isProd()).toBeFalsy()
+        process.env.NODE_ENV = 'production'
+        expect(isProd()).toBeTruthy()
+        process.env.NODE_ENV = 'prod'
+        expect(isProd()).toBeTruthy()
+      })
     })
   })
 
