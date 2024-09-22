@@ -1,5 +1,4 @@
 import type { Context, Next } from 'koa'
-import type { EnvObject, RuntimeName } from 'std-env'
 import type { IConfig } from '../src/config'
 import type { IMessage } from '../src/message'
 import type { IHealth, IRegisteredRoutes, IRouter, Services, User } from '../src/types'
@@ -22,24 +21,13 @@ describe('⬢ Validate types', () => {
     }).toMatchTypeOf<IHealth>()
 
     expectTypeOf({
-      server: {
-        host: '127.0.0.1',
-        port: 0,
-        isHTTPs: false,
-      },
-      app: {
-        env: {
-          foo: '',
-        } as EnvObject,
-        log_level: 3,
-        services: ['db'] as Services[],
-        ratelimit: 0,
-        duration: 0,
-      },
-      system: {
-        platform: 'linux' as NodeJS.Platform,
-        runtime: '' as RuntimeName,
-      },
+      host: '127.0.0.1',
+      port: 0,
+      isHTTPs: false,
+      log_level: 3,
+      services: ['db'] as Services[],
+      ratelimit: 0,
+      duration: 0,
     }).toMatchTypeOf<IConfig>()
 
     expectTypeOf<IMessage>({
