@@ -68,13 +68,13 @@ export function userValidatorMiddleware() {
 
 export const routers: IRouter[] = [
   {
-    name: 'Index',
+    name: 'Welcome',
     path: '/',
     method: HttpMethodEnum.GET,
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
-      ctx.body = createSuccess({ message: 'Index', data: {} })
+      ctx.body = createSuccess({ message: 'Welcome to Koa Starter' })
     },
   },
   {

@@ -4,8 +4,9 @@ import { createError, createSuccess, hasProp, sanitizeStatusCode, sanitizeStatus
 describe('⬢ Validate message', () => {
   describe('⬢ Validate sanitizeStatusMessage', () => {
     it('● should validate statusMessage', () => {
-      expect(sanitizeStatusMessage('Hello, \\u{e42}\\u{e25}\\u{e01}')).toStrictEqual('Hello, โลก')
-      expect(sanitizeStatusMessage('Hello')).toStrictEqual('Hello')
+      expect(sanitizeStatusMessage('&<>"\'')).toStrictEqual('&amp;&lt;&gt;&quot;&#39;')
+      expect(sanitizeStatusMessage('🦄 & 🐐')).toStrictEqual('🦄 &amp; 🐐')
+      expect(sanitizeStatusMessage('Hello <em>World</em>')).toStrictEqual('Hello &lt;em&gt;World&lt;/em&gt;')
     })
   })
 

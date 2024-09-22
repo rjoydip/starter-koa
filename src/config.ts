@@ -11,6 +11,8 @@ export interface IConfig {
   ratelimit?: number
   duration?: number
   enable_cache?: boolean
+  graceful_delay?: number
+  sentry_dsn?: string
   system: {
     platform: NodeJS.Platform
     runtime: RuntimeName
