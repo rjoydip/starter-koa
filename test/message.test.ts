@@ -92,6 +92,13 @@ describe('⬢ Validate message', () => {
 
       expect(
         createError({
+          message: new Error('Native Error').message,
+          data: {},
+        }).toJSON(),
+      ).toStrictEqual({ message: 'Native Error', data: {}, statusCode: 500 })
+
+      expect(
+        createError({
           statusMessage: new Error('Native Error').message,
         }).toJSON(),
       ).toStrictEqual({ message: 'Native Error', statusCode: 500 })

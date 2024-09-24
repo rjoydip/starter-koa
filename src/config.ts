@@ -1,5 +1,4 @@
 import type { LogLevel } from 'consola'
-import type { RuntimeName } from 'std-env'
 import type { Services } from './types'
 
 export interface IConfig {
@@ -13,10 +12,6 @@ export interface IConfig {
   enable_cache?: boolean
   graceful_delay?: number
   sentry_dsn?: string
-  system: {
-    platform: NodeJS.Platform
-    runtime: RuntimeName
-  }
 }
 
 export function defineConfig(config: IConfig): IConfig {
