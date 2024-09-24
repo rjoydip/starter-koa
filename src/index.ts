@@ -39,7 +39,7 @@ export function handleGracefulShutdown(): void {
 }
 
 /* v8 ignore start */
-; (async () => {
+async function main(): Promise<void> {
   try {
     init({
       dsn: config.sentry_dsn,
@@ -58,5 +58,7 @@ export function handleGracefulShutdown(): void {
   catch (error: any) {
     captureException(`Error starting server: ${error}`)
   }
-})()
+}
+
+main()
 /* v8 ignore stop */

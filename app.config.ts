@@ -8,7 +8,7 @@ const {
   ENABLE_HTTPS = false,
   PORT = 8080,
   HOST = '127.0.0.1',
-  RATE_LIMIT = 100,
+  RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
   SERVICES = ['db', 'redis'],
   ENABLE_CACHE = false,

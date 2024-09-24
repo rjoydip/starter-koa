@@ -19,10 +19,10 @@ const app = new Koa({
   asyncLocalStorage: false,
   env: environment(),
 })
+setupKoaErrorHandler(app)
 const whitelist = ['127.0.0.1']
 const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
 const router = new Router()
-setupKoaErrorHandler(app)
 
 /* External middleware - [START] */
 app.use(helmet())
@@ -47,23 +47,19 @@ app.use(ratelimit({
 app.use(async (ctx, next) => {
   const hostname = ctx.request.hostname
   let pass = true
-
   if (whitelist && Array.isArray(whitelist)) {
     pass = whitelist.some((item) => {
       return new RegExp(item).test(hostname)
     })
   }
-
   if (pass && blacklist && Array.isArray(blacklist)) {
     pass = !blacklist.some((item) => {
       return new RegExp(item).test(hostname)
     })
   }
-
   if (pass) {
     return await next()
   }
-
   ctx.throw(403)
   ctx.body = createSuccess({ message: 'Forbidden!!!' })
 })
@@ -79,13 +75,10 @@ app.use(async (ctx, next) => {
 // Middleware to check if the incoming URL matches custom routes
 app.use(async (ctx, next) => {
   const requestedUrl = ctx.request.path
-
   // Get all registered routes
   const registeredRoutes = getRegisteredRoutes(router)
-
   // Check if the requested URL matches any route regex pattern
   const hasMatchedRoutes = registeredRoutes.some(route => route.regexp.test(requestedUrl))
-
   if (!hasMatchedRoutes) {
     ctx.status = 404
     ctx.body = createError({ status: 404, message: 'Route Not Found' })
@@ -114,14 +107,17 @@ router
       data: { status: 'up' },
     })
   })
-  .get('/health', (ctx) => {
+  .get('/health', async (ctx) => {
+    // const data = await cacheInstance.health()
+    const _isDBUp = await isDBUp()
+    const data = {
+      db: _isDBUp,
+      redis: false,
+    }
     ctx.status = HTTP_STATUS_CODE[200]
     ctx.body = createSuccess({
       message: 'Health',
-      data: {
-        db: !!isDBUp,
-        redis: false,
-      },
+      data,
     })
   })
   .get('/metrics', (ctx) => {
