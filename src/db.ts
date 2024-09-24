@@ -56,7 +56,7 @@ export async function isDBUp(): Promise<boolean> {
 }
 
 /* User Queries - Start */
-export async function getUser(id: string): Promise<User> {
+export async function getUser(id: string): Promise<User | undefined> {
   const { rows } = (await db.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [id]))
   return rows[0]
 }

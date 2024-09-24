@@ -20,7 +20,7 @@ describe('⬢ Validate utils', () => {
 
   describe('⬢ Validate routes', () => {
     it('● should validated regestered routes', () => {
-      const registeredRoutes = ['/', '/status', '/health', '/users', '/user/:id', '/user']
+      const registeredRoutes = ['/', '/status', '/health', '/metrics', '/users', '/user/:id', '/user']
       const routes = getRegisteredRoutes(router)
       const paths = routes.map(i => i.path)
       expect([...new Set(paths)]).toStrictEqual(registeredRoutes)

@@ -24,15 +24,15 @@ describe('⬢ Validate db', () => {
   })
 
   it('● should insert and retrieve a user', async () => {
-    const insertedUser = await setUser(user)
-    expect(insertedUser).toBeDefined()
-    expect(insertedUser?.name).toBe(user.name)
+    const usr = await setUser(user)
+    expect(usr).toBeDefined()
+    expect(usr?.name).toBe(user.name)
 
-    if (insertedUser) {
-      const fetchedUser = await getUser(insertedUser._id)
+    if (usr?._id) {
+      const fetchedUser = await getUser(usr._id)
       expect(fetchedUser).toBeDefined()
-      expect(fetchedUser.name).toBe(user.name)
-      expect(fetchedUser.email).toBe(user.email)
+      expect(fetchedUser?.name).toBe(user.name)
+      expect(fetchedUser?.email).toBe(user.email)
     }
   })
 

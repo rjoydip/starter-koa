@@ -85,6 +85,7 @@ class _Error<DataT = unknown> extends Error {
     if (this.message) {
       obj.message = sanitizeStatusMessage(this.message)
     }
+
     if (this.data !== undefined) {
       obj.data = this.data
     }

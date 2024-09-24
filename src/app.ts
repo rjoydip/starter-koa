@@ -1,39 +1,32 @@
-import type { Context } from 'koa'
 import type { IRouter } from './types'
+import { loadavg } from 'node:os'
+import { cpuUsage, memoryUsage } from 'node:process'
 import { setupKoaErrorHandler } from '@sentry/node'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
-import ip from 'koa-ip'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
 import config from '../app.config'
+import { isDBUp } from './db'
 import logger from './logger'
-import { createError } from './message'
+import { createError, createSuccess } from './message'
 import { routers } from './routers'
-import { environment, getRegisteredRoutes } from './utils'
+import { environment, getRegisteredRoutes, HTTP_STATUS_CODE } from './utils'
 
 // Aapplication instances
 const app = new Koa({
   asyncLocalStorage: false,
   env: environment(),
 })
+const whitelist = ['127.0.0.1']
+const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
 const router = new Router()
 setupKoaErrorHandler(app)
 
 /* External middleware - [START] */
 app.use(helmet())
 app.use(koaBody())
-app.use(ip({
-  whitelist: ['127.0.0.1'],
-  blacklist: ['192.168.0.*', '8.8.8.[0-3]'],
-  handler: async (ctx: Context) => {
-    // TODO: Add unit test
-    /* v8 ignore next 3 */
-    ctx.status = 403
-    ctx.body = createError({ status: 403, message: 'Forbidden!!!' })
-  },
-}))
 app.use(ratelimit({
   driver: 'memory',
   db: new Map(),
@@ -50,6 +43,30 @@ app.use(ratelimit({
 }))
 /* External middleware - [END] */
 
+/* Internal middleware - [START] */
+app.use(async (ctx, next) => {
+  const hostname = ctx.request.hostname
+  let pass = true
+
+  if (whitelist && Array.isArray(whitelist)) {
+    pass = whitelist.some((item) => {
+      return new RegExp(item).test(hostname)
+    })
+  }
+
+  if (pass && blacklist && Array.isArray(blacklist)) {
+    pass = !blacklist.some((item) => {
+      return new RegExp(item).test(hostname)
+    })
+  }
+
+  if (pass) {
+    return await next()
+  }
+
+  ctx.throw(403)
+  ctx.body = createSuccess({ message: 'Forbidden!!!' })
+})
 // Logger middleware
 app.use(async (ctx, next) => {
   const start = Date.now()
@@ -77,14 +94,48 @@ app.use(async (ctx, next) => {
     await next()
   }
 })
-
 // Authentication middleware
 app.use(async (_, next) => {
   logger.debug('Authentication Middleware')
   await next()
 })
+/* Internal middleware - [END] */
 
 // Custom routers
+router
+  .get('/', (ctx) => {
+    ctx.status = HTTP_STATUS_CODE[200]
+    ctx.body = createSuccess({ message: 'Welcome to Koa Starter' })
+  })
+  .get('/status', (ctx) => {
+    ctx.status = HTTP_STATUS_CODE[200]
+    ctx.body = createSuccess({
+      message: 'Status',
+      data: { status: 'up' },
+    })
+  })
+  .get('/health', (ctx) => {
+    ctx.status = HTTP_STATUS_CODE[200]
+    ctx.body = createSuccess({
+      message: 'Health',
+      data: {
+        db: !!isDBUp,
+        redis: false,
+      },
+    })
+  })
+  .get('/metrics', (ctx) => {
+    ctx.status = HTTP_STATUS_CODE[200]
+    ctx.body = createSuccess({
+      message: 'Metrics',
+      data: {
+        memoryUsage: memoryUsage(),
+        cpuUsage: cpuUsage(),
+        loadAverage: loadavg(),
+      },
+    })
+  })
+
 routers.forEach((r: IRouter) => {
   // TODO: Change it to dynamic method calling
   switch (r.method) {

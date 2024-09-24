@@ -9,10 +9,6 @@ describe('⬢ Validate config', () => {
     log_level: 3,
     services: ['db', 'redis'],
     ratelimit: 100,
-    system: {
-      platform: 'aix',
-      runtime: 'bun',
-    },
     graceful_delay: 0,
     sentry_dsn: 'fake_dsn',
     isHTTPs: false,
@@ -28,8 +24,6 @@ describe('⬢ Validate config', () => {
     expect(config?.ratelimit).toStrictEqual(100)
     expect(config?.ratelimit).toStrictEqual(100)
     expect(config?.sentry_dsn).toStrictEqual('fake_dsn')
-    expect(config?.system?.platform).toStrictEqual('aix')
-    expect(config?.system?.runtime).toStrictEqual('bun')
   })
 
   it('● should validated overwrite config value', async () => {
@@ -47,7 +41,5 @@ describe('⬢ Validate config', () => {
     expect(config?.ratelimit).toStrictEqual(100)
     expect(config?.graceful_delay).toStrictEqual(100)
     expect(config?.sentry_dsn).toStrictEqual('fake_updated_dsn')
-    expect(config?.system?.platform).toStrictEqual('aix')
-    expect(config?.system?.runtime).toStrictEqual('bun')
   })
 })
