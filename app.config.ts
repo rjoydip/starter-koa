@@ -1,5 +1,5 @@
 import type { LogLevel } from 'consola'
-import type { Services } from './src/types'
+import type { Runtime, Services } from './src/types'
 import { env } from 'node:process'
 import { defineConfig } from './src/config'
 
@@ -14,6 +14,7 @@ const {
   ENABLE_CACHE = false,
   GRACEFUL_DELAY = 500,
   SENTRY_DNS = '',
+  RUNTIME = 'node',
 } = env
 
 export default defineConfig({
@@ -27,4 +28,5 @@ export default defineConfig({
   enable_cache: Boolean(ENABLE_CACHE),
   graceful_delay: Number(GRACEFUL_DELAY),
   sentry_dsn: SENTRY_DNS,
+  runtime: RUNTIME as Runtime,
 })

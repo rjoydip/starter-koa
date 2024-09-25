@@ -1,5 +1,5 @@
 import type { LogLevel } from 'consola'
-import type { Services } from './types'
+import type { Runtime, Services } from './types'
 
 export interface IConfig {
   host?: string
@@ -12,6 +12,7 @@ export interface IConfig {
   enable_cache?: boolean
   graceful_delay?: number
   sentry_dsn?: string
+  runtime?: Runtime
 }
 
 export function defineConfig(config: IConfig): IConfig {

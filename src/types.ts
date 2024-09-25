@@ -21,3 +21,5 @@ export interface IRouter {
   middleware: Middleware[]
   handler: (ctx: Context, next: Next) => Promise<void>
 }
+
+export type Runtime = 'node' | 'bun' | 'deno'

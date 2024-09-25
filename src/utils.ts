@@ -1,5 +1,5 @@
 import type Router from 'koa-router'
-import type { IRegisteredRoutes } from './types'
+import type { IRegisteredRoutes, Runtime } from './types'
 import process from 'node:process'
 import { captureException as sentryCaptureException } from '@sentry/node'
 import logger from './logger'
@@ -32,6 +32,18 @@ export function captureException(errorMessage: Error | string): void {
     sentryCaptureException(errMsg)
     return errMsg
   })
+}
+
+/**
+ * Determines the platform for test execution.
+ */
+export function getRuntime(): Runtime {
+  if ((globalThis as any).Deno)
+    return 'deno'
+  if (globalThis.Bun)
+    return 'bun'
+
+  return 'node'
 }
 
 export function isDev(): boolean {
