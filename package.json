@@ -59,9 +59,9 @@
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.7",
-    "@sentry/node": "^8.31.0",
-    "@sentry/profiling-node": "^8.31.0",
+    "@electric-sql/pglite": "^0.2.8",
+    "@sentry/node": "^8.32.0",
+    "@sentry/profiling-node": "^8.32.0",
     "close-with-grace": "^2.1.0",
     "consola": "^3.2.3",
     "koa": "^2.15.3",
@@ -78,7 +78,7 @@
     "@types/koa": "^2.15.0",
     "@types/koa-ratelimit": "^5.0.5",
     "@types/koa-router": "^7.4.8",
-    "@types/node": "^22.7.0",
+    "@types/node": "^22.7.1",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.1",
     "autocannon": "^7.15.0",
