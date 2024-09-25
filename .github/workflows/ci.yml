@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
 
+      - run: bun i -g @antfu/ni
       - run: ni
       - run: nr lint
       - run: nr typecheck
@@ -33,6 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
 
+      - run: bun i -g @antfu/ni
       - run: ni
       - run: nr build
       - run: nr test
