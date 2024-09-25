@@ -41,7 +41,8 @@
   ],
   "engines": {
     "node": ">=20",
-    "bun": ">=1.1.30",
+    "deno": ">=1.40",
+    "bun": ">=1.1.20",
     "typescript": ">=5.5"
   },
   "scripts": {
@@ -72,7 +73,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.1",
-    "@antfu/ni": "^0.23.0",
+    "@types/bun": "^1.1.10",
     "@types/deno": "^2.0.0",
     "@types/koa": "^2.15.0",
     "@types/koa-ratelimit": "^5.0.5",
