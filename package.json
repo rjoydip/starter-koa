@@ -16,13 +16,16 @@
   "keywords": [],
   "sideEffects": false,
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+    "import": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "require": {
+      "types": "./dist/index.d.cts",
+      "default": "./dist/index.cjs"
     }
   },
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "typesVersions": {
@@ -38,11 +41,12 @@
   ],
   "engines": {
     "node": ">=20",
-    "bun": ">=1.1.30",
+    "deno": ">=1.40",
+    "bun": ">=1.1.20",
     "typescript": ">=5.5"
   },
   "scripts": {
-    "all": "bun update && nr lint && nr typecheck && nr build && nr test",
+    "all": "bun update --latest && nr lint && nr typecheck && nr build && nr test",
     "build": "NODE_ENV=production unbuild",
     "lint": "eslint . --fix",
     "start": "node --env-file=.env.production dist/index.mjs",
@@ -51,13 +55,13 @@
     "benchmark": "autocannon -c 1 -d 10 -p 1 127.0.0.1:3000/health",
     "benchmark:doctor": "clinic doctor --on-port 'autocannon -c 10 -d 10 -p 10 127.0.0.1:3000/health' -- node --env-file=.env.test dist/index.mjs",
     "benchmark:flame": "clinic flame --on-port 'autocannon -c 10 -d 10 -p 10 127.0.0.1:3000/health' -- node --env-file=.env.test dist/index.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --skipLibCheck",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.7",
-    "@sentry/node": "^8.31.0",
-    "@sentry/profiling-node": "^8.31.0",
+    "@electric-sql/pglite": "^0.2.8",
+    "@sentry/node": "^8.32.0",
+    "@sentry/profiling-node": "^8.32.0",
     "close-with-grace": "^2.1.0",
     "consola": "^3.2.3",
     "koa": "^2.15.3",
@@ -65,19 +69,21 @@
     "koa-helmet": "^7.0.2",
     "koa-ratelimit": "^5.1.0",
     "koa-router": "^13.0.1",
-    "valibot": "^0.41.0"
+    "valibot": "^0.42.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.7.1",
+    "@types/bun": "^1.1.10",
+    "@types/deno": "^2.0.0",
     "@types/koa": "^2.15.0",
     "@types/koa-ratelimit": "^5.0.5",
     "@types/koa-router": "^7.4.8",
-    "@types/node": "^22.6.1",
+    "@types/node": "^22.7.1",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.1",
     "autocannon": "^7.15.0",
     "clinic": "^13.0.0",
-    "esbuild": "^0.23.1",
+    "esbuild": "^0.24.0",
     "eslint": "^9.11.1",
     "lint-staged": "^15.2.10",
     "simple-git-hooks": "^2.11.1",

@@ -5,12 +5,23 @@
 
 Koa application starter
 
-## Setup
+## Development
+
+<summary>local development</summary>
+
+- Clone this repository
+- Install latest LTS version of [Node.js](https://nodejs.org/en/)
+- Enable [Corepack](https://github.com/nodejs/corepack) using `corepack enable`
+- Install dependencies using `ni`
+- Run interactive tests using `nr dev`
+
+## Commands
 
 For install
 
 ```sh
-bun install # or nci
+bun install # or ni
+bun install --production # or nci
 ```
 
 For build

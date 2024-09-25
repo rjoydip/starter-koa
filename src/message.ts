@@ -1,5 +1,6 @@
 /**
  * Make sure the status message is safe to use in a response.
+ * @returns string
  */
 export function sanitizeStatusMessage(statusMessage = ''): string {
   return statusMessage
@@ -57,13 +58,50 @@ export function hasProp(obj: any, prop: string | symbol): boolean {
  * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
  */
 class _Error<DataT = unknown> extends Error {
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {number}
+   */
   statusCode = 500
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {boolean}
+   */
   fatal = false
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {boolean}
+   */
   unhandled = false
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?string}
+   */
   statusMessage?: string
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?DataT}
+   */
   data?: DataT
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?unknown}
+   */
   cause?: unknown
 
+  /**
+   * Creates an instance of _Error.
+   *
+   * @constructor
+   * @param {string} message
+   * @param {{ cause?: unknown }\} [opts]
+   */
   constructor(message: string, opts: { cause?: unknown } = {}) {
     super(message, opts)
 
@@ -73,6 +111,11 @@ class _Error<DataT = unknown> extends Error {
     }
   }
 
+  /**
+   * ${1:Description placeholder}
+   *
+   * @returns (Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>)
+   */
   toJSON(): Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'> {
     const obj: Pick<
       _Error<DataT>,
@@ -172,11 +215,44 @@ export function createError<DataT = unknown>(
   return err
 }
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ * @interface IMessage
+ * @typedef {IMessage}
+ * @template [T=unknown]
+ */
 export interface IMessage<T = unknown> {
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?T}
+   */
   data?: T
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?number}
+   */
   status?: number
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?number}
+   */
   statusCode?: number
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?string}
+   */
   statusMessage?: string
+  /**
+   * ${1:Description placeholder}
+   *
+   * @type {?string}
+   */
   message?: string
 }
 

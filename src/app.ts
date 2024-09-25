@@ -15,13 +15,33 @@ import { routers } from './routers'
 import { environment, getRegisteredRoutes, HTTP_STATUS_CODE } from './utils'
 
 // Aapplication instances
+/**
+ * ${1:Description placeholder}
+ *
+ * @type {${2:*}}
+ */
 const app = new Koa({
   asyncLocalStorage: false,
   env: environment(),
 })
 setupKoaErrorHandler(app)
+/**
+ * ${1:Description placeholder}
+ *
+ * @type {{}\}
+ */
 const whitelist = ['127.0.0.1']
+/**
+ * ${1:Description placeholder}
+ *
+ * @type {{}\}
+ */
 const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
+/**
+ * ${1:Description placeholder}
+ *
+ * @type {${2:*}}
+ */
 const router = new Router()
 
 /* External middleware - [START] */

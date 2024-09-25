@@ -10,8 +10,19 @@ import { initDB } from './db'
 import logger from './logger'
 import { captureException, environment, isProd } from './utils'
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @type {Server}
+ */
 let server: Server
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ * @returns Server
+ */
 export function startServer(): Server {
   const port = config?.port
   /* v8 ignore next 3 */
@@ -23,6 +34,11 @@ export function startServer(): Server {
   return server
 }
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ */
 export function handleGracefulShutdown(): void {
   closeWithGrace(
     {
@@ -39,6 +55,12 @@ export function handleGracefulShutdown(): void {
 }
 
 /* v8 ignore start */
+/**
+ * ${1:Description placeholder}
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 async function main(): Promise<void> {
   try {
     init({

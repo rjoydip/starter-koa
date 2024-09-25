@@ -6,6 +6,13 @@ import { getUser } from './db'
 import { createError } from './message'
 import { captureException, HTTP_STATUS_CODE } from './utils'
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ * @param {${2:*}} schema
+ * @returns (ctx: Context, next: Next) => Promise<void>
+ */
 export function requestValidator(schema: any) {
   return async function (ctx: Context, next: Next): Promise<void> {
     if (ctx.request.body) {
@@ -31,6 +38,12 @@ export function requestValidator(schema: any) {
   }
 }
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ * @returns (ctx: Context, next: Next) => Promise<void>
+ */
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
@@ -64,6 +77,13 @@ export function userValidator() {
   }
 }
 
+/**
+ * ${1:Description placeholder}
+ *
+ * @export
+ * @param {(IRouter | null)} [router]
+ * @returns boolean
+ */
 export function validateRouter(router: IRouter | null = null): boolean {
   if (!router) {
     throw new Error('Router is empty')

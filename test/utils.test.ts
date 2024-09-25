@@ -2,7 +2,7 @@ import { getTraceData, init, isInitialized, captureException as sentryCaptureExc
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '../src/app'
 import logger from '../src/logger'
-import { captureException, environment, getRegisteredRoutes, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
+import { captureException, environment, getRegisteredRoutes, getRuntime, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
 
 describe('⬢ Validate utils', () => {
   const MY_APP_DSN = 'http://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001'
@@ -113,6 +113,24 @@ describe('⬢ Validate utils', () => {
         expect(isProd()).toBeTruthy()
         process.env.NODE_ENV = 'prod'
         expect(isProd()).toBeTruthy()
+      })
+    })
+
+    describe('⬢ Validate platform & runtime', () => {
+      it('● should validated node runtime', () => {
+        expect(getRuntime()).toStrictEqual('node')
+      })
+      it('● should validated bun runtime', () => {
+        globalThis.Bun as unknown as typeof import('bun')
+        globalThis.Bun = {
+          ...globalThis.Bun,
+          env: {},
+        }
+        expect(getRuntime()).toStrictEqual('bun')
+      })
+      it('● should validated deno runtime', () => {
+        globalThis.Deno = {}
+        expect(getRuntime()).toStrictEqual('deno')
       })
     })
   })
