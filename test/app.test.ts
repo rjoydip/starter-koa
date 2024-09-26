@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import { app } from '../src/app'
+import { app, graphqlApp } from '../src/app'
 
 describe('⬢ Validate app', () => {
   describe('⬢ Validate main routes', () => {
@@ -67,6 +67,14 @@ describe('⬢ Validate app', () => {
       expect(status).toEqual(200)
       expect(body.message).toStrictEqual('Metrics')
       expect(body.data).toBeDefined()
+    })
+  })
+
+  describe('⬢ Validate graphqlQL routes', () => {
+    it('● GET /status', async () => {
+      const { status } = await request(graphqlApp.callback())
+        .get('/status')
+      expect(status).toEqual(204)
     })
   })
 

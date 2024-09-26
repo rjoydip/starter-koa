@@ -1,6 +1,6 @@
 import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { UserSchema } from '../src/schema'
+import { schema, UserSchema } from '../src/schema'
 
 describe('⬢ Validate schema', () => {
   const playload = {
@@ -28,5 +28,15 @@ describe('⬢ Validate schema', () => {
     result.issues?.forEach((issue) => {
       expect(issue.message).toStrictEqual('Invalid length: Expected >=8 but received 4')
     })
+  })
+})
+
+describe('⬢ Validate graphql schema', () => {
+  it('● should validated main schema', () => {
+    const query = schema.getQueryType()
+    const queryField = query?.getFields()
+    expect(schema).toBeDefined()
+    expect(query?.name).toStrictEqual('Query')
+    expect(queryField).toBeDefined()
   })
 })

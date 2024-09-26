@@ -2,6 +2,7 @@ import type { IRouter } from './types'
 import { loadavg } from 'node:os'
 import { cpuUsage, memoryUsage } from 'node:process'
 import { setupKoaErrorHandler } from '@sentry/node'
+import { createYoga } from 'graphql-yoga'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
@@ -12,36 +13,22 @@ import { isDBUp } from './db'
 import logger from './logger'
 import { createError, createSuccess } from './message'
 import { routers } from './routers'
+import { schema } from './schema'
 import { environment, getRegisteredRoutes, HTTP_STATUS_CODE } from './utils'
 
 // Aapplication instances
-/**
- * ${1:Description placeholder}
- *
- * @type {${2:*}}
- */
 const app = new Koa({
   asyncLocalStorage: false,
   env: environment(),
 })
+const graphqlApp = new Koa()
 setupKoaErrorHandler(app)
-/**
- * ${1:Description placeholder}
- *
- * @type {{}\}
- */
+const yoga = createYoga({
+  landingPage: true,
+  schema,
+})
 const whitelist = ['127.0.0.1']
-/**
- * ${1:Description placeholder}
- *
- * @type {{}\}
- */
 const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
-/**
- * ${1:Description placeholder}
- *
- * @type {${2:*}}
- */
 const router = new Router()
 
 /* External middleware - [START] */
@@ -64,6 +51,16 @@ app.use(ratelimit({
 /* External middleware - [END] */
 
 /* Internal middleware - [START] */
+// GraphQL middleware
+graphqlApp.use(async (ctx) => {
+  const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
+  ctx.status = response.status
+  response.headers.forEach((value, key) => {
+    ctx.append(key, value)
+  })
+  ctx.body = response.body
+})
+// IP middleware
 app.use(async (ctx, next) => {
   const hostname = ctx.request.hostname
   let pass = true
@@ -91,8 +88,7 @@ app.use(async (ctx, next) => {
   logger.debug(`> ${ctx.method} ${ctx.url} - ${ms}ms`)
   ctx.set('X-Response-Time', `${ms}ms`)
 })
-
-// Middleware to check if the incoming URL matches custom routes
+// Route matching middleware
 app.use(async (ctx, next) => {
   const requestedUrl = ctx.request.path
   // Get all registered routes
@@ -172,7 +168,6 @@ routers.forEach((r: IRouter) => {
 
 // Dispatch routes and allow OPTIONS request method
 app.use(router.routes())
-app.use(router.allowedMethods())
+  .use(router.allowedMethods())
 
-export { app, router }
-export default app
+export { app, graphqlApp, router }
