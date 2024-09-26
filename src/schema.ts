@@ -1,3 +1,4 @@
+import { createSchema } from 'graphql-yoga'
 import { email, maxLength, minLength, nullish, object, pipe, regex, string, uuid } from 'valibot'
 
 /**
@@ -11,4 +12,17 @@ export const UserSchema = object({
   email: pipe(string(), email()),
   phone: pipe(string(), regex(/^\+(?:[0-9-()/.]\s?){6,15}\d$/)),
   address: pipe(string(), minLength(10), maxLength(50)),
+})
+
+export const schema = createSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      hello: String
+    }
+  `,
+  resolvers: {
+    Query: {
+      hello: () => 'world',
+    },
+  },
 })

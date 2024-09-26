@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import app from '../src/app'
+import { app } from '../src/app'
 import { dbDown, initDB, tablesDrop } from '../src/db'
 
 describe('⬢ Validate routes', () => {

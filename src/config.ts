@@ -24,6 +24,12 @@ export interface IConfig {
   /**
    * ${1:Description placeholder}
    *
+   * @type {?number}
+   */
+  graphql_port?: number
+  /**
+   * ${1:Description placeholder}
+   *
    * @type {?boolean}
    */
   isHTTPs?: boolean

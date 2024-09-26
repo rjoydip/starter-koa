@@ -24,6 +24,7 @@ describe('⬢ Validate types', () => {
     expectTypeOf({
       host: '127.0.0.1',
       port: 0,
+      graphql_port: 0,
       isHTTPs: false,
       log_level: 3,
       services: ['db'] as Services[],

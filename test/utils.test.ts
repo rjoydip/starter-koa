@@ -129,7 +129,11 @@ describe('⬢ Validate utils', () => {
         expect(getRuntime()).toStrictEqual('bun')
       })
       it('● should validated deno runtime', () => {
-        globalThis.Deno = {}
+        globalThis.bun = undefined
+        globalThis.Deno as unknown as typeof Deno
+        globalThis.Deno = {
+          ...globalThis.Deno,
+        }
         expect(getRuntime()).toStrictEqual('deno')
       })
     })
