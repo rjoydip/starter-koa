@@ -14,8 +14,6 @@ const port = config?.port
 const graphqlPort = config?.graphql_port
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns Server
  */
@@ -39,8 +37,6 @@ export function startServer(): { appServer: Server, graphqlServer: Server } {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  */
 export function handleGracefulShutdown({ appServer, graphqlServer }: { appServer: Server, graphqlServer: Server }): void {
@@ -61,8 +57,6 @@ export function handleGracefulShutdown({ appServer, graphqlServer }: { appServer
 
 /* v8 ignore start */
 /**
- * ${1:Description placeholder}
- *
  * @async
  * @returns {Promise<void>}
  */

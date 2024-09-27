@@ -1,6 +1,4 @@
 import type { IRouter } from './types'
-import { loadavg } from 'node:os'
-import { cpuUsage, memoryUsage } from 'node:process'
 import { setupKoaErrorHandler } from '@sentry/node'
 import { createYoga } from 'graphql-yoga'
 import Koa from 'koa'
@@ -9,12 +7,12 @@ import helmet from 'koa-helmet'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
 import config from '../app.config'
-import { isDBUp } from './db'
 import logger from './logger'
-import { createError, createSuccess } from './message'
+import { createSuccess } from './message'
+import resolvers from './resolvers'
 import { routers } from './routers'
 import { schema } from './schema'
-import { environment, getRegisteredRoutes, HTTP_STATUS_CODE } from './utils'
+import { environment, HTTP_STATUS_CODE } from './utils'
 
 // Aapplication instances
 const app = new Koa({
@@ -29,7 +27,10 @@ const yoga = createYoga({
 })
 const whitelist = ['127.0.0.1']
 const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
-const router = new Router()
+const apiRouter = new Router({
+  prefix: '/api',
+})
+const appRouter = new Router()
 
 /* External middleware - [START] */
 app.use(helmet())
@@ -88,21 +89,7 @@ app.use(async (ctx, next) => {
   logger.debug(`> ${ctx.method} ${ctx.url} - ${ms}ms`)
   ctx.set('X-Response-Time', `${ms}ms`)
 })
-// Route matching middleware
-app.use(async (ctx, next) => {
-  const requestedUrl = ctx.request.path
-  // Get all registered routes
-  const registeredRoutes = getRegisteredRoutes(router)
-  // Check if the requested URL matches any route regex pattern
-  const hasMatchedRoutes = registeredRoutes.some(route => route.regexp.test(requestedUrl))
-  if (!hasMatchedRoutes) {
-    ctx.status = 404
-    ctx.body = createError({ status: 404, message: 'Route Not Found' })
-  }
-  else {
-    await next()
-  }
-})
+
 // Authentication middleware
 app.use(async (_, next) => {
   logger.debug('Authentication Middleware')
@@ -111,63 +98,57 @@ app.use(async (_, next) => {
 /* Internal middleware - [END] */
 
 // Custom routers
-router
+appRouter
   .get('/', (ctx) => {
     ctx.status = HTTP_STATUS_CODE[200]
-    ctx.body = createSuccess({ message: 'Welcome to Koa Starter' })
+    ctx.body = createSuccess(resolvers.Query.index())
   })
   .get('/status', (ctx) => {
     ctx.status = HTTP_STATUS_CODE[200]
-    ctx.body = createSuccess({
-      message: 'Status',
-      data: { status: 'up' },
-    })
+    ctx.body = createSuccess(resolvers.Query.status())
   })
   .get('/health', async (ctx) => {
-    // const data = await cacheInstance.health()
-    const _isDBUp = await isDBUp()
-    const data = {
-      db: _isDBUp,
-      redis: false,
-    }
+    const payload = await resolvers.Query.health()
     ctx.status = HTTP_STATUS_CODE[200]
-    ctx.body = createSuccess({
-      message: 'Health',
-      data,
-    })
+    ctx.body = createSuccess(payload)
   })
   .get('/metrics', (ctx) => {
+    const payload = resolvers.Query.metrics()
     ctx.status = HTTP_STATUS_CODE[200]
-    ctx.body = createSuccess({
-      message: 'Metrics',
-      data: {
-        memoryUsage: memoryUsage(),
-        cpuUsage: cpuUsage(),
-        loadAverage: loadavg(),
-      },
-    })
+    ctx.body = createSuccess(payload)
   })
 
 routers.forEach((r: IRouter) => {
   // TODO: Change it to dynamic method calling
   switch (r.method) {
     case HttpMethodEnum.GET:
-      router.get(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.get(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.POST:
-      router.post(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.post(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.PUT:
-      router.put(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.put(r.name, r.path, ...r.middleware, r.handler)
       break
     case HttpMethodEnum.DELETE:
-      router.delete(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.delete(r.name, r.path, ...r.middleware, r.handler)
       break
   }
 })
-
+app.use(async (ctx, next) => {
+  try {
+    await next()
+    if (ctx.status === 404) {
+      ctx.throw(404)
+    }
+  }
+  catch (error: any) {
+    ctx.throw(error)
+  }
+})
 // Dispatch routes and allow OPTIONS request method
-app.use(router.routes())
-  .use(router.allowedMethods())
+app.use(appRouter.routes())
+app.use(apiRouter.routes())
+  .use(apiRouter.allowedMethods())
 
-export { app, graphqlApp, router }
+export { apiRouter, app, appRouter, graphqlApp }

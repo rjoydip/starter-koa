@@ -23,23 +23,11 @@ describe('⬢ Validate app', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toEqual({
-        message: 'Status',
         statusCode: 200,
+        message: 'Request successful',
         data: {
           status: 'up',
         },
-      })
-    })
-
-    it('● GET /invalid', async () => {
-      const { headers, status, body } = await request(app.callback())
-        .get('/invalid')
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(404)
-      expect(body).toEqual({
-        statusCode: 404,
-        message: 'Route Not Found',
       })
     })
 
@@ -50,8 +38,8 @@ describe('⬢ Validate app', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body).toEqual({
-        message: 'Health',
         statusCode: 200,
+        message: 'Request successful',
         data: {
           db: true,
           redis: false,
@@ -65,7 +53,7 @@ describe('⬢ Validate app', () => {
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body.message).toStrictEqual('Metrics')
+      expect(body.message).toStrictEqual('Request successful')
       expect(body.data).toBeDefined()
     })
   })

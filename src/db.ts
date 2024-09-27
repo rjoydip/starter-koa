@@ -3,8 +3,6 @@ import { PGlite } from '@electric-sql/pglite'
 import { uuid_ossp } from '@electric-sql/pglite/contrib/uuid_ossp'
 
 /**
- * ${1:Description placeholder}
- *
  * @type {${2:*}}
  */
 const db = new PGlite({
@@ -14,8 +12,6 @@ const db = new PGlite({
 })
 
 /**
- * ${1:Description placeholder}
- *
  * @async
  * @returns {Promise<void>}
  */
@@ -40,8 +36,6 @@ async function tablesCreate(): Promise<void> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @returns {Promise<void>}
@@ -57,8 +51,6 @@ export async function tablesDrop(): Promise<void> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @returns {Promise<void>}
@@ -71,8 +63,6 @@ export async function initDB(): Promise<void> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @returns {Promise<void>}
@@ -83,8 +73,6 @@ export async function dbDown(): Promise<void> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @returns Promise<boolean>
@@ -96,8 +84,6 @@ export async function isDBUp(): Promise<boolean> {
 
 /* User Queries - Start */
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @param {string} id
@@ -109,8 +95,6 @@ export async function getUser(id: string): Promise<User | undefined> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @returns Promise<User[]>
@@ -121,8 +105,6 @@ export async function getUsers(): Promise<User[]> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @param {User} user
@@ -137,8 +119,6 @@ export async function setUser(user: User): Promise<User | undefined> {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @param {string} id
@@ -154,8 +134,6 @@ export async function updateUser(id: string, user: User): Promise<User | undefin
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @async
  * @param {string} id

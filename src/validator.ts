@@ -7,8 +7,6 @@ import { createError } from './message'
 import { captureException, HTTP_STATUS_CODE } from './utils'
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @param {${2:*}} schema
  * @returns (ctx: Context, next: Next) => Promise<void>
@@ -39,8 +37,6 @@ export function requestValidator(schema: any) {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns (ctx: Context, next: Next) => Promise<void>
  */
@@ -78,8 +74,6 @@ export function userValidator() {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @param {(IRouter | null)} [router]
  * @returns boolean

@@ -16,9 +16,9 @@ describe('⬢ Validate validator', () => {
       phone: '+(46)0511-7158851',
     }
 
-    it('● should validated requestValidator POST /user', async () => {
+    it('● should validated requestValidator POST /api/user', async () => {
       const { headers, status, body } = await request(app.callback())
-        .post('/user')
+        .post('/api/user')
         .send()
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(422)
@@ -28,9 +28,9 @@ describe('⬢ Validate validator', () => {
       })
     })
 
-    it('● should validated requestValidator invalid data POST /user', async () => {
+    it('● should validated requestValidator invalid data POST /api/user', async () => {
       const { headers, status, body } = await request(app.callback())
-        .post('/user')
+        .post('/api/user')
         .send({
           ...testUser,
           name: null,
@@ -43,20 +43,20 @@ describe('⬢ Validate validator', () => {
       })
     })
 
-    it('● should validated userValidator GET /user/200', async () => {
+    it('● should validated userValidator GET /api/user/200', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(testUser)
       const { headers, status } = await request(app.callback())
-        .get('/user/200')
+        .get('/api/user/200')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(getUserMock).toBeCalledTimes(1)
     })
 
-    it('● should validated userValidator GET /user/422', async () => {
+    it('● should validated userValidator GET /api/user/422', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(undefined)
       const { headers, status, body } = await request(app.callback())
-        .get('/user/422')
+        .get('/api/user/422')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(422)
@@ -67,10 +67,10 @@ describe('⬢ Validate validator', () => {
       expect(getUserMock).toBeCalledTimes(1)
     })
 
-    it('● should validated userValidator GET /user/500', async () => {
+    it('● should validated userValidator GET /api/user/500', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockRejectedValue(new Error('DB error'))
       const { headers, status, body } = await request(app.callback())
-        .get(`/user/500`)
+        .get(`/api/user/500`)
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(500)
       expect(body).toStrictEqual({
@@ -111,7 +111,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route name', async () => {
       expect(() => validateRouter({
         name: '',
-        path: '/users',
+        path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: [],
         handler: () => Promise.resolve(),
@@ -131,7 +131,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route method', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/users',
+        path: '/api/users',
         method: 'FOO' as HttpMethod,
         middleware: [],
         handler: () => Promise.resolve(),
@@ -141,7 +141,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route middleware', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/users',
+        path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: null as any,
         handler: () => Promise.resolve(),
@@ -151,7 +151,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route handler', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/users',
+        path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: [],
         handler: null as any,
