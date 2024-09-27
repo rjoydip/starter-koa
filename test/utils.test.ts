@@ -1,8 +1,7 @@
 import { getTraceData, init, isInitialized, captureException as sentryCaptureException } from '@sentry/node'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { router } from '../src/app'
 import logger from '../src/logger'
-import { captureException, environment, getRegisteredRoutes, getRuntime, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
+import { captureException, environment, getRuntime, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
 
 describe('⬢ Validate utils', () => {
   const MY_APP_DSN = 'http://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001'
@@ -16,27 +15,6 @@ describe('⬢ Validate utils', () => {
 
   afterEach(() => {
     process.env = originalEnv
-  })
-
-  describe('⬢ Validate routes', () => {
-    it('● should validated regestered routes', () => {
-      const registeredRoutes = ['/', '/status', '/health', '/metrics', '/users', '/user/:id', '/user']
-      const routes = getRegisteredRoutes(router)
-      const paths = routes.map(i => i.path)
-      expect([...new Set(paths)]).toStrictEqual(registeredRoutes)
-    })
-
-    it('● should validated invalid regestered routes', () => {
-      const registeredRoutes = ['/', '/health', '/users', '/user/:id', '/user']
-      const routes = getRegisteredRoutes(router)
-      const paths = routes.map(i => i.path)
-      expect([...new Set(paths)]).not.equal(registeredRoutes)
-    })
-
-    it('● should validated captureException for non-prod', () => {
-      expect(() => captureException('testing message')).not.toThrowError()
-      expect(mockLoggerError).toHaveBeenCalledTimes(0)
-    })
   })
 
   describe('⬢ Validate utilities', () => {

@@ -1,19 +1,14 @@
-import type Router from 'koa-router'
-import type { IRegisteredRoutes, Runtime } from './types'
+import type { Runtime } from './types'
 import process from 'node:process'
 import { captureException as sentryCaptureException } from '@sentry/node'
 import logger from './logger'
 
 /**
- * ${1:Description placeholder}
- *
  * @type {string}
  */
 const prefix: string = 'Invariant failed'
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @param {boolean} condition
  * @param {?(string | (() => string))} [message]
@@ -28,24 +23,6 @@ export function invariant(condition: boolean, message?: string | (() => string))
 }
 
 /**
- * ${1:Description placeholder}
- *
- * @export
- * @param {Router<any>} router
- * @returns IRegisteredRoutes[]
- */
-export function getRegisteredRoutes(router: Router<any>): IRegisteredRoutes[] {
-  return router.stack.map((layer) => {
-    return {
-      path: layer.path,
-      regexp: layer.regexp,
-    }
-  })
-}
-
-/**
- * ${1:Description placeholder}
- *
  * @export
  * @param {(Error | string)} errorMessage
  */
@@ -72,8 +49,6 @@ export function getRuntime(): Runtime {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns boolean
  */
@@ -82,8 +57,6 @@ export function isDev(): boolean {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns boolean
  */
@@ -92,8 +65,6 @@ export function isTest(): boolean {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns boolean
  */
@@ -102,8 +73,6 @@ export function isProd(): boolean {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @returns string
  */
@@ -112,8 +81,6 @@ export function environment(): string {
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @type {{ 200: number; 401: number; 500: number; 422: number; }\}
  */
 export const HTTP_STATUS_CODE = {

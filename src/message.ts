@@ -59,38 +59,26 @@ export function hasProp(obj: any, prop: string | symbol): boolean {
  */
 class _Error<DataT = unknown> extends Error {
   /**
-   * ${1:Description placeholder}
-   *
    * @type {number}
    */
   statusCode = 500
   /**
-   * ${1:Description placeholder}
-   *
    * @type {boolean}
    */
   fatal = false
   /**
-   * ${1:Description placeholder}
-   *
    * @type {boolean}
    */
   unhandled = false
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?string}
    */
   statusMessage?: string
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?DataT}
    */
   data?: DataT
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?unknown}
    */
   cause?: unknown
@@ -112,8 +100,6 @@ class _Error<DataT = unknown> extends Error {
   }
 
   /**
-   * ${1:Description placeholder}
-   *
    * @returns (Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>)
    */
   toJSON(): Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'> {
@@ -216,8 +202,6 @@ export function createError<DataT = unknown>(
 }
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @interface IMessage
  * @typedef {IMessage}
@@ -225,32 +209,22 @@ export function createError<DataT = unknown>(
  */
 export interface IMessage<T = unknown> {
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?T}
    */
   data?: T
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?number}
    */
   status?: number
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?number}
    */
   statusCode?: number
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?string}
    */
   statusMessage?: string
   /**
-   * ${1:Description placeholder}
-   *
    * @type {?string}
    */
   message?: string

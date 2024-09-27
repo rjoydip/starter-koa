@@ -8,8 +8,6 @@ import { captureException, HTTP_STATUS_CODE } from './utils'
 import { requestValidator, userValidator } from './validator'
 
 /**
- * ${1:Description placeholder}
- *
  * @type {IRouter[]}
  */
 export const routers: IRouter[] = [
@@ -127,8 +125,6 @@ export const routers: IRouter[] = [
 ]
 
 /**
- * ${1:Description placeholder}
- *
  * @export
  * @param {string} route
  * @returns (IRouter | null)
