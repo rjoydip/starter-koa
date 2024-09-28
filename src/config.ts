@@ -1,5 +1,6 @@
 import type { LogLevel } from 'consola'
 import type { Runtime, Services } from './types'
+import { env } from 'node:process'
 
 /**
  * @export
@@ -57,11 +58,32 @@ export interface IConfig {
   runtime?: Runtime
 }
 
-/**
- * @export
- * @param {IConfig} config
- * @returns IConfig
- */
-export function defineConfig(config: IConfig): IConfig {
-  return config
+const {
+  LOG_LEVEL = 3,
+  ENABLE_HTTPS = false,
+  PORT = 8080,
+  GRAPHQL_PORT = 8081,
+  HOST = '127.0.0.1',
+  RATE_LIMIT = 70000,
+  RATE_DURATION = 6000,
+  SERVICES = ['db', 'redis'],
+  ENABLE_CACHE = false,
+  GRACEFUL_DELAY = 500,
+  SENTRY_DNS = '',
+  RUNTIME = 'node',
+} = env
+
+export default {
+  port: Number(PORT),
+  graphql_port: Number(GRAPHQL_PORT),
+  host: HOST,
+  isHTTPs: Boolean(ENABLE_HTTPS),
+  services: SERVICES as Services[],
+  ratelimit: Number(RATE_LIMIT),
+  duration: Number(RATE_DURATION),
+  log_level: LOG_LEVEL as LogLevel,
+  enable_cache: Boolean(ENABLE_CACHE),
+  graceful_delay: Number(GRACEFUL_DELAY),
+  sentry_dsn: SENTRY_DNS,
+  runtime: RUNTIME as Runtime,
 }

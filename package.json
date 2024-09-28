@@ -2,7 +2,7 @@
   "name": "starter-koa",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "bun@1.1.30",
+  "packageManager": "pnpm@9.11.0",
   "description": "Koa application starter",
   "author": "Joydip Roy <joydipand@gmail.com>",
   "license": "MIT",
@@ -40,14 +40,14 @@
     "dist"
   ],
   "engines": {
-    "node": ">=20",
-    "deno": ">=1.40",
-    "bun": ">=1.1.20",
+    "node": ">=22",
+    "pnpm": ">=9",
     "typescript": ">=5.5"
   },
   "scripts": {
-    "all": "bun update --latest && nr lint && nr typecheck && nr build && nr test",
-    "build": "NODE_ENV=production unbuild",
+    "all": "nr _update && nr lint && nr typecheck && nr build && nr test",
+    "_update": "taze -w -f -w -i",
+    "build": "unbuild",
     "lint": "eslint . --fix",
     "start": "node --env-file=.env.production dist/index.mjs",
     "dev": "tsx watch --env-file=.env.dev src/index.ts",
@@ -88,15 +88,18 @@
     "esbuild": "^0.24.0",
     "eslint": "^9.11.1",
     "lint-staged": "^15.2.10",
+    "pnpm": "^9.11.0",
+    "rollup": "^4.22.5",
     "simple-git-hooks": "^2.11.1",
     "supertest": "^7.0.0",
+    "taze": "^0.17.2",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
     "unbuild": "^2.0.0",
     "vitest": "^2.1.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "bunx lint-staged"
+    "pre-commit": "pnpx lint-staged"
   },
   "lint-staged": {
     "*": "eslint --fix"

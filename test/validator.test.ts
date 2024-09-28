@@ -7,6 +7,8 @@ import * as db from '../src/db'
 import { getRouter } from '../src/routers'
 import { validateRouter } from '../src/validator'
 
+const appInstance = app.callback()
+
 describe('⬢ Validate validator', () => {
   describe('⬢ Validate middleware', () => {
     const testUser = {
@@ -17,7 +19,7 @@ describe('⬢ Validate validator', () => {
     }
 
     it('● should validated requestValidator POST /api/user', async () => {
-      const { headers, status, body } = await request(app.callback())
+      const { headers, status, body } = await request(appInstance)
         .post('/api/user')
         .send()
       expect(headers['content-type']).toMatch(/json/)
@@ -29,7 +31,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated requestValidator invalid data POST /api/user', async () => {
-      const { headers, status, body } = await request(app.callback())
+      const { headers, status, body } = await request(appInstance)
         .post('/api/user')
         .send({
           ...testUser,
@@ -45,7 +47,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/200', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(testUser)
-      const { headers, status } = await request(app.callback())
+      const { headers, status } = await request(appInstance)
         .get('/api/user/200')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -55,7 +57,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/422', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(undefined)
-      const { headers, status, body } = await request(app.callback())
+      const { headers, status, body } = await request(appInstance)
         .get('/api/user/422')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -69,7 +71,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/500', async () => {
       const getUserMock = vi.spyOn(db, 'getUser').mockRejectedValue(new Error('DB error'))
-      const { headers, status, body } = await request(app.callback())
+      const { headers, status, body } = await request(appInstance)
         .get(`/api/user/500`)
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(500)
