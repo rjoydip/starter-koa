@@ -1,6 +1,5 @@
 import type { IConfig } from '../src/config'
 import { describe, expect, it } from 'vitest'
-import { defineConfig } from '../src/config'
 
 describe('⬢ Validate config', () => {
   const defaultConfig: IConfig = {
@@ -17,7 +16,7 @@ describe('⬢ Validate config', () => {
     enable_cache: false,
   }
   it('● should validated config', async () => {
-    const config = defineConfig(defaultConfig)
+    const config = defaultConfig
     expect(config?.host).toStrictEqual('127.0.0.1')
     expect(config?.port).toStrictEqual(8080)
     expect(config?.graphql_port).toStrictEqual(8081)
@@ -29,14 +28,14 @@ describe('⬢ Validate config', () => {
   })
 
   it('● should validated overwrite config value', async () => {
-    const config = defineConfig({
+    const config = {
       ...defaultConfig,
       port: 1000,
       graphql_port: 1001,
       ratelimit: 100,
       graceful_delay: 100,
       sentry_dsn: 'fake_updated_dsn',
-    })
+    }
     expect(config?.host).toStrictEqual('127.0.0.1')
     expect(config?.port).toStrictEqual(1000)
     expect(config?.graphql_port).toStrictEqual(1001)

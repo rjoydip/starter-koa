@@ -1,7 +1,6 @@
 import type { OutputChunk, Plugin } from 'rollup'
 import { transform } from 'esbuild'
 import { defineBuildConfig } from 'unbuild'
-import { isProd } from './src/utils'
 
 export default defineBuildConfig({
   entries: [
@@ -13,7 +12,7 @@ export default defineBuildConfig({
     emitCJS: true,
     inlineDependencies: true,
     esbuild: {
-      minify: isProd(),
+      minify: true,
     },
   },
   hooks: {

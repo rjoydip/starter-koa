@@ -5,6 +5,9 @@
 
 Koa application starter
 
+> [!NOTE]
+> This project is in the early stages and under development. Although the bun is being used as package manager but application and some other script are working through node.
+
 ## Development
 
 <summary>local development</summary>

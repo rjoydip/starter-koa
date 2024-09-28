@@ -1,5 +1,5 @@
 import { createConsola } from 'consola'
-import config from '../app.config'
+import config from './config'
 
 /**
  * @type {${2:*}}
