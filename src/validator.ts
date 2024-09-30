@@ -2,9 +2,11 @@ import type { Context, Next } from 'koa'
 import type { IRouter } from './types'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
-import { getUser } from './db'
 import { createError } from './message'
+import resolvers from './resolvers'
 import { captureException, HTTP_STATUS_CODE } from './utils'
+
+const { Query } = resolvers
 
 /**
  * @export
@@ -43,23 +45,18 @@ export function requestValidator(schema: any) {
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
-      if (ctx.params && ctx.params.id) {
-        const user = await getUser(ctx.params.id)
-        if (user) {
-          ctx.state.user = user
-          await next()
-        }
-        else {
-          ctx.status = HTTP_STATUS_CODE[422]
-          ctx.body = createError({
-            message: 'User Invalid',
-            status: HTTP_STATUS_CODE[422],
-          })
-          captureException('User Invalid')
-        }
+      const user = await Query.getUser(null, { id: ctx.params.id })
+      if (user) {
+        ctx.state.user = user
+        await next()
       }
       else {
-        await next()
+        ctx.status = HTTP_STATUS_CODE[422]
+        ctx.body = createError({
+          message: 'User Invalid',
+          status: HTTP_STATUS_CODE[422],
+        })
+        captureException('User Invalid')
       }
     }
     catch (error: any) {

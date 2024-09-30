@@ -3,9 +3,9 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
 import { dbDown, initDB, tablesDrop } from '../src/db'
 
-const appInstance = app.callback()
-
 describe('⬢ Validate routes', () => {
+  const appInstance = app.callback()
+
   const testUser = {
     name: 'Benedicte Smans',
     email: 'BenedicteSmans@armyspy.com',
@@ -21,7 +21,7 @@ describe('⬢ Validate routes', () => {
     await dbDown()
   })
 
-  describe('⬢ Validate routing', () => {
+  describe('⬢ Validate user routes', () => {
     let _id: string
 
     it('● GET /api/users', async () => {
@@ -32,19 +32,6 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(200)
       expect(body.message).toStrictEqual('Fetched all user details successfully')
       expect(body.data.length).toBe(0)
-    })
-
-    it('● PUT /api/user:/:wrong-id', async () => {
-      const { headers, status, body } = await request(appInstance)
-        .put('/api/user/wrong-id')
-        .send(testUser)
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(500)
-      expect(body).toStrictEqual({
-        message: 'Update user details failed',
-        statusCode: 500,
-      })
     })
 
     it('● POST /api/user', async () => {

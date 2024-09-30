@@ -3,10 +3,11 @@ import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
-import * as db from '../src/db'
+import resolvers from '../src/resolvers'
 import { getRouter } from '../src/routers'
 import { validateRouter } from '../src/validator'
 
+const { Query } = resolvers
 const appInstance = app.callback()
 
 describe('⬢ Validate validator', () => {
@@ -46,7 +47,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/200', async () => {
-      const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(testUser)
+      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(testUser)
       const { headers, status } = await request(appInstance)
         .get('/api/user/200')
         .set('Accept', 'application/json')
@@ -56,7 +57,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/422', async () => {
-      const getUserMock = vi.spyOn(db, 'getUser').mockResolvedValue(undefined)
+      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(undefined)
       const { headers, status, body } = await request(appInstance)
         .get('/api/user/422')
         .set('Accept', 'application/json')
@@ -70,7 +71,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/500', async () => {
-      const getUserMock = vi.spyOn(db, 'getUser').mockRejectedValue(new Error('DB error'))
+      const getUserMock = vi.spyOn(Query, 'getUser').mockRejectedValue(new Error('query fetching error'))
       const { headers, status, body } = await request(appInstance)
         .get(`/api/user/500`)
       expect(headers['content-type']).toMatch(/json/)

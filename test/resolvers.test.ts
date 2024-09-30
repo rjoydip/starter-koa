@@ -1,9 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import type { UserInput } from '../src/types'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { dbDown, initDB } from '../src/db'
 import resolvers from '../src/resolvers'
 
 describe('⬢ Validate resolvers', () => {
+  beforeAll(async () => await initDB())
+  afterAll(async () => await dbDown())
+
   const query = resolvers.Query
+  const mutation = resolvers.Mutation
+
   it('● should validate query index', async () => {
     const { index } = query
     expect(await index()).toStrictEqual({
@@ -30,13 +36,74 @@ describe('⬢ Validate resolvers', () => {
 
   it('● should validate query health', async () => {
     const { health } = query
-    await initDB()
     expect(await health()).toStrictEqual({
       data: {
         db: true,
         redis: false,
       },
     })
-    await dbDown()
+  })
+
+  it('● should validate query getUsers', async () => {
+    const { getUsers } = query
+    const $ = await getUsers()
+    expect($).toBeDefined()
+    expect($.length).toBe(0)
+  })
+
+  it('● should validate query getUser', async () => {
+    const { getUser } = query
+    const $ = await getUser(null, { id: 'aee05181-dd00-48cb-a813-85a00a063660' })
+    expect($).toBeUndefined()
+    expect($?._id).toBeUndefined()
+    expect($?.name).toBeUndefined()
+    expect($?.email).toBeUndefined()
+    expect($?.address).toBeUndefined()
+  })
+
+  it('● should validate mutation createUser', async () => {
+    const { createUser } = mutation
+    const $ = await createUser(null, { input: { name: 'John Doe', email: 'john@example.com', phone: '1234567890', address: '123 Main St' } })
+    expect($).toBeDefined()
+    expect($?._id).toBeDefined()
+    expect($?.name).toBeDefined()
+    expect($?.name).toBeDefined()
+    expect($?.address).toBeDefined()
+  })
+
+  it('● should validate mutation updateUser', async () => {
+    const { getUsers } = query
+    const { updateUser } = mutation
+    const users: UserInput[] = await getUsers()
+    if (users && users[0]._id) {
+      const $ = await updateUser(null, {
+        id: users[0]._id,
+        input: {
+          ...users[0],
+          name: 'John Doe Edited',
+          email: 'john.edit@example.com',
+        },
+      })
+      expect($).toBeDefined()
+      expect($?._id).toBeDefined()
+      expect($?.name).toBeDefined()
+      expect($?.name).toBeDefined()
+      expect($?.address).toBeDefined()
+    }
+  })
+  it('● should validate mutation deleteUser', async () => {
+    const { getUsers } = query
+    const { deleteUser } = mutation
+    const users: UserInput[] = await getUsers()
+    if (users && users[0]._id) {
+      const $ = await deleteUser(null, {
+        id: users[0]._id,
+      })
+      expect($).toBeUndefined()
+      expect($?._id).toBeUndefined()
+      expect($?.name).toBeUndefined()
+      expect($?.name).toBeUndefined()
+      expect($?.address).toBeUndefined()
+    }
   })
 })
