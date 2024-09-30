@@ -2,12 +2,21 @@ import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import { app, graphqlApp } from '../src/app'
 
-const appInstance = app.callback()
-const graphqlAppInstance = graphqlApp.callback()
-
 describe('⬢ Validate app', () => {
+  const appInstance = app.callback()
+  const graphqlAppInstance = graphqlApp.callback()
+
   describe('⬢ Validate main routes', () => {
-    it('● GET /', async () => {
+    it('● GET /invalid', async () => {
+      const { headers, status, body } = await request(appInstance)
+        .get('/invalid')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch('text/plain')
+      expect(status).toEqual(404)
+      expect(body).toEqual({})
+    })
+
+    it.sequential('● GET /', async () => {
       const { headers, status, body } = await request(appInstance)
         .get('/')
         .set('Accept', 'application/json')
@@ -19,7 +28,7 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it('● GET /status', async () => {
+    it.sequential('● GET /status', async () => {
       const { headers, status, body } = await request(appInstance)
         .get('/status')
         .set('Accept', 'application/json')
@@ -34,16 +43,7 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it('● GET /invalid', async () => {
-      const { headers, status, body } = await request(appInstance)
-        .get('/invalid')
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch('text/plain')
-      expect(status).toEqual(404)
-      expect(body).toEqual({})
-    })
-
-    it('● GET /health', async () => {
+    it.sequential('● GET /health', async () => {
       const { headers, status, body } = await request(appInstance)
         .get('/health')
         .set('Accept', 'application/json')
@@ -59,7 +59,7 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it('● GET /metrics', async () => {
+    it.sequential('● GET /metrics', async () => {
       const { headers, status, body } = await request(appInstance)
         .get('/metrics')
         .set('Accept', 'application/json')

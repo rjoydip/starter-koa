@@ -125,7 +125,7 @@ export async function createUser(user: User): Promise<User | undefined> {
  * @param {User} user
  * @returns Promise<User | undefined | []>
  */
-export async function updateUser(id: string, user: User): Promise<User | undefined | []> {
+export async function updateUser(id: string, user: User): Promise<User | undefined> {
   return await db.transaction(async (tx) => {
     await tx.query<User>(`UPDATE users SET name = $2, email = $3, phone = $4, address = $5 WHERE _id = $1;`, [id, user.name, user.email, user.phone, user.address])
     const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [id])

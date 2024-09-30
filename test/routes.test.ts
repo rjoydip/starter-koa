@@ -3,9 +3,9 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
 import { dbDown, initDB, tablesDrop } from '../src/db'
 
-const appInstance = app.callback()
-
 describe('⬢ Validate routes', () => {
+  const appInstance = app.callback()
+
   const testUser = {
     name: 'Benedicte Smans',
     email: 'BenedicteSmans@armyspy.com',
@@ -21,7 +21,7 @@ describe('⬢ Validate routes', () => {
     await dbDown()
   })
 
-  describe('⬢ Validate routing', () => {
+  describe('⬢ Validate user routes', () => {
     let _id: string
 
     it('● GET /api/users', async () => {

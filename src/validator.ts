@@ -45,23 +45,18 @@ export function requestValidator(schema: any) {
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
-      if (ctx.params && ctx.params.id) {
-        const user = await Query.getUser(null, { id: ctx.params.id })
-        if (user) {
-          ctx.state.user = user
-          await next()
-        }
-        else {
-          ctx.status = HTTP_STATUS_CODE[422]
-          ctx.body = createError({
-            message: 'User Invalid',
-            status: HTTP_STATUS_CODE[422],
-          })
-          captureException('User Invalid')
-        }
+      const user = await Query.getUser(null, { id: ctx.params.id })
+      if (user) {
+        ctx.state.user = user
+        await next()
       }
       else {
-        await next()
+        ctx.status = HTTP_STATUS_CODE[422]
+        ctx.body = createError({
+          message: 'User Invalid',
+          status: HTTP_STATUS_CODE[422],
+        })
+        captureException('User Invalid')
       }
     }
     catch (error: any) {
