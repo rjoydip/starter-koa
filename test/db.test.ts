@@ -1,6 +1,6 @@
 import type { User } from '../src/types'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { dbDown, getUser, getUsers, initDB, isDBUp, setUser } from '../src/db'
+import { createUser, dbDown, getUser, getUsers, initDB, isDBUp } from '../src/db'
 
 const user: User = {
   _id: '',
@@ -24,7 +24,7 @@ describe('⬢ Validate db', () => {
   })
 
   it('● should insert and retrieve a user', async () => {
-    const usr = await setUser(user)
+    const usr = await createUser(user)
     expect(usr).toBeDefined()
     expect(usr?.name).toBe(user.name)
 

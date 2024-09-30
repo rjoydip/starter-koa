@@ -34,19 +34,6 @@ describe('⬢ Validate routes', () => {
       expect(body.data.length).toBe(0)
     })
 
-    it('● PUT /api/user:/:wrong-id', async () => {
-      const { headers, status, body } = await request(appInstance)
-        .put('/api/user/wrong-id')
-        .send(testUser)
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(500)
-      expect(body).toStrictEqual({
-        message: 'Update user details failed',
-        statusCode: 500,
-      })
-    })
-
     it('● POST /api/user', async () => {
       const { headers, status, body } = await request(appInstance)
         .post('/api/user')

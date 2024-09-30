@@ -13,6 +13,7 @@ export type Services = 'db' | 'redis'
  * @typedef {User}
  */
 export type User = InferOutput<typeof UserSchema>
+export interface UserInput extends InferOutput<Omit<typeof UserSchema, '_id'>> {}
 /**
  * @export
  * @interface IRegisteredRoutes

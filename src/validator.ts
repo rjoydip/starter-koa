@@ -2,9 +2,11 @@ import type { Context, Next } from 'koa'
 import type { IRouter } from './types'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
-import { getUser } from './db'
 import { createError } from './message'
+import resolvers from './resolvers'
 import { captureException, HTTP_STATUS_CODE } from './utils'
+
+const { Query } = resolvers
 
 /**
  * @export
@@ -44,7 +46,7 @@ export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
       if (ctx.params && ctx.params.id) {
-        const user = await getUser(ctx.params.id)
+        const user = await Query.getUser(null, { id: ctx.params.id })
         if (user) {
           ctx.state.user = user
           await next()

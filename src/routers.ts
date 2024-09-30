@@ -1,11 +1,13 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
 import { HttpMethodEnum } from 'koa-body'
-import { deleteUser, getUsers, setUser, updateUser } from './db'
 import { createError, createSuccess } from './message'
+import resolvers from './resolvers'
 import { UserSchema } from './schema'
 import { captureException, HTTP_STATUS_CODE } from './utils'
 import { requestValidator, userValidator } from './validator'
+
+const { Query, Mutation } = resolvers
 
 /**
  * @type {IRouter[]}
@@ -18,7 +20,7 @@ export const routers: IRouter[] = [
     middleware: [],
     handler: async (ctx: Koa.Context) => {
       try {
-        const users = await getUsers()
+        const users = await Query.getUsers()
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           status: HTTP_STATUS_CODE[200],
@@ -56,10 +58,10 @@ export const routers: IRouter[] = [
     name: 'PostUser',
     path: '/user',
     method: HttpMethodEnum.POST,
-    middleware: [requestValidator(UserSchema), userValidator()],
+    middleware: [requestValidator(UserSchema)],
     handler: async (ctx: Koa.Context) => {
       try {
-        const payload = await setUser(ctx.request.body)
+        const payload = await Mutation.createUser(null, { input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details stored successfully',
@@ -83,7 +85,7 @@ export const routers: IRouter[] = [
     middleware: [requestValidator(UserSchema), userValidator()],
     handler: async (ctx: Koa.Context) => {
       try {
-        const user = await updateUser(ctx.params.id, ctx.request.body)
+        const user = await Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details updates successfully',
@@ -108,7 +110,7 @@ export const routers: IRouter[] = [
     middleware: [userValidator()],
     handler: async (ctx: Koa.Context) => {
       try {
-        await deleteUser(ctx.params.id)
+        await Mutation.deleteUser(null, { id: ctx.params.id })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({ message: 'User delete successfully', data: ctx.state.user })
       }

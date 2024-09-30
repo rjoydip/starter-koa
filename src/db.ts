@@ -110,7 +110,7 @@ export async function getUsers(): Promise<User[]> {
  * @param {User} user
  * @returns Promise<User | undefined>
  */
-export async function setUser(user: User): Promise<User | undefined> {
+export async function createUser(user: User): Promise<User | undefined> {
   return await db.transaction(async (tx) => {
     const insert = await tx.query<User>(`INSERT INTO users (name, email, phone, address) VALUES ($1, $2, $3, $4) RETURNING _id`, [user.name, user.email, user.phone, user.address])
     const { rows } = await tx.query<User>(`SELECT _id, name, email, phone, address from users WHERE _id = $1;`, [insert.rows[0]._id])
