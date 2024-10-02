@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://unpkg.com/undocs/schema/config.json
+name: starter-koa
+shortDescription: Koa application starter
+description: Koa application starter
+github: rjoydip/starter-koa
+themeColor: amber
+url: https://rjoydip/starter-koa
+automd: true
+redirects: {}
+landing:
+  contributors: true
+  featuresTitle: Koa application starter
+  features:
+    - title: 'Small & Simple Structure'
+      description: A Simple server with good capabilities. The codebase followes monolithic structure.
+      icon: i-fa-puzzle-piece
+      to: ''
+      target: _blank
+
+    - title: 'Unit Test & Coverage'
+      description: Application has tested fully and having good coverage.
+      icon: i-material-symbols-robot-2-sharp
+      to: ''
+      target: _blank
+
+    - title: GraphQL
+      description: Starter contains fully GraphQL features.
+      icon: i-material-symbols-potted-plant-outline
+      to: ''
+      target: _blank
+
+    - title: OpenAPI
+      description: Supports OpenAPI and fancy API client.
+      icon: i-material-symbols-potted-plant-outline
+      to: ''
+      target: _blank
