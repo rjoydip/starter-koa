@@ -4,42 +4,35 @@ import https from 'node:https'
 import { init } from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import closeWithGrace from 'close-with-grace'
-import { app, graphqlApp } from './app'
+import { app } from './app'
 import config from './config'
 import { initDB } from './db'
 import logger from './logger'
 import { captureException, environment, isProd } from './utils'
 
 const port = config?.port
-const graphqlPort = config?.graphql_port
 
 /**
  * @export
  * @returns Server
  */
-export function startServer(): { appServer: Server, graphqlServer: Server } {
+export function startServer(): Server {
   /* v8 ignore start */
-  const appServer = config?.isHTTPs
+  const server = config?.isHTTPs
     ? https.createServer(app.callback())
     : http.createServer(app.callback())
-
-  const graphqlServer = config?.isHTTPs
-    ? https.createServer(graphqlApp.callback())
-    : http.createServer(graphqlApp.callback())
   /* v8 ignore stop */
 
-  appServer.listen(port)
-  graphqlServer.listen(graphqlPort)
+  server.listen(port)
 
   logger.ready(`Server running on port ${port}`)
-  logger.ready(`GraphQL server running on port ${graphqlPort}`)
-  return { appServer, graphqlServer }
+  return server
 }
 
 /**
  * @export
  */
-export function handleGracefulShutdown({ appServer, graphqlServer }: { appServer: Server, graphqlServer: Server }): void {
+export function handleGracefulShutdown(server: Server): void {
   closeWithGrace(
     {
       delay: config.graceful_delay,
@@ -49,8 +42,7 @@ export function handleGracefulShutdown({ appServer, graphqlServer }: { appServer
       if (err) {
         captureException(err)
       }
-      appServer.close()
-      graphqlServer.close()
+      server.close()
     },
   )
 }
@@ -73,8 +65,8 @@ async function main(): Promise<void> {
       profilesSampleRate: 1.0,
     })
     await initDB()
-    const { appServer, graphqlServer } = await startServer()
-    handleGracefulShutdown({ appServer, graphqlServer })
+    const server = await startServer()
+    handleGracefulShutdown(server)
   }
   catch (error: any) {
     captureException(`Error starting server: ${error}`)

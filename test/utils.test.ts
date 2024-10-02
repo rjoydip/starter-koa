@@ -1,7 +1,12 @@
+import { readFile } from 'node:fs/promises'
 import { getTraceData, init, isInitialized, captureException as sentryCaptureException } from '@sentry/node'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import logger from '../src/logger'
-import { captureException, environment, getRuntime, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
+import { API_PREFIX, captureException, environment, getOpenAPISpec, getRuntime, HTTP_STATUS_CODE, invariant, isDev, isProd, isTest } from '../src/utils'
+
+vi.mock('fs/promises', () => ({
+  readFile: vi.fn(),
+}))
 
 describe('⬢ Validate utils', () => {
   const MY_APP_DSN = 'http://acacaeaccacacacabcaacdacdacadaca@sentry.io/000001'
@@ -17,7 +22,25 @@ describe('⬢ Validate utils', () => {
     process.env = originalEnv
   })
 
-  describe('⬢ Validate utilities', () => {
+  it('● should validated exported value', () => {
+    expect(API_PREFIX).toStrictEqual('/api')
+  })
+
+  it('● should return the content of the openapi.yaml file as a string', async () => {
+    const mockOpenAPISpec = 'openapi: 3.0.0\ninfo:\n  title: Test API'
+    ;(readFile as any).mockResolvedValue(mockOpenAPISpec)
+    const result = await getOpenAPISpec()
+    expect(result).toBe(mockOpenAPISpec)
+    expect(readFile).toHaveBeenCalledWith('./src/openapi.yaml', { encoding: 'utf8' })
+  })
+
+  it('● should throw an error if reading the file fails', async () => {
+    const error = new Error('File not found')
+    ;(readFile as any).mockRejectedValue(error)
+    await expect(getOpenAPISpec()).rejects.toThrow('File not found')
+  })
+
+  describe('⬢ Validate utility methods', () => {
     describe('⬢ Validate invariant', () => {
       it('● should validated invariant for prod', () => {
         expect(() => invariant(false, 'production message')).toThrowError('Invariant failed')

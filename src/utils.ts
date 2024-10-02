@@ -1,4 +1,5 @@
 import type { Runtime } from './types'
+import { readFile } from 'node:fs/promises'
 import process from 'node:process'
 import { captureException as sentryCaptureException } from '@sentry/node'
 import logger from './logger'
@@ -7,6 +8,7 @@ import logger from './logger'
  * @type {string}
  */
 const prefix: string = 'Invariant failed'
+export const API_PREFIX = '/api'
 
 /**
  * @export
@@ -88,4 +90,8 @@ export const HTTP_STATUS_CODE = {
   401: 401,
   500: 500,
   422: 422,
+}
+
+export async function getOpenAPISpec(): Promise<string> {
+  return await readFile('./src/openapi.yaml', { encoding: 'utf8' })
 }

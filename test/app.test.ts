@@ -1,14 +1,13 @@
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import { app, graphqlApp } from '../src/app'
+import { app } from '../src/app'
 
 describe('⬢ Validate app', () => {
-  const appInstance = app.callback()
-  const graphqlAppInstance = graphqlApp.callback()
+  const app$ = app.callback()
 
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get('/invalid')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch('text/plain')
@@ -16,8 +15,8 @@ describe('⬢ Validate app', () => {
       expect(body).toEqual({})
     })
 
-    it.sequential('● GET /', async () => {
-      const { headers, status, body } = await request(appInstance)
+    it('● GET /', async () => {
+      const { headers, status, body } = await request(app$)
         .get('/')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -28,8 +27,8 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it.sequential('● GET /status', async () => {
-      const { headers, status, body } = await request(appInstance)
+    it('● GET /status', async () => {
+      const { headers, status, body } = await request(app$)
         .get('/status')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -43,8 +42,8 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it.sequential('● GET /health', async () => {
-      const { headers, status, body } = await request(appInstance)
+    it('● GET /health', async () => {
+      const { headers, status, body } = await request(app$)
         .get('/health')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -59,8 +58,8 @@ describe('⬢ Validate app', () => {
       })
     })
 
-    it.sequential('● GET /metrics', async () => {
-      const { headers, status, body } = await request(appInstance)
+    it('● GET /metrics', async () => {
+      const { headers, status, body } = await request(app$)
         .get('/metrics')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -68,16 +67,35 @@ describe('⬢ Validate app', () => {
       expect(body.message).toStrictEqual('Request successful')
       expect(body.data).toBeDefined()
     })
+
+    it('● GET /openapi', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/openapi')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body).toBeDefined()
+      expect(typeof body).toStrictEqual('object')
+    })
+
+    it('● GET /apidocs', async () => {
+      const { headers, status, text, type } = await request(app$)
+        .get('/apidocs')
+      expect(headers['content-type']).toMatch(/html/)
+      expect(status).toEqual(200)
+      expect(text).toBeDefined()
+      expect(type).toStrictEqual('text/html')
+    })
   })
 
   describe('⬢ Validate graphqlQL routes', () => {
     it('● GET /status', async () => {
-      const { status } = await request(graphqlAppInstance)
+      const { status } = await request(app$)
         .get('/status')
-      expect(status).toEqual(204)
+      expect(status).toEqual(200)
     })
     it('● GET /graphql', async () => {
-      const { status } = await request(graphqlAppInstance)
+      const { status } = await request(app$)
         .get('/graphql')
       expect(status).toEqual(200)
     })
@@ -85,7 +103,7 @@ describe('⬢ Validate app', () => {
 
   describe('⬢ IP middleware', () => {
     it('● should allow access from whitelisted IP', async () => {
-      const res = await request(appInstance)
+      const res = await request(app$)
         .get('/')
         .set('x-forwarded-for', '127.0.0.1')
 
@@ -97,7 +115,7 @@ describe('⬢ Validate app', () => {
     })
 
     it('● should allow access from an IP not listed in blacklist or whitelist', async () => {
-      const res = await request(appInstance)
+      const res = await request(app$)
         .get('/')
 
       expect(res.status).toBe(200)
@@ -109,7 +127,7 @@ describe('⬢ Validate app', () => {
 
     it('● should block access from blacklisted IP range', async () => {
       app.proxy = true
-      const res = await request(appInstance)
+      const res = await request(app$)
         .get('/')
         .set('x-forwarded-host', '192.168.0.5')
       expect(res.status).toBe(403)
@@ -117,7 +135,7 @@ describe('⬢ Validate app', () => {
 
     it('● should block access from blacklisted IP', async () => {
       app.proxy = true
-      const res = await request(appInstance)
+      const res = await request(app$)
         .get('/')
         .set('Host', '192.168.0.5')
       expect(res.status).toBe(403)

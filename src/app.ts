@@ -1,5 +1,6 @@
+import type { Context, Next } from 'koa'
 import type { IRouter } from './types'
-import { setupKoaErrorHandler } from '@sentry/node'
+import { parseYAML } from 'confbox'
 import { createYoga } from 'graphql-yoga'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
@@ -11,29 +12,30 @@ import logger from './logger'
 import { createSuccess } from './message'
 import resolvers from './resolvers'
 import { routers } from './routers'
+import { apiDocs } from './scalar'
 import { schema } from './schema'
-import { environment, HTTP_STATUS_CODE } from './utils'
+import { API_PREFIX, environment, getOpenAPISpec, HTTP_STATUS_CODE, isProd } from './utils'
 
+const whitelist = ['127.0.0.1']
+const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
 // Aapplication instances
 const app = new Koa({
-  asyncLocalStorage: false,
   env: environment(),
 })
-const graphqlApp = new Koa()
-setupKoaErrorHandler(app)
 const yoga = createYoga({
   landingPage: true,
   schema,
 })
-const whitelist = ['127.0.0.1']
-const blacklist = ['192.168.0.*', '8.8.8.[0-3]']
 const apiRouter = new Router({
-  prefix: '/api',
+  prefix: API_PREFIX,
 })
 const appRouter = new Router()
 
 /* External middleware - [START] */
-app.use(helmet())
+app.use(helmet({
+  contentSecurityPolicy: isProd(),
+  crossOriginEmbedderPolicy: isProd(),
+}))
 app.use(koaBody())
 app.use(ratelimit({
   driver: 'memory',
@@ -52,16 +54,7 @@ app.use(ratelimit({
 /* External middleware - [END] */
 
 /* Internal middleware - [START] */
-// GraphQL middleware
-graphqlApp.use(async (ctx) => {
-  const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
-  ctx.status = response.status
-  response.headers.forEach((value, key) => {
-    ctx.append(key, value)
-  })
-  ctx.body = response.body
-})
-// IP middleware
+// IP
 app.use(async (ctx, next) => {
   const hostname = ctx.request.hostname
   let pass = true
@@ -81,7 +74,7 @@ app.use(async (ctx, next) => {
   ctx.throw(403)
   ctx.body = createSuccess({ message: 'Forbidden!!!' })
 })
-// Logger middleware
+// Logger
 app.use(async (ctx, next) => {
   const start = Date.now()
   await next()
@@ -89,11 +82,22 @@ app.use(async (ctx, next) => {
   logger.debug(`> ${ctx.method} ${ctx.url} - ${ms}ms`)
   ctx.set('X-Response-Time', `${ms}ms`)
 })
-
-// Authentication middleware
+// Authentication
 app.use(async (_, next) => {
   logger.debug('Authentication Middleware')
   await next()
+})
+// 404 response
+app.use(async (ctx, next) => {
+  try {
+    await next()
+    if (ctx.status === 404) {
+      ctx.throw(404)
+    }
+  }
+  catch (error: any) {
+    ctx.throw(error)
+  }
 })
 /* Internal middleware - [END] */
 
@@ -117,33 +121,45 @@ appRouter
     ctx.status = HTTP_STATUS_CODE[200]
     ctx.body = createSuccess(payload)
   })
+  .get('/openapi', async (ctx) => {
+    ctx.status = HTTP_STATUS_CODE[200]
+    const openapiSpec = await getOpenAPISpec()
+    ctx.body = parseYAML(openapiSpec)
+  })
+  .get('/apidocs', async (ctx: Context, next: Next) => {
+    ctx.type = 'html'
+    const openapiSpec = await getOpenAPISpec()
+    ctx.body = apiDocs({
+      spec: {
+        content: openapiSpec,
+      },
+    })
+    await next()
+  })
+  .all('/graphql', async (ctx) => {
+    const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
+    ctx.status = response.status
+    response.headers.forEach((value, key) => {
+      ctx.append(key, value)
+    })
+    ctx.body = response.body
+  })
 
 routers.forEach((r: IRouter) => {
   // TODO: Change it to dynamic method calling
   switch (r.method) {
     case HttpMethodEnum.GET:
-      apiRouter.get(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.get(r.name, r.path, ...r.middleware, r.defineHandler)
       break
     case HttpMethodEnum.POST:
-      apiRouter.post(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.post(r.name, r.path, ...r.middleware, r.defineHandler)
       break
     case HttpMethodEnum.PUT:
-      apiRouter.put(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.put(r.name, r.path, ...r.middleware, r.defineHandler)
       break
     case HttpMethodEnum.DELETE:
-      apiRouter.delete(r.name, r.path, ...r.middleware, r.handler)
+      apiRouter.delete(r.name, r.path, ...r.middleware, r.defineHandler)
       break
-  }
-})
-app.use(async (ctx, next) => {
-  try {
-    await next()
-    if (ctx.status === 404) {
-      ctx.throw(404)
-    }
-  }
-  catch (error: any) {
-    ctx.throw(error)
   }
 })
 // Dispatch routes and allow OPTIONS request method
@@ -151,4 +167,4 @@ app.use(appRouter.routes())
 app.use(apiRouter.routes())
   .use(apiRouter.allowedMethods())
 
-export { apiRouter, app, appRouter, graphqlApp }
+export { apiRouter, app, appRouter }
