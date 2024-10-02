@@ -4,7 +4,7 @@ import { app } from '../src/app'
 import { dbDown, initDB, tablesDrop } from '../src/db'
 
 describe('⬢ Validate routes', () => {
-  const appInstance = app.callback()
+  const app$ = app.callback()
 
   const testUser = {
     name: 'Benedicte Smans',
@@ -25,7 +25,7 @@ describe('⬢ Validate routes', () => {
     let _id: string
 
     it('● GET /api/users', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -35,7 +35,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● POST /api/user', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .post('/api/user')
         .send({
           ...testUser,
@@ -59,7 +59,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it.sequential('● GET /api/user:/:id', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -69,7 +69,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it.sequential('● PUT /api/user:/:id', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .put(`/api/user/${_id}`)
         .send(testUser)
         .set('Accept', 'application/json')
@@ -91,7 +91,7 @@ describe('⬢ Validate routes', () => {
     it.sequential('● DELETE /api/user:/:id status 500', async () => {
       const db = await import('../src/db')
       vi.spyOn(db, 'deleteUser').mockRejectedValueOnce(new Error('DB unable to take transaction'))
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .delete(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -99,7 +99,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it.sequential('● PUT /api/user:/:throw', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .put(`/api/user/${_id}`)
         .send({
           ...testUser,
@@ -115,7 +115,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it.sequential('● DELETE /api/user:/:id', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .delete(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -128,7 +128,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it.sequential('● GET /api/user/:deleted-user', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -140,7 +140,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● DELETE /api/user:/:wrong-id', async () => {
-      const deleteUserResponse = await request(appInstance)
+      const deleteUserResponse = await request(app$)
         .delete('/api/user/wrong-id')
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)
@@ -155,7 +155,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● GET /api/users 500', async () => {
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -163,7 +163,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● GET /api/user/:id 500', async () => {
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .get(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -171,7 +171,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● POST /api/user 500', async () => {
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .post('/api/user/')
         .send(testUser)
         .set('Accept', 'application/json')
@@ -180,7 +180,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● PUT /api/user/:id 500', async () => {
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .delete(`/api/user/${_id}`)
         .send({
           _id: 'xxxx',
@@ -192,7 +192,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● DELETE /api/user:/:id 500', async () => {
-      const deleteUserResponse = await request(appInstance)
+      const deleteUserResponse = await request(app$)
         .delete(`/api/user/${_id}`)
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)

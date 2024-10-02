@@ -62,7 +62,6 @@ const {
   LOG_LEVEL = 3,
   ENABLE_HTTPS = false,
   PORT = 8080,
-  GRAPHQL_PORT = 8081,
   HOST = '127.0.0.1',
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
@@ -75,7 +74,6 @@ const {
 
 export default {
   port: Number(PORT),
-  graphql_port: Number(GRAPHQL_PORT),
   host: HOST,
   isHTTPs: Boolean(ENABLE_HTTPS),
   services: SERVICES as Services[],

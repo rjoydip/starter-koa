@@ -92,8 +92,8 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router method must be a valid HTTP method')
   }
 
-  if (!router.handler || typeof router.handler !== 'function') {
-    throw new Error('Router handler must be a function')
+  if (!router.defineHandler || typeof router.defineHandler !== 'function') {
+    throw new Error('Router defineHandler must be a function')
   }
 
   if (!router.middleware && !Array.isArray(router.middleware)) {

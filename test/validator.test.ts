@@ -7,10 +7,9 @@ import resolvers from '../src/resolvers'
 import { getRouter } from '../src/routers'
 import { validateRouter } from '../src/validator'
 
-const { Query } = resolvers
-const appInstance = app.callback()
-
 describe('⬢ Validate validator', () => {
+  const { Query } = resolvers
+  const app$ = app.callback()
   describe('⬢ Validate middleware', () => {
     const testUser = {
       name: 'Benedicte Smans',
@@ -20,7 +19,7 @@ describe('⬢ Validate validator', () => {
     }
 
     it('● should validated requestValidator POST /api/user', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .post('/api/user')
         .send()
       expect(headers['content-type']).toMatch(/json/)
@@ -32,7 +31,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated requestValidator invalid data POST /api/user', async () => {
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .post('/api/user')
         .send({
           ...testUser,
@@ -48,7 +47,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/200', async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(testUser)
-      const { headers, status } = await request(appInstance)
+      const { headers, status } = await request(app$)
         .get('/api/user/200')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -58,7 +57,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/422', async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(undefined)
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get('/api/user/422')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -72,7 +71,7 @@ describe('⬢ Validate validator', () => {
 
     it('● should validated userValidator GET /api/user/500', async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockRejectedValue(new Error('query fetching error'))
-      const { headers, status, body } = await request(appInstance)
+      const { headers, status, body } = await request(app$)
         .get(`/api/user/500`)
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(500)
@@ -117,7 +116,7 @@ describe('⬢ Validate validator', () => {
         path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: [],
-        handler: () => Promise.resolve(),
+        defineHandler: () => Promise.resolve(),
       })).toThrow('Router name must be a non-empty string')
     })
 
@@ -127,7 +126,7 @@ describe('⬢ Validate validator', () => {
         path: '',
         method: HttpMethodEnum.GET,
         middleware: [],
-        handler: () => Promise.resolve(),
+        defineHandler: () => Promise.resolve(),
       })).toThrow('Router path must be a non-empty string')
     })
 
@@ -137,7 +136,7 @@ describe('⬢ Validate validator', () => {
         path: '/api/users',
         method: 'FOO' as HttpMethod,
         middleware: [],
-        handler: () => Promise.resolve(),
+        defineHandler: () => Promise.resolve(),
       })).toThrow('Router method must be a valid HTTP method')
     })
 
@@ -147,18 +146,18 @@ describe('⬢ Validate validator', () => {
         path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: null as any,
-        handler: () => Promise.resolve(),
+        defineHandler: () => Promise.resolve(),
       })).toThrow('Router middleware must be an array')
     })
 
-    it('● should validated route handler', async () => {
+    it('● should validated route defineHandler', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
         path: '/api/users',
         method: HttpMethodEnum.GET,
         middleware: [],
-        handler: null as any,
-      })).toThrow('Router handler must be a function')
+        defineHandler: null as any,
+      })).toThrow('Router defineHandler must be a function')
     })
   })
 })

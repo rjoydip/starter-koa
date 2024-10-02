@@ -6,7 +6,16 @@
 Koa application starter
 
 > [!NOTE]
-> This project is in the early stages and under development. Although the bun is being used as package manager but application and some other script are working through node.
+> This project is in the early stages and under development. Although the pnpm is being used as package manager but application and some other script are working through node.
+
+✅ Koa <br>
+✅ PGLite <br>
+✅ Sentry <br>
+✅ Consola <br>
+✅ GraphQL Yoga <br>
+✅ Valibot <br>
+✅ Vitest <br>
+✅ Unbuild <br>
 
 ## Development
 
@@ -23,33 +32,41 @@ Koa application starter
 For install
 
 ```sh
-bun install # or ni
-bun install --production # or nci
+pnpm install # or ni
+pnpm install --production # or nci
 ```
 
 For build
 
 ```sh
-bun run build # or nr build
+pnpm run build # or nr build
 ```
 
 For lint
 
 ```sh
-bun run lint # or nr lint
+pnpm run lint # or nr lint
 ```
 
 For test
 
 ```sh
-bun test # or nr test
+pnpm test # or nr test
 ```
 
 For all scripts
 
 ```sh
-bun run all # or nr all
+pnpm run all # or nr all
 ```
+
+## API
+
+After running dev command visit `/apidocs` endpoint.
+
+## GraphQL
+
+For showing graphql playground visit `/graphql`.
 
 ## License
 

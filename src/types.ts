@@ -73,7 +73,7 @@ export interface IRouter {
   /**
    * @type {(ctx: Context, next: Next) => Promise<void>}
    */
-  handler: (ctx: Context, next: Next) => Promise<void>
+  defineHandler: (ctx: Context, next: Next) => Promise<void>
 }
 
 /**

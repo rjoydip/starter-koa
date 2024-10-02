@@ -18,7 +18,7 @@ export const routers: IRouter[] = [
     path: '/users',
     method: HttpMethodEnum.GET,
     middleware: [],
-    handler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Koa.Context) => {
       try {
         const users = await Query.getUsers()
         ctx.status = HTTP_STATUS_CODE[200]
@@ -43,7 +43,7 @@ export const routers: IRouter[] = [
     path: '/user/:id',
     method: HttpMethodEnum.GET,
     middleware: [userValidator()],
-    handler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Koa.Context) => {
       const user = ctx.state.user
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess({
@@ -59,7 +59,7 @@ export const routers: IRouter[] = [
     path: '/user',
     method: HttpMethodEnum.POST,
     middleware: [requestValidator(UserSchema)],
-    handler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Koa.Context) => {
       try {
         const payload = await Mutation.createUser(null, { input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
@@ -83,7 +83,7 @@ export const routers: IRouter[] = [
     path: '/user/:id',
     method: HttpMethodEnum.PUT,
     middleware: [requestValidator(UserSchema), userValidator()],
-    handler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Koa.Context) => {
       try {
         const user = await Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
@@ -108,7 +108,7 @@ export const routers: IRouter[] = [
     path: '/user/:id',
     method: HttpMethodEnum.DELETE,
     middleware: [userValidator()],
-    handler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Koa.Context) => {
       try {
         await Mutation.deleteUser(null, { id: ctx.params.id })
         ctx.status = HTTP_STATUS_CODE[200]
