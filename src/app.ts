@@ -29,7 +29,7 @@ const yoga = createYoga({
 const apiRouter = new Router({
   prefix: API_PREFIX,
 })
-const appRouter = new Router()
+const router = new Router()
 
 /* External middleware - [START] */
 app.use(helmet({
@@ -102,7 +102,7 @@ app.use(async (ctx, next) => {
 /* Internal middleware - [END] */
 
 // Custom routers
-appRouter
+router
   .get('/', (ctx) => {
     ctx.status = HTTP_STATUS_CODE[200]
     ctx.body = createSuccess(resolvers.Query.index())
@@ -163,8 +163,11 @@ routers.forEach((r: IRouter) => {
   }
 })
 // Dispatch routes and allow OPTIONS request method
-app.use(appRouter.routes())
-app.use(apiRouter.routes())
+app
+  .use(router.routes())
+  .use(router.allowedMethods())
+  .use(apiRouter.routes())
   .use(apiRouter.allowedMethods())
 
-export { apiRouter, app, appRouter }
+export { app }
+export default app
