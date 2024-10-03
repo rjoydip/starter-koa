@@ -1,5 +1,5 @@
 import type { Context, Middleware, Next } from 'koa'
-import type { HttpMethod } from 'koa-body'
+import type { HttpMethodEnum } from 'koa-body/lib/types'
 import type { InferOutput } from 'valibot'
 import type { UserSchema } from './schema'
 
@@ -63,9 +63,9 @@ export interface IRouter {
    */
   path: string
   /**
-   * @type {HttpMethod}
+   * @type {HttpMethodEnum}
    */
-  method: HttpMethod
+  method: HttpMethodEnum
   /**
    * @type {Middleware[]}
    */

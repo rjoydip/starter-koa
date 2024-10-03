@@ -1,6 +1,6 @@
 import type { Context, Next } from 'koa'
 import type { IRouter } from './types'
-import { HttpMethodEnum } from 'koa-body'
+import { HttpMethodEnum } from 'koa-body/lib/types'
 import { safeParse } from 'valibot'
 import { createError } from './message'
 import resolvers from './resolvers'
