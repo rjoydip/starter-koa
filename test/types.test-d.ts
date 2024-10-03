@@ -2,7 +2,7 @@ import type { Context, Next } from 'koa'
 import type { IConfig } from '../src/config'
 import type { IMessage } from '../src/message'
 import type { IHealth, IRegisteredRoutes, IRouter, Runtime, Services, User } from '../src/types'
-import { HttpMethodEnum } from 'koa-body'
+import { HttpMethodEnum } from 'koa-body/lib/types'
 import { describe, expectTypeOf, it } from 'vitest'
 
 describe('⬢ Validate types', () => {
@@ -49,7 +49,7 @@ describe('⬢ Validate types', () => {
       path: '/',
       method: HttpMethodEnum.GET,
       middleware: [],
-      handler: (_ctx: Context, _next: Next) => Promise.resolve(),
+      defineHandler: (_ctx: Context, _next: Next) => Promise.resolve(),
     }).toMatchTypeOf<IRouter>()
   })
 })

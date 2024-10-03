@@ -1,21 +1,115 @@
 import type Koa from 'koa'
 import type { IRouter } from './types'
+import { parseYAML } from 'confbox/yaml'
+import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
 import { createError, createSuccess } from './message'
 import resolvers from './resolvers'
-import { UserSchema } from './schema'
-import { captureException, HTTP_STATUS_CODE } from './utils'
+import { apiDocs } from './scalar'
+import { schema, UserSchema } from './schema'
+import { API_PREFIX, captureException, getOpenAPISpec, HTTP_STATUS_CODE } from './utils'
 import { requestValidator, userValidator } from './validator'
 
+const yoga = createYoga({
+  landingPage: true,
+  schema,
+})
 const { Query, Mutation } = resolvers
 
 /**
  * @type {IRouter[]}
  */
-export const routers: IRouter[] = [
+const mainRoutes: IRouter[] = [
+  {
+    name: 'Index',
+    path: '/',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = createSuccess(resolvers.Query.index())
+    },
+  },
+  {
+    name: 'Status',
+    path: '/status',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = createSuccess(resolvers.Query.status())
+    },
+  },
+  {
+    name: 'Health',
+    path: '/health',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      const payload = await resolvers.Query.health()
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = createSuccess(payload)
+    },
+  },
+  {
+    name: 'Metrics',
+    path: '/metrics',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      const payload = await resolvers.Query.metrics()
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = createSuccess(payload)
+    },
+  },
+  {
+    name: 'OpenAPI',
+    path: '/openapi',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      ctx.status = HTTP_STATUS_CODE[200]
+      const openapiSpec = await getOpenAPISpec()
+      ctx.body = parseYAML(openapiSpec)
+    },
+  },
+  {
+    name: 'APIDocs',
+    path: '/apidocs',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      ctx.type = 'html'
+      const openapiSpec = await getOpenAPISpec()
+      ctx.body = apiDocs({
+        spec: {
+          content: openapiSpec,
+        },
+      })
+    },
+  },
+  {
+    name: 'GraphQL',
+    path: '/graphql',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Koa.Context) => {
+      const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
+      ctx.status = response.status
+      response.headers.forEach((value, key) => {
+        ctx.append(key, value)
+      })
+      ctx.body = response.body
+    },
+  },
+]
+/**
+ * @type {IRouter[]}
+ */
+const userRoutes: IRouter[] = [
   {
     name: 'GetUsers',
-    path: '/users',
+    path: `${API_PREFIX}/users`,
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Koa.Context) => {
@@ -40,7 +134,7 @@ export const routers: IRouter[] = [
   },
   {
     name: 'GetUser',
-    path: '/user/:id',
+    path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.GET,
     middleware: [userValidator()],
     defineHandler: async (ctx: Koa.Context) => {
@@ -56,7 +150,7 @@ export const routers: IRouter[] = [
   },
   {
     name: 'PostUser',
-    path: '/user',
+    path: `${API_PREFIX}/user`,
     method: HttpMethodEnum.POST,
     middleware: [requestValidator(UserSchema)],
     defineHandler: async (ctx: Koa.Context) => {
@@ -79,9 +173,9 @@ export const routers: IRouter[] = [
     },
   },
   {
-    name: 'PutUser',
-    path: '/user/:id',
-    method: HttpMethodEnum.PUT,
+    name: 'PatchUser',
+    path: `${API_PREFIX}/user/:id`,
+    method: HttpMethodEnum.PATCH,
     middleware: [requestValidator(UserSchema), userValidator()],
     defineHandler: async (ctx: Koa.Context) => {
       try {
@@ -105,7 +199,7 @@ export const routers: IRouter[] = [
   },
   {
     name: 'DeleteUser',
-    path: '/user/:id',
+    path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.DELETE,
     middleware: [userValidator()],
     defineHandler: async (ctx: Koa.Context) => {
@@ -125,6 +219,10 @@ export const routers: IRouter[] = [
     },
   },
 ]
+/**
+ * @type {IRouter[]}
+ */
+export const routers: IRouter[] = [...mainRoutes, ...userRoutes]
 
 /**
  * @export

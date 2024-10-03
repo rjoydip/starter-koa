@@ -27,7 +27,7 @@ Koa application starter
 - Install dependencies using `ni`
 - Run interactive tests using `nr dev`
 
-## Commands
+## CLI
 
 For install
 
