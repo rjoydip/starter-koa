@@ -1,4 +1,3 @@
-import type { HttpMethod } from 'koa-body'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
@@ -96,8 +95,8 @@ describe('⬢ Validate validator', () => {
       expect(validateRouter(getRouter('PostUser'))).toBeTruthy()
     })
 
-    it('● should validated /PUT user routes', async () => {
-      expect(validateRouter(getRouter('PutUser'))).toBeTruthy()
+    it('● should validated /PATCH user routes', async () => {
+      expect(validateRouter(getRouter('PatchUser'))).toBeTruthy()
     })
 
     it('● should validated /DELETE user routes', async () => {
@@ -113,7 +112,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route name', async () => {
       expect(() => validateRouter({
         name: '',
-        path: '/api/users',
+        path: '/api/user',
         method: HttpMethodEnum.GET,
         middleware: [],
         defineHandler: () => Promise.resolve(),
@@ -133,8 +132,8 @@ describe('⬢ Validate validator', () => {
     it('● should validated route method', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/api/users',
-        method: 'FOO' as HttpMethod,
+        path: '/api/user',
+        method: 'FOO' as any,
         middleware: [],
         defineHandler: () => Promise.resolve(),
       })).toThrow('Router method must be a valid HTTP method')
@@ -143,7 +142,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route middleware', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/api/users',
+        path: '/api/user',
         method: HttpMethodEnum.GET,
         middleware: null as any,
         defineHandler: () => Promise.resolve(),
@@ -153,7 +152,7 @@ describe('⬢ Validate validator', () => {
     it('● should validated route defineHandler', async () => {
       expect(() => validateRouter({
         name: 'xxxx',
-        path: '/api/users',
+        path: '/api/user',
         method: HttpMethodEnum.GET,
         middleware: [],
         defineHandler: null as any,

@@ -2,7 +2,7 @@
   "name": "starter-koa",
   "type": "module",
   "version": "0.0.0",
-  "packageManager": "pnpm@9.11.0",
+  "packageManager": "pnpm@9.12.0",
   "description": "Koa application starter",
   "author": "Joydip Roy <joydipand@gmail.com>",
   "license": "MIT",
@@ -59,9 +59,9 @@
     "prepare": "simple-git-hooks"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.9",
-    "@sentry/node": "^8.32.0",
-    "@sentry/profiling-node": "^8.32.0",
+    "@electric-sql/pglite": "^0.2.10",
+    "@sentry/node": "^8.33.0",
+    "@sentry/profiling-node": "^8.33.0",
     "close-with-grace": "^2.1.0",
     "confbox": "^0.1.7",
     "consola": "^3.2.3",
@@ -85,21 +85,21 @@
     "@types/koa-router": "^7.4.8",
     "@types/node": "^22.7.4",
     "@types/supertest": "^6.0.2",
-    "@vitest/coverage-v8": "^2.1.1",
+    "@vitest/coverage-v8": "^2.1.2",
     "autocannon": "^7.15.0",
     "clinic": "^13.0.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.11.1",
     "lint-staged": "^15.2.10",
-    "pnpm": "^9.11.0",
-    "rollup": "^4.23.0",
+    "pnpm": "^9.12.0",
+    "rollup": "^4.24.0",
     "simple-git-hooks": "^2.11.1",
     "supertest": "^7.0.0",
     "taze": "^0.17.2",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
     "unbuild": "^2.0.0",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.2"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpx lint-staged"

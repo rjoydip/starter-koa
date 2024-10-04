@@ -13,16 +13,111 @@ describe('⬢ Validate routes', () => {
     phone: '+(46)0511-7158851',
   }
 
-  beforeAll(async () => {
-    await initDB()
-  })
+  describe('⬢ Validate main routes', () => {
+    it('● GET /invalid', async () => {
+      const { headers, status } = await request(app$)
+        .get('/invalid')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch('text/plain')
+      expect(status).toEqual(404)
+    })
 
-  afterAll(async () => {
-    await dbDown()
+    it('● GET /', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body).toStrictEqual({
+        message: 'Welcome to Koa Starter',
+        statusCode: 200,
+      })
+    })
+
+    it('● GET /status', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/status')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body).toEqual({
+        statusCode: 200,
+        message: 'Request successful',
+        data: {
+          status: 'up',
+        },
+      })
+    })
+
+    it('● GET /health', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/health')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body).toEqual({
+        statusCode: 200,
+        message: 'Request successful',
+        data: {
+          db: true,
+          redis: false,
+        },
+      })
+    })
+
+    it('● GET /metrics', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/metrics')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body.message).toStrictEqual('Request successful')
+      expect(body.data).toBeDefined()
+    })
+
+    it('● GET /openapi', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/openapi')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body).toBeDefined()
+      expect(typeof body).toStrictEqual('object')
+    })
+
+    it('● GET /apidocs', async () => {
+      const { headers, status, text, type } = await request(app$)
+        .get('/apidocs')
+      expect(headers['content-type']).toMatch(/html/)
+      expect(status).toEqual(200)
+      expect(text).toBeDefined()
+      expect(type).toStrictEqual('text/html')
+    })
+
+    describe('⬢ Validate graphqlQL routes', () => {
+      it('● GET /status', async () => {
+        const { status } = await request(app$)
+          .get('/status')
+        expect(status).toEqual(200)
+      })
+      it('● GET /graphql', async () => {
+        const { status } = await request(app$)
+          .get('/graphql')
+        expect(status).toEqual(200)
+      })
+    })
   })
 
   describe('⬢ Validate user routes', () => {
     let _id: string
+
+    beforeAll(async () => {
+      await initDB()
+    })
+
+    afterAll(async () => {
+      await dbDown()
+    })
 
     it('● GET /api/users', async () => {
       const { headers, status, body } = await request(app$)
@@ -68,9 +163,9 @@ describe('⬢ Validate routes', () => {
       expect(Object.keys(body.data)).toStrictEqual(['_id', 'name', 'email', 'phone', 'address'])
     })
 
-    it.sequential('● PUT /api/user:/:id', async () => {
+    it.sequential('● PATCH /api/user:/:id', async () => {
       const { headers, status, body } = await request(app$)
-        .put(`/api/user/${_id}`)
+        .patch(`/api/user/${_id}`)
         .send(testUser)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -98,9 +193,9 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it.sequential('● PUT /api/user:/:throw', async () => {
+    it.sequential('● PATCH /api/user:/:throw', async () => {
       const { headers, status, body } = await request(app$)
-        .put(`/api/user/${_id}`)
+        .patch(`/api/user/${_id}`)
         .send({
           ...testUser,
           name: 'Benedicte Smans Marlou Schaminée',
