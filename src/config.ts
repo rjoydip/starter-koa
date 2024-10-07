@@ -1,5 +1,5 @@
 import type { LogLevel } from 'consola'
-import type { Runtime, Services } from './types'
+import type { Runtime } from './types'
 import { env } from 'node:process'
 
 /**
@@ -29,10 +29,6 @@ export interface IConfig {
    */
   log_level?: LogLevel
   /**
-   * @type {?Services[]}
-   */
-  services?: Services[]
-  /**
    * @type {?number}
    */
   ratelimit?: number
@@ -41,21 +37,41 @@ export interface IConfig {
    */
   duration?: number
   /**
-   * @type {?boolean}
-   */
-  enable_cache?: boolean
-  /**
    * @type {?number}
    */
   graceful_delay?: number
   /**
    * @type {?string}
    */
-  sentry_dsn?: string
+  monitor_dsn?: string
   /**
    * @type {?Runtime}
    */
   runtime?: Runtime
+  /**
+   * @type {?string}
+   */
+  AUTH_SECRET?: string
+  /**
+   * @type {?string}
+   */
+  AUTH_CALLBACK_URL?: string
+  /**
+   * @type {?string}
+   */
+  GITHUB_CLIENT_ID?: string
+  /**
+   * @type {?string}
+   */
+  GITHUB_CLIENT_SECRET?: string
+  /**
+   * @type {?string}
+   */
+  DATABASE_URL?: string
+  /**
+   * @type {?string}
+   */
+  DB_AUTH_TOKEN?: string
 }
 
 const {
@@ -65,23 +81,31 @@ const {
   HOST = '127.0.0.1',
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
-  SERVICES = ['db', 'redis'],
-  ENABLE_CACHE = false,
   GRACEFUL_DELAY = 500,
-  SENTRY_DNS = '',
+  MONITOR_DNS = '',
   RUNTIME = 'node',
+  AUTH_SECRET = '',
+  AUTH_CALLBACK_URL = '',
+  GITHUB_CLIENT_ID = '',
+  GITHUB_CLIENT_SECRET = '',
+  DATABASE_URL = '',
+  DB_AUTH_TOKEN = '',
 } = env
 
 export default {
   port: Number(PORT),
   host: HOST,
   isHTTPs: Boolean(ENABLE_HTTPS),
-  services: SERVICES as Services[],
   ratelimit: Number(RATE_LIMIT),
   duration: Number(RATE_DURATION),
   log_level: LOG_LEVEL as LogLevel,
-  enable_cache: Boolean(ENABLE_CACHE),
   graceful_delay: Number(GRACEFUL_DELAY),
-  sentry_dsn: SENTRY_DNS,
+  monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
+  auth_secret: AUTH_SECRET,
+  auth_callback_url: AUTH_CALLBACK_URL,
+  github_client_id: GITHUB_CLIENT_ID,
+  github_client_secrt: GITHUB_CLIENT_SECRET,
+  db_url: DATABASE_URL,
+  db_auth_token: DB_AUTH_TOKEN,
 }

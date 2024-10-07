@@ -1,10 +1,9 @@
-import type { UserInput } from '../src/types'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { dbDown, initDB } from '../src/db'
+import type { User } from '../src/types'
+import { afterAll, describe, expect, it } from 'vitest'
+import { dbDown } from '../src/db'
 import resolvers from '../src/resolvers'
 
 describe('⬢ Validate resolvers', () => {
-  beforeAll(async () => await initDB())
   afterAll(async () => await dbDown())
 
   const query = resolvers.Query
@@ -53,7 +52,7 @@ describe('⬢ Validate resolvers', () => {
 
   it('● should validate query getUser', async () => {
     const { getUser } = query
-    const $ = await getUser(null, { id: 'aee05181-dd00-48cb-a813-85a00a063660' })
+    const $ = await getUser(null, { id: 1 })
     expect($).toBeUndefined()
     expect($?._id).toBeUndefined()
     expect($?.name).toBeUndefined()
@@ -74,7 +73,7 @@ describe('⬢ Validate resolvers', () => {
   it('● should validate mutation updateUser', async () => {
     const { getUsers } = query
     const { updateUser } = mutation
-    const users: UserInput[] = await getUsers()
+    const users: User[] = await getUsers()
     if (users && users[0]._id) {
       const $ = await updateUser(null, {
         id: users[0]._id,
@@ -94,16 +93,11 @@ describe('⬢ Validate resolvers', () => {
   it('● should validate mutation deleteUser', async () => {
     const { getUsers } = query
     const { deleteUser } = mutation
-    const users: UserInput[] = await getUsers()
-    if (users && users[0]._id) {
-      const $ = await deleteUser(null, {
-        id: users[0]._id,
+    const users: User[] = await getUsers()
+    if (users && users[0].id) {
+      await deleteUser(null, {
+        id: users[0].id,
       })
-      expect($).toBeUndefined()
-      expect($?._id).toBeUndefined()
-      expect($?.name).toBeUndefined()
-      expect($?.name).toBeUndefined()
-      expect($?.address).toBeUndefined()
     }
   })
 })

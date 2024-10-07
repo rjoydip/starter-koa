@@ -1,12 +1,13 @@
 import type { Server } from 'node:http'
 import http from 'node:http'
 import https from 'node:https'
-import { init } from '@sentry/node'
+import { createClient } from '@libsql/client'
+import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import closeWithGrace from 'close-with-grace'
+import { libsqlIntegration } from 'sentry-integration-libsql-client'
 import { app } from './app'
 import config from './config'
-import { initDB } from './db'
 import logger from './logger'
 import { captureException, environment, isProd } from './utils'
 
@@ -54,17 +55,21 @@ export function handleGracefulShutdown(server: Server): void {
  */
 async function main(): Promise<void> {
   try {
-    init({
-      dsn: config.sentry_dsn,
+    const libsqlClient = createClient({
+      url: config.db_url!,
+      authToken: config.db_auth_token!,
+    })
+    Sentry.init({
+      dsn: config.monitor_dsn,
       environment: environment(),
       enabled: isProd(),
       integrations: [
         nodeProfilingIntegration(),
+        libsqlIntegration(libsqlClient, Sentry),
       ],
       tracesSampleRate: 1.0,
       profilesSampleRate: 1.0,
     })
-    await initDB()
     const server = await startServer()
     handleGracefulShutdown(server)
   }

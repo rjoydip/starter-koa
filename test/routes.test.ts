@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
-import { dbDown, initDB, tablesDrop } from '../src/db'
+import { dbDown, tablesDrop } from '../src/db'
 
 describe('⬢ Validate routes', () => {
   const app$ = app.callback()
@@ -110,10 +110,6 @@ describe('⬢ Validate routes', () => {
 
   describe('⬢ Validate user routes', () => {
     let _id: string
-
-    beforeAll(async () => {
-      await initDB()
-    })
 
     afterAll(async () => {
       await dbDown()

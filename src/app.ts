@@ -1,9 +1,12 @@
+import type { Context } from 'koa'
 import type { IRouter } from './types'
+import { toNodeHandler } from 'better-auth/node'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
+import { auth } from './auth'
 import config from './config'
 import logger from './logger'
 import { createSuccess } from './message'
@@ -89,10 +92,7 @@ app.use(async (ctx, next) => {
   }
 })
 // Authentication
-app.use(async (_, next) => {
-  logger.debug('Authentication Middleware')
-  await next()
-})
+router.all('/api/auth/*', (ctx: Context) => toNodeHandler(auth)(ctx.req, ctx.res))
 /* Internal middleware - [END] */
 
 // Custom routers

@@ -1,6 +1,6 @@
 import type { User } from '../src/types'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { createUser, dbDown, getUser, getUsers, initDB, isDBUp } from '../src/db'
+import { afterAll, describe, expect, it } from 'vitest'
+import { createUser, dbDown, getUser, getUsers, isDBUp } from '../src/db'
 
 const user: User = {
   _id: '',
@@ -11,10 +11,6 @@ const user: User = {
 }
 
 describe('⬢ Validate db', () => {
-  beforeAll(async () => {
-    await initDB()
-  })
-
   afterAll(async () => {
     await dbDown()
   })

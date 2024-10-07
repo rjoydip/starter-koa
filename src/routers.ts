@@ -3,10 +3,11 @@ import type { IRouter } from './types'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
+import { schema } from './db'
 import { createError, createSuccess } from './message'
 import resolvers from './resolvers'
 import { apiDocs } from './scalar'
-import { schema, UserSchema } from './schema'
+import { UserSchema } from './schema'
 import { API_PREFIX, captureException, getOpenAPISpec, HTTP_STATUS_CODE } from './utils'
 import { requestValidator, userValidator } from './validator'
 
@@ -17,6 +18,7 @@ const yoga = createYoga({
 const { Query, Mutation } = resolvers
 
 /**
+ * Main application routes
  * @type {IRouter[]}
  */
 const mainRoutes: IRouter[] = [
@@ -104,6 +106,7 @@ const mainRoutes: IRouter[] = [
   },
 ]
 /**
+ * User routes
  * @type {IRouter[]}
  */
 const userRoutes: IRouter[] = [
