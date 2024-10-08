@@ -12,3 +12,5 @@ temp
 .clinic
 *.env.*
 !*.env.example
+drizzle/**/*.json
+drizzle/**/*.sql

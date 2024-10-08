@@ -1,19 +1,20 @@
 import type { User } from './types'
 import { neon } from '@neondatabase/serverless'
-import { buildSchema } from 'drizzle-graphql'
 import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { createSchema } from 'graphql-yoga'
 import config from './config'
-import { users, UserSchema } from './schema'
+import resolvers from './resolvers'
+import { users } from './schema'
+import typeDefs from './typedefs'
 
 const neonClient = neon(config.db_url!)
-const db = drizzle(neonClient, { schema: UserSchema })
-export const { schema } = buildSchema(db)
+export const db = drizzle(neonClient)
 
 /**
  * @export
  * @async
- * @returns {Promise<void>}
+ * @returns Promise<void>
  */
 export async function tablesDrop(): Promise<void> {
   await sql`
@@ -24,7 +25,7 @@ export async function tablesDrop(): Promise<void> {
 /**
  * @export
  * @async
- * @returns {Promise<boolean>}
+ * @returns Promise<boolean>
  */
 export async function isDBUp(): Promise<boolean> {
   try {
@@ -40,7 +41,7 @@ export async function isDBUp(): Promise<boolean> {
 /**
  * @export
  * @async
- * @returns {Promise<void>}
+ * @returns Promise<void>
  */
 export async function dbDown(): Promise<void> {
   await tablesDrop()
@@ -63,7 +64,8 @@ export async function getUsers(): Promise<User[]> {
  * @returns Promise<User>
  */
 export async function getUser(id: number): Promise<User> {
-  return await db.select().from(users).where(eq(users.id, id))
+  const result = await db.select().from(users).where(eq(users.id, id))
+  return result[0]
 }
 
 /**
@@ -73,7 +75,8 @@ export async function getUser(id: number): Promise<User> {
  * @returns Promise<User>
  */
 export async function createUser(user: User): Promise<User> {
-  return await db.insert(users).values(user).returning()
+  const result = await db.insert(users).values(user).returning()
+  return result[0]
 }
 
 /**
@@ -84,7 +87,8 @@ export async function createUser(user: User): Promise<User> {
  * @returns Promise<User>
  */
 export async function updateUser(id: number, user: User): Promise<User> {
-  return await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning()
+  const result = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning()
+  return result[0]
 }
 
 /**
@@ -93,7 +97,13 @@ export async function updateUser(id: number, user: User): Promise<User> {
  * @param {number} id
  * @returns Promise<void>
  */
-export async function deleteUser(id: number): Promise<void> {
-  await db.delete(users).where(eq(users.id, id))
+export async function deleteUser(id: number): Promise<{ id: number }> {
+  const result = await db.delete(users).where(eq(users.id, id)).returning({ id: users.id })
+  return result[0]
 }
 /* User Queries - Start */
+
+export const schema = createSchema({
+  typeDefs,
+  resolvers,
+})

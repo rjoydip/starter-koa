@@ -1,4 +1,3 @@
-import type { Context } from 'koa'
 import type { IRouter } from './types'
 import { toNodeHandler } from 'better-auth/node'
 import Koa from 'koa'
@@ -92,7 +91,7 @@ app.use(async (ctx, next) => {
   }
 })
 // Authentication
-router.all('/api/auth/*', (ctx: Context) => toNodeHandler(auth)(ctx.req, ctx.res))
+router.all('/api/auth', ctx => toNodeHandler(auth)(ctx.req, ctx.res))
 /* Internal middleware - [END] */
 
 // Custom routers

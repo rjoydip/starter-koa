@@ -1,8 +1,6 @@
-import type * as libsql from '@libsql/core/api'
 import type { Runtime } from './types'
 import { readFile } from 'node:fs/promises'
 import process from 'node:process'
-import { createClient } from '@libsql/client'
 import { captureException as sentryCaptureException } from '@sentry/node'
 import logger from './logger'
 
@@ -96,18 +94,4 @@ export const HTTP_STATUS_CODE = {
 
 export async function getOpenAPISpec(): Promise<string> {
   return await readFile('./src/openapi.yaml', { encoding: 'utf8' })
-}
-
-export function testWithInMemoryClient(
-  f: (c: libsql.Client) => Promise<void>,
-): () => Promise<void> {
-  return async () => {
-    const c = createClient({ url: ':memory:' })
-    try {
-      await f(c)
-    }
-    finally {
-      c.close()
-    }
-  }
 }

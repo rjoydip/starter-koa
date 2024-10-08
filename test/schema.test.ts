@@ -1,7 +1,7 @@
 import type { User } from '../src/types'
 import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { UserSchema } from '../src/schema'
+import { users, UserSchema } from '../src/schema'
 
 describe('⬢ Validate schema', () => {
   const playload: User = {
@@ -9,11 +9,17 @@ describe('⬢ Validate schema', () => {
     role: 'user',
     name: 'Benedicte Smans',
     email: 'BenedicteSmans@armyspy.com',
+    password: '1234',
+    isVerified: false,
     address: 'Skolspåret 81, 533 18  LUNDSBRUNN',
     phone: '+(46)0511-7158851',
     createdAt: new Date(),
     updatedAt: new Date(),
   }
+
+  it('● should validated users table', () => {
+    expect(users).toBeDefined()
+  })
 
   it('● should validated UserSchema for correct user details', () => {
     const result = safeParse(UserSchema, playload)

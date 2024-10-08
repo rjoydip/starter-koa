@@ -2,12 +2,10 @@ import type { Config } from 'drizzle-kit'
 import config from './src/config'
 
 export default {
-  schema: './schema.ts',
-  out: './migrations',
-  dialect: 'sqlite',
-  driver: 'turso',
+  schema: './src/schema.ts',
+  out: './drizzle',
+  dialect: 'postgresql',
   dbCredentials: {
     url: config.db_url!,
-    authToken: config.db_auth_token!,
   },
 } satisfies Config

@@ -41,37 +41,29 @@ export interface IConfig {
    */
   graceful_delay?: number
   /**
-   * @type {?string}
-   */
-  monitor_dsn?: string
-  /**
    * @type {?Runtime}
    */
   runtime?: Runtime
   /**
    * @type {?string}
    */
-  AUTH_SECRET?: string
+  monitor_dsn?: string
   /**
    * @type {?string}
    */
-  AUTH_CALLBACK_URL?: string
+  auth_secret?: string
   /**
    * @type {?string}
    */
-  GITHUB_CLIENT_ID?: string
+  github_client_id?: string
   /**
    * @type {?string}
    */
-  GITHUB_CLIENT_SECRET?: string
+  github_client_secrt?: string
   /**
    * @type {?string}
    */
-  DATABASE_URL?: string
-  /**
-   * @type {?string}
-   */
-  DB_AUTH_TOKEN?: string
+  db_url?: string
 }
 
 const {
@@ -82,14 +74,12 @@ const {
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
   GRACEFUL_DELAY = 500,
-  MONITOR_DNS = '',
   RUNTIME = 'node',
-  AUTH_SECRET = '',
-  AUTH_CALLBACK_URL = '',
-  GITHUB_CLIENT_ID = '',
-  GITHUB_CLIENT_SECRET = '',
-  DATABASE_URL = '',
-  DB_AUTH_TOKEN = '',
+  MONITOR_DNS,
+  AUTH_SECRET,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  DATABASE_URL,
 } = env
 
 export default {
@@ -103,9 +93,7 @@ export default {
   monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
   auth_secret: AUTH_SECRET,
-  auth_callback_url: AUTH_CALLBACK_URL,
   github_client_id: GITHUB_CLIENT_ID,
   github_client_secrt: GITHUB_CLIENT_SECRET,
   db_url: DATABASE_URL,
-  db_auth_token: DB_AUTH_TOKEN,
 }
