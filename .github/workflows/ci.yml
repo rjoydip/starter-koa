@@ -33,15 +33,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - uses: SpicyPizza/create-envfile@v2.0
+      - uses: neondatabase/create-branch-action@v5
+        id: create-branch
         with:
-          envkey_DATABASE_URL: ${{ env.DATABASE_URL }}
-          file_name: .env.test
+          project_id: ${{ secrets.NEON_PROJ_ID }}
+          parent: main
+          database: koadb
+          branch_name: testing
+          username: koadb_owner
+          api_key: ${{ secrets.NEON_API_KEY }}
 
       - run: bun i -g @antfu/ni
       - run: nci
       - run: nr build
-      - run: |
-          ls -al
-          cat .env.test
       - run: nr test
+        env:
+          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
+
+      - uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJ_ID }}
+          branch: testing
+          api_key: ${{ secrets.NEON_API_KEY }}
