@@ -51,10 +51,6 @@ jobs:
           database: koadb
           api_key: ${{ secrets.NEON_API_KEY }}
 
-      - run: bun run db:migrate
-        env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
-
       - run: nr test
         env:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
