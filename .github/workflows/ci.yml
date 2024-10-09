@@ -48,11 +48,12 @@ jobs:
           project_id: ${{ secrets.NEON_PROJ_ID }}
           branch_name: testing/${{ steps.branch-name.outputs.current_branch }}
           username: koadb_owner
+          database: koadb
           api_key: ${{ secrets.NEON_API_KEY }}
 
       - run: bun run db:migrate
         env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
+          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
 
       - run: nr test
         env:
