@@ -41,4 +41,7 @@ jobs:
       - run: bun i -g @antfu/ni
       - run: nci
       - run: nr build
+      - run: |
+          ls -al
+          cat .env.test
       - run: nr test
