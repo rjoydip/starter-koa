@@ -33,19 +33,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - uses: neondatabase/create-branch-action@v5
-        id: create-branch
-        with:
-          project_id: ${{ secrets.NEON_PROJ_ID }}
-          parent: main
-          database: koadb
-          branch_name: testing
-          username: koadb_owner
-          api_key: ${{ secrets.NEON_API_KEY }}
 
       - run: bun i -g @antfu/ni
       - run: nci
       - run: nr build
+
+      - name: Get git branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v8
+
+      - uses: neondatabase/create-branch-action@v5
+        id: create-branch
+        with:
+          project_id: ${{ secrets.NEON_PROJ_ID }}
+          branch_name: testing/${{ steps.branch-name.outputs.current_branch }}
+          username: koadb_owner
+          api_key: ${{ secrets.NEON_API_KEY }}
+
+      - run: bun run db:migrate
+        env:
+          DATABASE_URL: ${{ steps.create-branch.outputs.db_url_with_pooler }}
+
       - run: nr test
         env:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
@@ -53,5 +61,5 @@ jobs:
       - uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch: testing
+          branch: testing/${{ steps.branch-name.outputs.current_branch }}
           api_key: ${{ secrets.NEON_API_KEY }}

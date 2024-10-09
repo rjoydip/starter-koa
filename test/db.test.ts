@@ -2,9 +2,9 @@ import type { User } from '../src/types'
 import { describe, expect, it } from 'vitest'
 import { createUser, deleteUser, getUser, getUsers, isDBUp } from '../src/db'
 
-const user: User = {
-  name: 'John Doe',
-  email: 'johndoe@example.com',
+const testUser: User = {
+  name: 'John Doe one',
+  email: 'johndoe.one@example.com',
   phone: '1234567890',
   isVerifed: false,
   password: '12345',
@@ -24,23 +24,23 @@ describe('⬢ Validate db', () => {
   })
 
   it.sequential('● should insert and retrieve a user', async () => {
-    const usr = await createUser(user)
+    const usr = await createUser(testUser)
     expect(usr).toBeDefined()
-    expect(usr?.name).toBe(user.name)
+    expect(usr?.name).toBe(testUser.name)
 
     if (usr?.id) {
       id = usr.id
       const fetchedUser = await getUser(usr.id)
       expect(fetchedUser).toBeDefined()
-      expect(fetchedUser?.name).toBe(user.name)
-      expect(fetchedUser?.email).toBe(user.email)
+      expect(fetchedUser?.name).toBe(testUser.name)
+      expect(fetchedUser?.email).toBe(testUser.email)
     }
   })
 
   it.sequential('● should fetch all users', async () => {
     const users = await getUsers()
     expect(users.length).toBeGreaterThan(0)
-    expect(users[0].name).toBe(user.name)
+    expect(users[0].name).toBe(testUser.name)
   })
 
   it.sequential('● should delete user', async () => {

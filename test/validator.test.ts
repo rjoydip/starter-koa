@@ -6,17 +6,20 @@ import resolvers from '../src/resolvers'
 import { getRouter } from '../src/routers'
 import { validateRouter } from '../src/validator'
 
+const testUser = {
+  name: 'Benedicte Smans One',
+  email: 'BenedicteSmans.one@armyspy.com',
+  isVerified: false,
+  password: '12345',
+  phone: '+(46)0511-7158851',
+  address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
+}
+
 describe('⬢ Validate validator', () => {
   const { Query } = resolvers
   const app$ = app.callback()
-  describe('⬢ Validate middleware', () => {
-    const testUser = {
-      name: 'Benedicte Smans',
-      email: 'BenedicteSmans@armyspy.com',
-      address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
-      phone: '+(46)0511-7158851',
-    }
 
+  describe('⬢ Validate middleware', () => {
     it('● should validated requestValidator POST /api/user', async () => {
       const { headers, status, body } = await request(app$)
         .post('/api/user')
