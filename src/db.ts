@@ -1,7 +1,7 @@
 import type { User } from './types'
 import { neon } from '@neondatabase/serverless'
-import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/neon-http'
+import { eq, sql } from 'drizzle-orm/sql'
 import { createSchema } from 'graphql-yoga'
 import config from './config'
 import resolvers from './resolvers'
@@ -14,37 +14,17 @@ export const db = drizzle(neonClient)
 /**
  * @export
  * @async
- * @returns Promise<void>
- */
-export async function tablesDrop(): Promise<void> {
-  await sql`
-    DROP TABLE if exists users;
-  `
-}
-
-/**
- * @export
- * @async
  * @returns Promise<boolean>
  */
 export async function isDBUp(): Promise<boolean> {
   try {
-    await sql`SELECT 1;`
+    await db.execute(sql`select 1`)
     return true
   }
   /* eslint-disable unused-imports/no-unused-vars */
   catch (_: any) {
     return false
   }
-}
-
-/**
- * @export
- * @async
- * @returns Promise<void>
- */
-export async function dbDown(): Promise<void> {
-  await tablesDrop()
 }
 
 /**

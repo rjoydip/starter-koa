@@ -1,18 +1,35 @@
 import type { User } from '../src/types'
-import { describe, expect, it } from 'vitest'
-import { createUser, deleteUser, getUser, getUsers, isDBUp } from '../src/db'
+import { faker } from '@faker-js/faker/locale/en'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createUser, db, deleteUser, getUser, getUsers, isDBUp } from '../src/db'
 
-const testUser: User = {
-  name: 'John Doe one',
-  email: 'johndoe.one@example.com',
-  phone: '1234567890',
-  isVerifed: false,
-  password: '12345',
-  address: '123 Main St',
-}
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+} = faker
 
 describe('⬢ Validate db', () => {
   let id: number
+  const testUser: User = {
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+  }
+
+  afterEach(() => {
+    faker.seed()
+  })
+
+  it('● should check if the database is not up', async () => {
+    vi.spyOn(db, 'execute').mockRejectedValueOnce(new Error('Error'))
+    expect(await isDBUp()).toBeFalsy()
+  })
 
   it('● should check if the database is up', async () => {
     expect(await isDBUp()).toBeTruthy()
@@ -24,13 +41,13 @@ describe('⬢ Validate db', () => {
   })
 
   it.sequential('● should insert and retrieve a user', async () => {
-    const usr = await createUser(testUser)
-    expect(usr).toBeDefined()
-    expect(usr?.name).toBe(testUser.name)
+    const user$ = await createUser(testUser)
+    expect(user$).toBeDefined()
+    expect(user$?.name).toBe(testUser.name)
 
-    if (usr?.id) {
-      id = usr.id
-      const fetchedUser = await getUser(usr.id)
+    if (user$?.id) {
+      id = user$.id
+      const fetchedUser = await getUser(user$.id)
       expect(fetchedUser).toBeDefined()
       expect(fetchedUser?.name).toBe(testUser.name)
       expect(fetchedUser?.email).toBe(testUser.email)
@@ -40,7 +57,6 @@ describe('⬢ Validate db', () => {
   it.sequential('● should fetch all users', async () => {
     const users = await getUsers()
     expect(users.length).toBeGreaterThan(0)
-    expect(users[0].name).toBe(testUser.name)
   })
 
   it.sequential('● should delete user', async () => {

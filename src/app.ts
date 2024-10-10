@@ -1,11 +1,9 @@
 import type { IRouter } from './types'
-import { toNodeHandler } from 'better-auth/node'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
-import { auth } from './auth'
 import config from './config'
 import logger from './logger'
 import { createSuccess } from './message'
@@ -91,19 +89,14 @@ app.use(async (ctx, next) => {
   }
 })
 // Authentication
-router.all('/api/auth', ctx => toNodeHandler(auth)(ctx.req, ctx.res))
+app.use(async (_, next) => {
+  logger.debug('Authentication Middleware')
+  await next()
+})
 /* Internal middleware - [END] */
 
 // Custom routers
-routers.forEach((r: IRouter) => {
-  const handler = methodMap[r.method]
-  if (handler) {
-    handler(r)
-  }
-  else {
-    logger.error(`Unsupported method: ${r.method}`)
-  }
-})
+routers.forEach((r: IRouter) => methodMap[r.method](r))
 // Dispatch routes and allow OPTIONS request method
 app
   .use(router.routes())

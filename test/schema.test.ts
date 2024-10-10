@@ -1,18 +1,29 @@
 import type { User } from '../src/types'
+import { faker } from '@faker-js/faker/locale/en'
 import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
 import { users, UserSchema } from '../src/schema'
 
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+  number,
+} = faker
+
 describe('⬢ Validate schema', () => {
   const playload: User = {
-    id: 1,
+    id: number.int({ min: 1, max: 10 }),
     role: 'user',
-    name: 'Benedicte Smans',
-    email: 'BenedicteSmans@armyspy.com',
-    password: '1234',
-    isVerified: false,
-    address: 'Skolspåret 81, 533 18  LUNDSBRUNN',
-    phone: '+(46)0511-7158851',
+    isVerified: datatype.boolean(),
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
     createdAt: new Date(),
     updatedAt: new Date(),
   }

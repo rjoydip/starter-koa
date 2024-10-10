@@ -1,4 +1,4 @@
-import type Koa from 'koa'
+import type { Context } from 'koa'
 import type { IRouter } from './types'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
@@ -27,7 +27,7 @@ const mainRoutes: IRouter[] = [
     path: '/',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(resolvers.Query.index())
     },
@@ -37,7 +37,7 @@ const mainRoutes: IRouter[] = [
     path: '/status',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(resolvers.Query.status())
     },
@@ -47,7 +47,7 @@ const mainRoutes: IRouter[] = [
     path: '/health',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       const payload = await resolvers.Query.health()
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
@@ -58,7 +58,7 @@ const mainRoutes: IRouter[] = [
     path: '/metrics',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       const payload = await resolvers.Query.metrics()
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
@@ -69,7 +69,7 @@ const mainRoutes: IRouter[] = [
     path: '/openapi',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
       const openapiSpec = await getOpenAPISpec()
       ctx.body = parseYAML(openapiSpec)
@@ -80,7 +80,7 @@ const mainRoutes: IRouter[] = [
     path: '/apidocs',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       ctx.type = 'html'
       const openapiSpec = await getOpenAPISpec()
       ctx.body = apiDocs({
@@ -95,7 +95,7 @@ const mainRoutes: IRouter[] = [
     path: '/graphql',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
       ctx.status = response.status
       response.headers.forEach((value, key) => {
@@ -115,7 +115,7 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/users`,
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       try {
         const users = await Query.getUsers()
         ctx.status = HTTP_STATUS_CODE[200]
@@ -140,7 +140,7 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.GET,
     middleware: [userValidator()],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       const user = ctx.state.user
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess({
@@ -156,7 +156,7 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/user`,
     method: HttpMethodEnum.POST,
     middleware: [requestValidator(UserSchema)],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       try {
         const payload = await Mutation.createUser(null, { input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
@@ -180,7 +180,7 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.PATCH,
     middleware: [requestValidator(UserSchema), userValidator()],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       try {
         const user = await Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
@@ -205,7 +205,7 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.DELETE,
     middleware: [userValidator()],
-    defineHandler: async (ctx: Koa.Context) => {
+    defineHandler: async (ctx: Context) => {
       try {
         await Mutation.deleteUser(null, { id: ctx.params.id })
         ctx.status = HTTP_STATUS_CODE[200]

@@ -1,49 +1,61 @@
-import { describe, expect, it } from 'vitest'
+import type { IConfig } from '../src/config'
+import { faker } from '@faker-js/faker/locale/en'
+import { afterEach, describe, expect, it } from 'vitest'
 import config from '../src/config'
 
+const {
+  internet,
+  number,
+  datatype,
+} = faker
+
 describe('⬢ Validate config', () => {
+  afterEach(() => {
+    faker.seed()
+  })
+
   it('● should validated config', async () => {
     const defaultConfig = config
-    expect(defaultConfig?.host).toStrictEqual('127.0.0.1')
     expect(defaultConfig?.port).toStrictEqual(8080)
     expect(defaultConfig?.log_level).toStrictEqual(3)
     expect(defaultConfig?.ratelimit).toStrictEqual(70000)
+    expect(defaultConfig?.graceful_delay).toStrictEqual(500)
     expect(defaultConfig?.runtime).toStrictEqual('node')
     expect(defaultConfig?.monitor_dsn).toBeUndefined()
-    expect(defaultConfig?.auth_secret).toBeUndefined()
     expect(defaultConfig?.db_url).toBeDefined()
-    expect(defaultConfig?.github_client_id).toBeUndefined()
-    expect(defaultConfig?.github_client_secrt).toBeUndefined()
+    expect(defaultConfig?.isHTTPs).toStrictEqual(false)
+    expect(defaultConfig?.duration).toStrictEqual(6000)
   })
 
   it('● should validated overwrite config value', async () => {
-    const overwriteConfig = {
+    const port = internet.port()
+    const isHTTPs = datatype.boolean()
+    const duration = number.int({ min: 1000, max: 6000 })
+    const dns = internet.url()
+    const db_url = internet.url()
+    const number$ = number.int({ min: 100, max: 1000 })
+
+    const overwriteConfig: IConfig = {
       ...config,
-      port: 1000,
-      graphql_port: 1001,
-      ratelimit: 100,
-      graceful_delay: 100,
-      monitor_dsn: 'fake_updated_dsn',
-      host: '127.0.0.1',
+      port,
+      graphql_port: port,
+      ratelimit: number$,
+      graceful_delay: number$,
+      monitor_dsn: dns,
       log_level: 3,
-      isHTTPs: false,
-      duration: 0,
+      isHTTPs,
+      duration,
       runtime: 'bun',
-      auth_secret: 'fake_auth_secret',
-      github_client_id: 'fake_github_client_id',
-      github_client_secrt: 'fake_github_client_secrt',
-      db_url: 'fake_db_url',
+      db_url,
     }
-    expect(overwriteConfig?.host).toStrictEqual('127.0.0.1')
-    expect(overwriteConfig?.port).toStrictEqual(1000)
+    expect(overwriteConfig?.port).toStrictEqual(port)
     expect(overwriteConfig?.log_level).toStrictEqual(3)
-    expect(overwriteConfig?.ratelimit).toStrictEqual(100)
-    expect(overwriteConfig?.graceful_delay).toStrictEqual(100)
-    expect(overwriteConfig?.db_url).toStrictEqual('fake_db_url')
+    expect(overwriteConfig?.ratelimit).toStrictEqual(number$)
+    expect(overwriteConfig?.graceful_delay).toStrictEqual(number$)
+    expect(overwriteConfig?.db_url).toStrictEqual(db_url)
     expect(overwriteConfig?.runtime).toStrictEqual('bun')
-    expect(overwriteConfig?.monitor_dsn).toStrictEqual('fake_updated_dsn')
-    expect(overwriteConfig?.auth_secret).toStrictEqual('fake_auth_secret')
-    expect(overwriteConfig?.github_client_id).toStrictEqual('fake_github_client_id')
-    expect(overwriteConfig?.github_client_secrt).toStrictEqual('fake_github_client_secrt')
+    expect(overwriteConfig?.monitor_dsn).toStrictEqual(dns)
+    expect(overwriteConfig?.isHTTPs).toStrictEqual(isHTTPs)
+    expect(overwriteConfig?.duration).toStrictEqual(duration)
   })
 })

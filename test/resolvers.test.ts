@@ -1,13 +1,33 @@
 import type { User } from '../src/types'
-import { afterAll, describe, expect, it } from 'vitest'
-import { dbDown } from '../src/db'
+import { faker } from '@faker-js/faker/locale/en'
+import { afterEach, describe, expect, it } from 'vitest'
 import resolvers from '../src/resolvers'
 
-describe('⬢ Validate resolvers', () => {
-  afterAll(async () => await dbDown())
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+  number,
+} = faker
 
+describe('⬢ Validate resolvers', () => {
   const query = resolvers.Query
   const mutation = resolvers.Mutation
+
+  const testUser: User = {
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+  }
+
+  afterEach(() => {
+    faker.seed()
+  })
 
   describe('⬢ Validate main resolvers', () => {
     it('● should validate query index', async () => {
@@ -55,13 +75,13 @@ describe('⬢ Validate resolvers', () => {
 
     it.sequential('● should validate query getUser', async () => {
       const { getUser } = query
-      const $ = await getUser(null, { id: 1 })
+      const $ = await getUser(null, { id: number.int({ min: 1, max: 10 }) })
       expect($).toBeUndefined()
     })
 
     it.sequential('● should validate mutation createUser', async () => {
       const { createUser } = mutation
-      const $ = await createUser(null, { input: { name: 'John Doe', email: 'john@example.com', phone: '1234567890', address: '123 Main St', password: '12345' } })
+      const $ = await createUser(null, { input: { ...testUser } })
       expect($).toBeDefined()
       expect($?.id).toBeDefined()
     })
@@ -75,8 +95,8 @@ describe('⬢ Validate resolvers', () => {
           id: users[0].id,
           input: {
             ...users[0],
-            name: 'John Doe Edited',
-            email: 'john.edit@example.com',
+            name: person.fullName(),
+            email: internet.email(),
           },
         })
         expect($).toBeDefined()

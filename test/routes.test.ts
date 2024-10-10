@@ -1,22 +1,37 @@
 import type { User } from '../src/types'
+import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
-import { tablesDrop } from '../src/db'
+import { db } from '../src/db'
+import resolvers from '../src/resolvers'
+
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+  number,
+} = faker
 
 describe('⬢ Validate routes', () => {
   const app$ = app.callback()
 
   const testUser: User = {
-    name: 'Benedicte Smans',
-    email: 'BenedicteSmans@armyspy.com',
-    isVerified: false,
-    password: '12345',
-    phone: '+(46)0511-7158851',
-    address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
   }
 
-  describe.skip('⬢ Validate main routes', () => {
+  afterEach(() => {
+    faker.seed()
+  })
+
+  describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
       const { headers, status } = await request(app$)
         .get('/invalid')
@@ -215,13 +230,15 @@ describe('⬢ Validate routes', () => {
     })
   })
 
-  describe.skip('⬢ Validate routing when table dropped', () => {
-    const id = 1
-    beforeAll(async () => {
-      await tablesDrop()
+  describe('⬢ Validate routing when DB error', () => {
+    const id = number.int({ min: 1, max: 10 })
+
+    afterEach(() => {
+      vi.clearAllMocks()
     })
 
     it('● GET /api/users 500', async () => {
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
@@ -229,7 +246,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● GET /api/user/:id 500', async () => {
+    it('● GET /api/user 500', async () => {
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
         .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
@@ -238,6 +256,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● POST /api/user 500', async () => {
+      vi.spyOn(db, 'insert').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
         .post('/api/user/')
         .send(testUser)
@@ -246,9 +265,11 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● PUT /api/user/:id 500', async () => {
+    it('● PATCH /api/user/:id 500', async () => {
+      vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
+      vi.spyOn(db, 'update').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
-        .delete(`/api/user/${id}`)
+        .patch(`/api/user/${id}`)
         .send({
           id,
           ...testUser,
@@ -259,6 +280,10 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● DELETE /api/user:/:id 500', async () => {
+      vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
+      vi.spyOn(db, 'delete').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(testUser)
+      vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(new Error('DB error'))
       const deleteUserResponse = await request(app$)
         .delete(`/api/user/${id}`)
         .set('Accept', 'application/json')

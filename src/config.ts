@@ -9,10 +9,6 @@ import { env } from 'node:process'
  */
 export interface IConfig {
   /**
-   * @type {?string}
-   */
-  host?: string
-  /**
    * @type {?number}
    */
   port?: number
@@ -51,18 +47,6 @@ export interface IConfig {
   /**
    * @type {?string}
    */
-  auth_secret?: string
-  /**
-   * @type {?string}
-   */
-  github_client_id?: string
-  /**
-   * @type {?string}
-   */
-  github_client_secrt?: string
-  /**
-   * @type {?string}
-   */
   db_url?: string
 }
 
@@ -70,21 +54,16 @@ const {
   LOG_LEVEL = 3,
   ENABLE_HTTPS = false,
   PORT = 8080,
-  HOST = '127.0.0.1',
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
   GRACEFUL_DELAY = 500,
   RUNTIME = 'node',
   MONITOR_DNS,
-  AUTH_SECRET,
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
   DATABASE_URL,
 } = env
 
 export default {
   port: Number(PORT),
-  host: HOST,
   isHTTPs: Boolean(ENABLE_HTTPS),
   ratelimit: Number(RATE_LIMIT),
   duration: Number(RATE_DURATION),
@@ -92,8 +71,5 @@ export default {
   graceful_delay: Number(GRACEFUL_DELAY),
   monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
-  auth_secret: AUTH_SECRET,
-  github_client_id: GITHUB_CLIENT_ID,
-  github_client_secrt: GITHUB_CLIENT_SECRET,
   db_url: DATABASE_URL,
 }
