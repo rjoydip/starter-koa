@@ -28,7 +28,8 @@ jobs:
       matrix:
         node: [lts/*]
         os: [ubuntu-latest, windows-latest, macos-latest]
-      fail-fast: false
+      fail-fast: true
+      max-parallel: 1
 
     steps:
       - uses: actions/checkout@v4
