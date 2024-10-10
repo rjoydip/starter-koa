@@ -56,6 +56,14 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
 
+  clean:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Get git branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v8
+
       - uses: neondatabase/delete-branch-action@v3
         with:
           project_id: ${{ secrets.NEON_PROJ_ID }}
