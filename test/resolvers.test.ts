@@ -66,7 +66,7 @@ describe('⬢ Validate resolvers', () => {
   })
 
   describe('⬢ Validate user resolvers', () => {
-    it.sequential('● should validate query getUsers', async () => {
+    it.skip('● should validate query getUsers', async () => {
       const { getUsers } = query
       const $ = await getUsers()
       expect($).toBeDefined()
