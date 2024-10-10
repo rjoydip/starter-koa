@@ -1,19 +1,13 @@
 import type { Context, Middleware, Next } from 'koa'
 import type { HttpMethodEnum } from 'koa-body/lib/types'
-import type { InferOutput } from 'valibot'
 import type { UserSchema } from './schema'
 
 /**
  * @export
- * @typedef {Services}
- */
-export type Services = 'db' | 'redis'
-/**
- * @export
  * @typedef {User}
  */
-export type User = InferOutput<typeof UserSchema>
-export interface UserInput extends InferOutput<Omit<typeof UserSchema, '_id'>> {}
+export type User = typeof UserSchema
+export interface UserInput extends Omit<typeof UserSchema, 'id'> {}
 /**
  * @export
  * @interface IRegisteredRoutes
@@ -39,10 +33,6 @@ export interface IHealth {
    * @type {string}
    */
   id: string
-  /**
-   * @type {Services}
-   */
-  services: Services
   /**
    * @type {boolean}
    */

@@ -1,5 +1,5 @@
 import type { LogLevel } from 'consola'
-import type { Runtime, Services } from './types'
+import type { Runtime } from './types'
 import { env } from 'node:process'
 
 /**
@@ -8,10 +8,6 @@ import { env } from 'node:process'
  * @typedef {IConfig}
  */
 export interface IConfig {
-  /**
-   * @type {?string}
-   */
-  host?: string
   /**
    * @type {?number}
    */
@@ -29,10 +25,6 @@ export interface IConfig {
    */
   log_level?: LogLevel
   /**
-   * @type {?Services[]}
-   */
-  services?: Services[]
-  /**
    * @type {?number}
    */
   ratelimit?: number
@@ -41,47 +33,43 @@ export interface IConfig {
    */
   duration?: number
   /**
-   * @type {?boolean}
-   */
-  enable_cache?: boolean
-  /**
    * @type {?number}
    */
   graceful_delay?: number
   /**
-   * @type {?string}
-   */
-  sentry_dsn?: string
-  /**
    * @type {?Runtime}
    */
   runtime?: Runtime
+  /**
+   * @type {?string}
+   */
+  monitor_dsn?: string
+  /**
+   * @type {?string}
+   */
+  db_url?: string
 }
 
 const {
   LOG_LEVEL = 3,
   ENABLE_HTTPS = false,
   PORT = 8080,
-  HOST = '127.0.0.1',
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
-  SERVICES = ['db', 'redis'],
-  ENABLE_CACHE = false,
   GRACEFUL_DELAY = 500,
-  SENTRY_DNS = '',
   RUNTIME = 'node',
+  MONITOR_DNS,
+  DATABASE_URL,
 } = env
 
 export default {
   port: Number(PORT),
-  host: HOST,
   isHTTPs: Boolean(ENABLE_HTTPS),
-  services: SERVICES as Services[],
   ratelimit: Number(RATE_LIMIT),
   duration: Number(RATE_DURATION),
   log_level: LOG_LEVEL as LogLevel,
-  enable_cache: Boolean(ENABLE_CACHE),
   graceful_delay: Number(GRACEFUL_DELAY),
-  sentry_dsn: SENTRY_DNS,
+  monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
+  db_url: DATABASE_URL,
 }

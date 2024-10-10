@@ -1,44 +1,66 @@
 import type { User } from '../src/types'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { createUser, dbDown, getUser, getUsers, initDB, isDBUp } from '../src/db'
+import { faker } from '@faker-js/faker/locale/en'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createUser, db, deleteUser, getUser, getUsers, isDBUp } from '../src/db'
 
-const user: User = {
-  _id: '',
-  name: 'John Doe',
-  email: 'johndoe@example.com',
-  phone: '1234567890',
-  address: '123 Main St',
-}
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+} = faker
 
 describe('⬢ Validate db', () => {
-  beforeAll(async () => {
-    await initDB()
+  let id: number
+  const testUser: User = {
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+  }
+
+  afterEach(() => {
+    faker.seed()
   })
 
-  afterAll(async () => {
-    await dbDown()
+  it('● should check if the database is not up', async () => {
+    vi.spyOn(db, 'execute').mockRejectedValueOnce(new Error('Error'))
+    expect(await isDBUp()).toBeFalsy()
   })
 
   it('● should check if the database is up', async () => {
     expect(await isDBUp()).toBeTruthy()
   })
 
-  it('● should insert and retrieve a user', async () => {
-    const usr = await createUser(user)
-    expect(usr).toBeDefined()
-    expect(usr?.name).toBe(user.name)
+  it.sequential('● should fetch users', async () => {
+    const users = await getUsers()
+    expect(users[0]).toBeUndefined()
+  })
 
-    if (usr?._id) {
-      const fetchedUser = await getUser(usr._id)
+  it.sequential('● should insert and retrieve a user', async () => {
+    const user$ = await createUser(testUser)
+    expect(user$).toBeDefined()
+    expect(user$?.name).toBe(testUser.name)
+
+    if (user$?.id) {
+      id = user$.id
+      const fetchedUser = await getUser(user$.id)
       expect(fetchedUser).toBeDefined()
-      expect(fetchedUser?.name).toBe(user.name)
-      expect(fetchedUser?.email).toBe(user.email)
+      expect(fetchedUser?.name).toBe(testUser.name)
+      expect(fetchedUser?.email).toBe(testUser.email)
     }
   })
 
-  it('● should fetch all users', async () => {
+  it.sequential('● should fetch all users', async () => {
     const users = await getUsers()
     expect(users.length).toBeGreaterThan(0)
-    expect(users[0].name).toBe(user.name)
+  })
+
+  it.sequential('● should delete user', async () => {
+    const deletedUser = await deleteUser(id)
+    expect(deletedUser.id).toStrictEqual(id)
   })
 })

@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker/locale/en'
 import consola from 'consola'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import logger from '../src/logger'
@@ -23,14 +24,14 @@ describe('⬢ Validate logger', () => {
   })
 
   it('● should call consola.info with correct message', () => {
-    const message = 'This is an info message'
+    const message = faker.lorem.text()
     expect(() => logger.info(message)).not.throw()
     expect(infoSpy).toBeCalledTimes(1)
     expect(infoSpy).toHaveBeenCalledWith(message)
   })
 
   it('● should call consola.error with correct error message', () => {
-    const errMsg = 'This is an error message'
+    const errMsg = faker.lorem.text()
     process.env.NODE_ENV = 'production'
     expect(() => captureException(errMsg)).toThrowError()
 

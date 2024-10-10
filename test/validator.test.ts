@@ -1,22 +1,39 @@
+import type { User } from '../src/types'
+import { faker } from '@faker-js/faker/locale/en'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
 import resolvers from '../src/resolvers'
 import { getRouter } from '../src/routers'
 import { validateRouter } from '../src/validator'
 
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+} = faker
+
 describe('⬢ Validate validator', () => {
   const { Query } = resolvers
   const app$ = app.callback()
-  describe('⬢ Validate middleware', () => {
-    const testUser = {
-      name: 'Benedicte Smans',
-      email: 'BenedicteSmans@armyspy.com',
-      address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
-      phone: '+(46)0511-7158851',
-    }
 
+  const testUser: User = {
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+  }
+
+  afterEach(() => {
+    faker.seed()
+  })
+
+  describe('⬢ Validate middleware', () => {
     it('● should validated requestValidator POST /api/user', async () => {
       const { headers, status, body } = await request(app$)
         .post('/api/user')

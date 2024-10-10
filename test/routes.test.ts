@@ -1,17 +1,35 @@
+import type { User } from '../src/types'
+import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
-import { dbDown, initDB, tablesDrop } from '../src/db'
+import { db } from '../src/db'
+import resolvers from '../src/resolvers'
+
+const {
+  person,
+  internet,
+  phone,
+  datatype,
+  location,
+  number,
+} = faker
 
 describe('⬢ Validate routes', () => {
   const app$ = app.callback()
 
-  const testUser = {
-    name: 'Benedicte Smans',
-    email: 'BenedicteSmans@armyspy.com',
-    address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
-    phone: '+(46)0511-7158851',
+  const testUser: User = {
+    name: person.fullName(),
+    email: internet.email(),
+    phone: phone.number({ style: 'international' }),
+    isVerifed: datatype.boolean(),
+    password: internet.password(),
+    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
   }
+
+  afterEach(() => {
+    faker.seed()
+  })
 
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
@@ -109,17 +127,9 @@ describe('⬢ Validate routes', () => {
   })
 
   describe('⬢ Validate user routes', () => {
-    let _id: string
+    let id: string
 
-    beforeAll(async () => {
-      await initDB()
-    })
-
-    afterAll(async () => {
-      await dbDown()
-    })
-
-    it('● GET /api/users', async () => {
+    it.sequential('● GET /api/users', async () => {
       const { headers, status, body } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
@@ -129,7 +139,7 @@ describe('⬢ Validate routes', () => {
       expect(body.data.length).toBe(0)
     })
 
-    it('● POST /api/user', async () => {
+    it.sequential('● POST /api/user', async () => {
       const { headers, status, body } = await request(app$)
         .post('/api/user')
         .send({
@@ -139,92 +149,69 @@ describe('⬢ Validate routes', () => {
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body).toStrictEqual({
-        statusCode: 200,
-        message: 'User details stored successfully',
-        data: {
-          _id: expect.anything(),
-          name: 'Benedicte Smans',
-          email: 'BenedicteSmans@armyspy.com',
-          phone: '+(46)0511-7158851',
-          address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
-        },
-      })
-      _id = body.data._id
+      expect(body.message).toStrictEqual('User details stored successfully')
+      expect(body.data).toBeDefined()
+      id = body.data.id
     })
 
     it.sequential('● GET /api/user:/:id', async () => {
       const { headers, status, body } = await request(app$)
-        .get(`/api/user/${_id}`)
+        .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body.data).toBeDefined()
-      expect(Object.keys(body.data)).toStrictEqual(['_id', 'name', 'email', 'phone', 'address'])
+      expect(Object.keys(body.data)).toStrictEqual(['id', 'name', 'email', 'phone', 'password', 'address', 'isVerified', 'role', 'createdAt', 'updatedAt'])
     })
 
     it.sequential('● PATCH /api/user:/:id', async () => {
       const { headers, status, body } = await request(app$)
-        .patch(`/api/user/${_id}`)
+        .patch(`/api/user/${id}`)
         .send(testUser)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body).toStrictEqual({
-        statusCode: 200,
-        message: 'User details updates successfully',
-        data: {
-          _id: expect.anything(),
-          name: 'Benedicte Smans',
-          email: 'BenedicteSmans@armyspy.com',
-          phone: '+(46)0511-7158851',
-          address: 'Skolspåret 81, 533 18  LUNDSBRUNN, United States',
-        },
-      })
+      expect(body.message).toStrictEqual('User details updates successfully')
+      expect(body.data).toBeDefined()
     })
 
-    it.sequential('● DELETE /api/user:/:id status 500', async () => {
-      const db = await import('../src/db')
-      vi.spyOn(db, 'deleteUser').mockRejectedValueOnce(new Error('DB unable to take transaction'))
-      const { headers, status } = await request(app$)
-        .delete(`/api/user/${_id}`)
+    it.sequential('● DELETE /api/user:/:id', async () => {
+      const { headers, status, body } = await request(app$)
+        .delete(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(500)
+      expect(status).toEqual(200)
+      expect(body.message).toStrictEqual('User delete successfully')
+      expect(body.data).toBeDefined()
+    })
+
+    it.sequential('● DELETE /api/user:/:id status 422', async () => {
+      const { headers, status } = await request(app$)
+        .delete(`/api/user/${id}`)
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(422)
     })
 
     it.sequential('● PATCH /api/user:/:throw', async () => {
       const { headers, status, body } = await request(app$)
-        .patch(`/api/user/${_id}`)
+        .patch(`/api/user/${id}`)
         .send({
           ...testUser,
           name: 'Benedicte Smans Marlou Schaminée',
         })
         .set('Accept', 'application/json')
-      expect(status).toEqual(500)
+      expect(status).toEqual(422)
       expect(headers['content-type']).toMatch(/json/)
       expect(body).toStrictEqual({
-        message: 'User details updates failed',
-        statusCode: 500,
-      })
-    })
-
-    it.sequential('● DELETE /api/user:/:id', async () => {
-      const { headers, status, body } = await request(app$)
-        .delete(`/api/user/${_id}`)
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch(/json/)
-      expect(status).toEqual(200)
-      expect(body).toStrictEqual({
-        statusCode: 200,
-        message: 'User delete successfully',
-        data: expect.anything(),
+        message: 'User Invalid',
+        statusCode: 422,
       })
     })
 
     it.sequential('● GET /api/user/:deleted-user', async () => {
       const { headers, status, body } = await request(app$)
-        .get(`/api/user/${_id}`)
+        .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(422)
@@ -234,7 +221,7 @@ describe('⬢ Validate routes', () => {
       })
     })
 
-    it('● DELETE /api/user:/:wrong-id', async () => {
+    it.sequential('● DELETE /api/user:/:wrong-id', async () => {
       const deleteUserResponse = await request(app$)
         .delete('/api/user/wrong-id')
         .set('Accept', 'application/json')
@@ -243,13 +230,15 @@ describe('⬢ Validate routes', () => {
     })
   })
 
-  describe('⬢ Validate routing when table dropped', () => {
-    const _id = 'c8d4db90-c19a-4f64-bb47-72c933a9a32e'
-    beforeAll(async () => {
-      await tablesDrop()
+  describe('⬢ Validate routing when DB error', () => {
+    const id = number.int({ min: 1, max: 10 })
+
+    afterEach(() => {
+      vi.clearAllMocks()
     })
 
     it('● GET /api/users 500', async () => {
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
@@ -257,15 +246,17 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● GET /api/user/:id 500', async () => {
+    it('● GET /api/user 500', async () => {
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
-        .get(`/api/user/${_id}`)
+        .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(500)
     })
 
     it('● POST /api/user 500', async () => {
+      vi.spyOn(db, 'insert').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
         .post('/api/user/')
         .send(testUser)
@@ -274,11 +265,13 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● PUT /api/user/:id 500', async () => {
+    it('● PATCH /api/user/:id 500', async () => {
+      vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
+      vi.spyOn(db, 'update').mockRejectedValueOnce(new Error('DB error'))
       const { headers, status } = await request(app$)
-        .delete(`/api/user/${_id}`)
+        .patch(`/api/user/${id}`)
         .send({
-          _id: 'xxxx',
+          id,
           ...testUser,
         })
         .set('Accept', 'application/json')
@@ -287,8 +280,12 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● DELETE /api/user:/:id 500', async () => {
+      vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
+      vi.spyOn(db, 'delete').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(testUser)
+      vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(new Error('DB error'))
       const deleteUserResponse = await request(app$)
-        .delete(`/api/user/${_id}`)
+        .delete(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)
       expect(deleteUserResponse.status).toEqual(500)

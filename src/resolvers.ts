@@ -1,4 +1,4 @@
-import type { UserInput } from './types'
+import type { User, UserInput } from './types'
 import { loadavg } from 'node:os'
 import { cpuUsage, memoryUsage } from 'node:process'
 import { createUser, deleteUser, getUser, getUsers, isDBUp, updateUser } from './db'
@@ -33,10 +33,10 @@ export default {
         },
       }
     },
-    async getUser(_: unknown, { id }: { id: string }) {
+    async getUser(_: unknown, { id }: { id: number }) {
       return await getUser(id)
     },
-    async getUsers() {
+    async getUsers(): Promise<User[]> {
       return await getUsers()
     },
   },
@@ -44,10 +44,10 @@ export default {
     async createUser(_: unknown, { input }: { input: UserInput }) {
       return await createUser(input)
     },
-    async updateUser(_: unknown, { id, input }: { id: string, input: UserInput }) {
+    async updateUser(_: unknown, { id, input }: { id: number, input: UserInput }) {
       return await updateUser(id, input)
     },
-    async deleteUser(_: unknown, { id }: { id: string }) {
+    async deleteUser(_: unknown, { id }: { id: number }) {
       return await deleteUser(id)
     },
   },

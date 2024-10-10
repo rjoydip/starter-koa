@@ -1,12 +1,11 @@
 import type { Server } from 'node:http'
 import http from 'node:http'
 import https from 'node:https'
-import { init } from '@sentry/node'
+import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import closeWithGrace from 'close-with-grace'
 import { app } from './app'
 import config from './config'
-import { initDB } from './db'
 import logger from './logger'
 import { captureException, environment, isProd } from './utils'
 
@@ -54,8 +53,8 @@ export function handleGracefulShutdown(server: Server): void {
  */
 async function main(): Promise<void> {
   try {
-    init({
-      dsn: config.sentry_dsn,
+    Sentry.init({
+      dsn: config.monitor_dsn,
       environment: environment(),
       enabled: isProd(),
       integrations: [
@@ -64,7 +63,6 @@ async function main(): Promise<void> {
       tracesSampleRate: 1.0,
       profilesSampleRate: 1.0,
     })
-    await initDB()
     const server = await startServer()
     handleGracefulShutdown(server)
   }

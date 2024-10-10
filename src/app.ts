@@ -96,15 +96,7 @@ app.use(async (_, next) => {
 /* Internal middleware - [END] */
 
 // Custom routers
-routers.forEach((r: IRouter) => {
-  const handler = methodMap[r.method]
-  if (handler) {
-    handler(r)
-  }
-  else {
-    logger.error(`Unsupported method: ${r.method}`)
-  }
-})
+routers.forEach((r: IRouter) => methodMap[r.method](r))
 // Dispatch routes and allow OPTIONS request method
 app
   .use(router.routes())
