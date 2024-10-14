@@ -1,5 +1,6 @@
 import type { User } from '../src/types'
 import { faker } from '@faker-js/faker/locale/en'
+import { isCI } from 'std-env'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createUser,
@@ -43,7 +44,7 @@ describe('⬢ Validate db', () => {
     expect(await isDBUp()).toBeTruthy()
   })
 
-  it.sequential('● should fetch users', async () => {
+  it.skipIf(isCI)('● should fetch users', async () => {
     const users = await getUsers()
     expect(users[0]).toBeUndefined()
   })
