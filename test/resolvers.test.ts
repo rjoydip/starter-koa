@@ -63,6 +63,7 @@ describe('⬢ Validate resolvers', () => {
   })
 
   describe('⬢ Validate user resolvers', () => {
+    let id: number
     it.skip('● should validate query getUsers', async () => {
       const { getUsers } = query
       const $ = await getUsers()
@@ -81,17 +82,18 @@ describe('⬢ Validate resolvers', () => {
       const $ = await createUser(null, { input: { ...testUser } })
       expect($).toBeDefined()
       expect($?.id).toBeDefined()
+      id = $.id
     })
 
     it.sequential('● should validate mutation updateUser', async () => {
-      const { getUsers } = query
+      const { getUser } = query
       const { updateUser } = mutation
-      const users: User[] = await getUsers()
-      if (users && users[0].id) {
+      const user: User = await getUser(null, { id })
+      if (id === user.id) {
         const $ = await updateUser(null, {
-          id: users[0].id,
+          id,
           input: {
-            ...users[0],
+            ...user[0],
             name: person.fullName(),
             email: internet.email(),
           },

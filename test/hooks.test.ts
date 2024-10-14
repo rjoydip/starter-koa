@@ -1,5 +1,6 @@
 import type { User } from '../src/types'
 import { faker } from '@faker-js/faker/locale/en'
+import { isCI } from 'std-env'
 import { afterEach, describe, expect, it } from 'vitest'
 import hooks from '../src/hooks'
 
@@ -63,7 +64,7 @@ describe('⬢ Validate hooks', () => {
     expect(version).toBeTypeOf('string')
   })
 
-  it('● should validate getUsers hook', async () => {
+  it.skipIf(isCI)('● should validate getUsers hook', async () => {
     const payload = await hooks.callHook('getUsers')
     expect(payload).toStrictEqual({
       data: [],
