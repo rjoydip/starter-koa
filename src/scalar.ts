@@ -111,15 +111,20 @@ export function apiReference(options: ApiReferenceOptions): string {
       <script
         id="api-reference"
         type="application/json"
-        data-configuration="${JSON.stringify(options)
-    .split('"')
-    .join('&quot;')}">${options.spec?.content
-  ? typeof options.spec?.content === 'function'
-    ? JSON.stringify(options.spec?.content())
-    : JSON.stringify(options.spec?.content)
-  : ''
-}</script>
-  <script src="${options.cdn || 'https://cdn.jsdelivr.net/npm/@scalar/api-reference'}"></script>
+        data-configuration="${
+          JSON.stringify(options)
+            .split('"')
+            .join('&quot;')
+        }">${
+          options.spec?.content
+            ? typeof options.spec?.content === 'function'
+              ? JSON.stringify(options.spec?.content())
+              : JSON.stringify(options.spec?.content)
+            : ''
+        }</script>
+  <script src="${
+    options.cdn || 'https://cdn.jsdelivr.net/npm/@scalar/api-reference'
+  }"></script>
   `
 }
 

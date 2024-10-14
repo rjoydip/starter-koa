@@ -8,6 +8,7 @@ import { app } from './app'
 import config from './config'
 import logger from './logger'
 import { captureException, environment, isProd } from './utils'
+import { ws } from './ws'
 
 const port = config?.port
 
@@ -24,6 +25,9 @@ export function startServer(): Server {
 
   server.listen(port)
 
+  server.on('upgrade', ws.handleUpgrade)
+  server.on('error', () => ws.closeAll())
+
   logger.ready(`Server running on port ${port}`)
   return server
 }
@@ -36,7 +40,7 @@ export function handleGracefulShutdown(server: Server): void {
     {
       delay: config.graceful_delay,
     },
-    async ({ err }) => {
+    ({ err }) => {
       logger.error(`[close-with-grace] ${err}`)
       if (err) {
         captureException(err)
@@ -54,7 +58,7 @@ export function handleGracefulShutdown(server: Server): void {
 async function main(): Promise<void> {
   try {
     Sentry.init({
-      dsn: config.monitor_dsn,
+      dsn: config.monitor_dsn!,
       environment: environment(),
       enabled: isProd(),
       integrations: [
@@ -66,10 +70,10 @@ async function main(): Promise<void> {
     const server = await startServer()
     handleGracefulShutdown(server)
   }
-  catch (error: any) {
+  catch (error) {
     captureException(`Error starting server: ${error}`)
   }
 }
 
-main()
+main().catch(logger.error)
 /* v8 ignore stop */

@@ -1,21 +1,16 @@
 # starter-koa
 
-[![JSDocs][jsdocs-src]][jsdocs-href]
-[![License][license-src]][license-href]
+[![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
 
 Koa application starter
 
 > [!NOTE]
-> This project is in the early stages and under development. Although the pnpm is being used as package manager but application and some other script are working through node.
+> This project is in the early stages and under development. Although the pnpm
+> is being used as package manager but application and some other script are
+> working through node.
 
-✅ Koa <br>
-✅ PGLite <br>
-✅ Sentry <br>
-✅ Consola <br>
-✅ GraphQL Yoga <br>
-✅ Valibot <br>
-✅ Vitest <br>
-✅ Unbuild <br>
+✅ Koa <br> ✅ Neon DB <br> ✅ Drizzle <br> ✅ Sentry <br> ✅ GraphQL Yoga <br>
+✅ Valibot <br> ✅ Vitest <br> ✅ Unbuild <br>
 
 ## Development
 
@@ -62,11 +57,36 @@ pnpm run all # or nr all
 
 ## API
 
-After running dev command visit `/apidocs` endpoint.
+After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client.
 
 ## GraphQL
 
 For showing graphql playground visit `/graphql`.
+
+## Websocket
+
+For showing graphql playground visit `/_ws`.
+
+```sh
+# Ping - Client on the the 'Ping' button - Response 'Pong' from server
+
+# Reload or Reconnect - Browser refereshing not required - Only click on 'Reconnect' button
+
+# Get Users
+method=getUsers
+
+# Get User
+method=getUser&id=<USER_ID>
+
+# Create User
+method=createUser&<FIELD_1>:<VALUE_1>&<FIELD_2>:<VALUE_2> ...
+
+# Update User
+method=updateUser&id=<USER_ID>&<FIELD_1>:<VALUE_1>&<FIELD_2>:<VALUE_2> ...
+
+# Delete User
+method=deleteUser&id=<USER_ID>
+```
 
 ## License
 

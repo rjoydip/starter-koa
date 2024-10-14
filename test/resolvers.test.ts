@@ -20,9 +20,10 @@ describe('⬢ Validate resolvers', () => {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
-    isVerifed: datatype.boolean(),
+    isVerified: datatype.boolean(),
     password: internet.password(),
-    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+    address:
+      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
   afterEach(() => {
@@ -30,30 +31,6 @@ describe('⬢ Validate resolvers', () => {
   })
 
   describe('⬢ Validate main resolvers', () => {
-    it('● should validate query index', async () => {
-      const { index } = query
-      expect(await index()).toStrictEqual({
-        message: 'Welcome to Koa Starter',
-      })
-    })
-
-    it('● should validate query status', async () => {
-      const { status } = query
-      expect(status()).toStrictEqual({
-        data: { status: 'up' },
-      })
-    })
-
-    it('● should validate query metrics', async () => {
-      const { metrics } = query
-      const $ = metrics()
-      expect($).toBeDefined()
-      expect($.data).toBeDefined()
-      expect($.data.cpuUsage).toBeDefined()
-      expect($.data.memoryUsage).toBeDefined()
-      expect($.data.loadAverage).toBeDefined()
-    })
-
     it('● should validate query health', async () => {
       const { health } = query
       expect(await health()).toStrictEqual({
@@ -62,6 +39,26 @@ describe('⬢ Validate resolvers', () => {
           redis: false,
         },
       })
+    })
+
+    it('● should validate query _metrics', () => {
+      const { _metrics } = query
+      const $ = _metrics()
+      expect($).toBeDefined()
+      expect($.data).toBeDefined()
+      expect($.data.memoryUsage).toBeDefined()
+      expect($.data.loadAverage).toBeDefined()
+    })
+
+    it('● should validate query _meta', async () => {
+      const { _meta } = query
+      const $ = await _meta()
+      expect($).toBeDefined()
+      expect($.data).toBeDefined()
+      expect($.data.name).toBeDefined()
+      expect($.data.description).toBeDefined()
+      expect($.data.license).toBeDefined()
+      expect($.data.version).toBeDefined()
     })
   })
 

@@ -14,6 +14,7 @@ const {
   phone,
   datatype,
   location,
+  string,
 } = faker
 
 describe('⬢ Validate validator', () => {
@@ -24,9 +25,10 @@ describe('⬢ Validate validator', () => {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
-    isVerifed: datatype.boolean(),
+    isVerified: datatype.boolean(),
     password: internet.password(),
-    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+    address:
+      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
   afterEach(() => {
@@ -62,7 +64,9 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/200', async () => {
-      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(testUser)
+      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(
+        testUser,
+      )
       const { headers, status } = await request(app$)
         .get('/api/user/200')
         .set('Accept', 'application/json')
@@ -72,7 +76,9 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/422', async () => {
-      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(undefined)
+      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(
+        undefined,
+      )
       const { headers, status, body } = await request(app$)
         .get('/api/user/422')
         .set('Accept', 'application/json')
@@ -86,7 +92,9 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/500', async () => {
-      const getUserMock = vi.spyOn(Query, 'getUser').mockRejectedValue(new Error('query fetching error'))
+      const getUserMock = vi.spyOn(Query, 'getUser').mockRejectedValue(
+        new Error('query fetching error'),
+      )
       const { headers, status, body } = await request(app$)
         .get(`/api/user/500`)
       expect(headers['content-type']).toMatch(/json/)
@@ -100,80 +108,80 @@ describe('⬢ Validate validator', () => {
   })
 
   describe('⬢ Validate routes', () => {
-    it('● should validated /GET users routes', async () => {
+    it('● should validated /GET users routes', () => {
       expect(validateRouter(getRouter('GetUsers'))).toBeTruthy()
     })
 
-    it('● should validated /GET user routes', async () => {
+    it('● should validated /GET user routes', () => {
       expect(validateRouter(getRouter('GetUser'))).toBeTruthy()
     })
 
-    it('● should validated /POST user routes', async () => {
+    it('● should validated /POST user routes', () => {
       expect(validateRouter(getRouter('PostUser'))).toBeTruthy()
     })
 
-    it('● should validated /PATCH user routes', async () => {
-      expect(validateRouter(getRouter('PatchUser'))).toBeTruthy()
+    it('● should validated /PUT user routes', () => {
+      expect(validateRouter(getRouter('PutUser'))).toBeTruthy()
     })
 
-    it('● should validated /DELETE user routes', async () => {
+    it('● should validated /DELETE user routes', () => {
       expect(validateRouter(getRouter('DeleteUser'))).toBeTruthy()
     })
 
-    it('● should validated invalid route', async () => {
+    it('● should validated invalid route', () => {
       const invalidRouter = getRouter('invalid')
       expect(invalidRouter).toBeNull()
-      expect(() => validateRouter(invalidRouter)).toThrowError('Router is empty')
+      expect(() => validateRouter(invalidRouter)).toThrowError(
+        'Router is empty',
+      )
     })
 
-    it('● should validated route name', async () => {
-      expect(() => validateRouter({
-        name: '',
-        path: '/api/user',
-        method: HttpMethodEnum.GET,
-        middleware: [],
-        defineHandler: () => Promise.resolve(),
-      })).toThrow('Router name must be a non-empty string')
+    it('● should validated route name', () => {
+      expect(() =>
+        validateRouter({
+          name: '',
+          path: '/api/user',
+          method: HttpMethodEnum.GET,
+          middleware: [],
+          defineHandler: () => Promise.resolve(),
+        }),
+      ).toThrow('Router name must be a non-empty string')
     })
 
-    it('● should validated route path', async () => {
-      expect(() => validateRouter({
-        name: 'xxxx',
-        path: '',
-        method: HttpMethodEnum.GET,
-        middleware: [],
-        defineHandler: () => Promise.resolve(),
-      })).toThrow('Router path must be a non-empty string')
+    it('● should validated route path', () => {
+      expect(() =>
+        validateRouter({
+          name: string.alphanumeric(5),
+          path: '',
+          method: HttpMethodEnum.GET,
+          middleware: [],
+          defineHandler: () => Promise.resolve(),
+        }),
+      ).toThrow('Router path must be a non-empty string')
     })
 
-    it('● should validated route method', async () => {
-      expect(() => validateRouter({
-        name: 'xxxx',
-        path: '/api/user',
-        method: 'FOO' as any,
-        middleware: [],
-        defineHandler: () => Promise.resolve(),
-      })).toThrow('Router method must be a valid HTTP method')
+    it('● should validated route method', () => {
+      expect(() =>
+        validateRouter({
+          name: string.alphanumeric(5),
+          path: '/api/user',
+          method: 'FOO' as any,
+          middleware: [],
+          defineHandler: () => Promise.resolve(),
+        }),
+      ).toThrow('Router method must be a valid HTTP method')
     })
 
-    it('● should validated route middleware', async () => {
-      expect(() => validateRouter({
-        name: 'xxxx',
-        path: '/api/user',
-        method: HttpMethodEnum.GET,
-        middleware: null as any,
-        defineHandler: () => Promise.resolve(),
-      })).toThrow('Router middleware must be an array')
-    })
-
-    it('● should validated route defineHandler', async () => {
-      expect(() => validateRouter({
-        name: 'xxxx',
-        path: '/api/user',
-        method: HttpMethodEnum.GET,
-        middleware: [],
-        defineHandler: null as any,
-      })).toThrow('Router defineHandler must be a function')
+    it('● should validated route middleware', () => {
+      expect(() =>
+        validateRouter({
+          name: string.alphanumeric(5),
+          path: '/api/user',
+          method: HttpMethodEnum.GET,
+          middleware: null as any,
+          defineHandler: () => Promise.resolve(),
+        }),
+      ).toThrow('Router middleware must be an array')
     })
   })
 })

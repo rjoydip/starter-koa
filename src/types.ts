@@ -30,13 +30,13 @@ export interface IRegisteredRoutes {
  */
 export interface IHealth {
   /**
-   * @type {string}
+   * @type {boolean}
    */
-  id: string
+  db: boolean
   /**
    * @type {boolean}
    */
-  up: boolean
+  redis: boolean
 }
 /**
  * @export
@@ -61,9 +61,9 @@ export interface IRouter {
    */
   middleware: Middleware[]
   /**
-   * @type {(ctx: Context, next: Next) => Promise<void>}
+   * @type {(ctx: Context, next: Next) => Promise<void> | void}
    */
-  defineHandler: (ctx: Context, next: Next) => Promise<void>
+  defineHandler: (ctx: Context, next: Next) => Promise<void> | void
 }
 
 /**
@@ -71,3 +71,49 @@ export interface IRouter {
  * @typedef {Runtime}
  */
 export type Runtime = 'node' | 'bun' | 'deno'
+
+/**
+ * @export
+ * @interface IMetaData
+ * @typedef {IMetaData}
+ */
+export interface IMetaData {
+  /**
+   * @type {string}
+   */
+  description: string
+  /**
+   * @type {string}
+   */
+  license: string
+  /**
+   * @type {string}
+   */
+  name: string
+  /**
+   * @type {string}
+   */
+  version: string
+}
+
+/**
+ * @export
+ * @interface IMetrics
+ * @typedef {IMetrics}
+ */
+export interface IMetrics {
+  /**
+   * @type {NodeJS.MemoryUsage}
+   */
+  memoryUsage: NodeJS.MemoryUsage
+  /**
+   * @type {number[]}
+   */
+  loadAverage: number[]
+}
+
+/**
+ * @export
+ * @typedef {THooksMapper}
+ */
+export type THooksMapper = 'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'

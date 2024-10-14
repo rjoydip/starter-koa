@@ -4,6 +4,7 @@ import request from 'supertest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
 import { db } from '../src/db'
+import hooks from '../src/hooks'
 import resolvers from '../src/resolvers'
 
 const {
@@ -22,9 +23,10 @@ describe('⬢ Validate routes', () => {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
-    isVerifed: datatype.boolean(),
+    isVerified: datatype.boolean(),
     password: internet.password(),
-    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+    address:
+      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
   afterEach(() => {
@@ -85,12 +87,28 @@ describe('⬢ Validate routes', () => {
 
     it('● GET /metrics', async () => {
       const { headers, status, body } = await request(app$)
-        .get('/metrics')
+        .get('/_metrics')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body.message).toStrictEqual('Request successful')
       expect(body.data).toBeDefined()
+    })
+
+    it('● GET /_meta', async () => {
+      const { headers, status, body } = await request(app$)
+        .get('/_meta')
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body.message).toStrictEqual('Request successful')
+      expect(body.data).toBeDefined()
+      expect(Object.keys(body.data)).toStrictEqual([
+        'description',
+        'name',
+        'license',
+        'version',
+      ])
     })
 
     it('● GET /openapi', async () => {
@@ -103,9 +121,18 @@ describe('⬢ Validate routes', () => {
       expect(typeof body).toStrictEqual('object')
     })
 
-    it('● GET /apidocs', async () => {
+    it('● GET /references', async () => {
       const { headers, status, text, type } = await request(app$)
-        .get('/apidocs')
+        .get('/references')
+      expect(headers['content-type']).toMatch(/html/)
+      expect(status).toEqual(200)
+      expect(text).toBeDefined()
+      expect(type).toStrictEqual('text/html')
+    })
+
+    it('● GET /_ws', async () => {
+      const { headers, status, text, type } = await request(app$)
+        .get('/_ws')
       expect(headers['content-type']).toMatch(/html/)
       expect(status).toEqual(200)
       expect(text).toBeDefined()
@@ -129,13 +156,15 @@ describe('⬢ Validate routes', () => {
   describe('⬢ Validate user routes', () => {
     let id: string
 
-    it.sequential('● GET /api/users', async () => {
+    it('● GET /api/users', async () => {
       const { headers, status, body } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body.message).toStrictEqual('Fetched all user details successfully')
+      expect(body.message).toStrictEqual(
+        'Fetched all user details successfully',
+      )
       expect(body.data.length).toBe(0)
     })
 
@@ -161,12 +190,23 @@ describe('⬢ Validate routes', () => {
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(body.data).toBeDefined()
-      expect(Object.keys(body.data)).toStrictEqual(['id', 'name', 'email', 'phone', 'password', 'address', 'isVerified', 'role', 'createdAt', 'updatedAt'])
+      expect(Object.keys(body.data)).toStrictEqual([
+        'id',
+        'name',
+        'email',
+        'phone',
+        'password',
+        'address',
+        'isVerified',
+        'role',
+        'createdAt',
+        'updatedAt',
+      ])
     })
 
-    it.sequential('● PATCH /api/user:/:id', async () => {
+    it.sequential('● PUT /api/user:/:id', async () => {
       const { headers, status, body } = await request(app$)
-        .patch(`/api/user/${id}`)
+        .put(`/api/user/${id}`)
         .send(testUser)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
@@ -193,9 +233,9 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(422)
     })
 
-    it.sequential('● PATCH /api/user:/:throw', async () => {
+    it.sequential('● PUT /api/user:/:throw', async () => {
       const { headers, status, body } = await request(app$)
-        .patch(`/api/user/${id}`)
+        .put(`/api/user/${id}`)
         .send({
           ...testUser,
           name: 'Benedicte Smans Marlou Schaminée',
@@ -238,7 +278,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● GET /api/users 500', async () => {
-      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
@@ -247,7 +287,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● GET /api/user 500', async () => {
-      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
@@ -256,7 +296,7 @@ describe('⬢ Validate routes', () => {
     })
 
     it('● POST /api/user 500', async () => {
-      vi.spyOn(db, 'insert').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(db, 'insert').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .post('/api/user/')
         .send(testUser)
@@ -265,11 +305,11 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● PATCH /api/user/:id 500', async () => {
-      vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
-      vi.spyOn(db, 'update').mockRejectedValueOnce(new Error('DB error'))
+    it('● PUT /api/user/:id 500', async () => {
+      vi.spyOn(db, 'update').mockRejectedValueOnce(new Error('Error'))
+      vi.spyOn(hooks, 'callHook').mockRejectedValueOnce(new Error('Hook Error'))
       const { headers, status } = await request(app$)
-        .patch(`/api/user/${id}`)
+        .put(`/api/user/${id}`)
         .send({
           id,
           ...testUser,
@@ -283,7 +323,9 @@ describe('⬢ Validate routes', () => {
       vi.spyOn(db, 'select').mockResolvedValueOnce(testUser)
       vi.spyOn(db, 'delete').mockRejectedValueOnce(new Error('DB error'))
       vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(testUser)
-      vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(new Error('DB error'))
+      vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(
+        new Error('DB error'),
+      )
       const deleteUserResponse = await request(app$)
         .delete(`/api/user/${id}`)
         .set('Accept', 'application/json')
