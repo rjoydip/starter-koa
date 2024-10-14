@@ -102,7 +102,10 @@ class _Error<DataT = unknown> extends Error {
   /**
    * @returns (Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>)
    */
-  toJSON(): Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'> {
+  toJSON(): Pick<
+    _Error<DataT>,
+    'message' | 'statusCode' | 'statusMessage' | 'data'
+  > {
     const obj: Pick<
       _Error<DataT>,
       'message' | 'statusCode' | 'statusMessage' | 'data'
@@ -140,7 +143,6 @@ class _Error<DataT = unknown> extends Error {
  *   data: { field: 'email' }
  * })
  *
- *
  * @return {_Error} - An instance of _Error.
  *
  * @remarks
@@ -170,8 +172,7 @@ export function createError<DataT = unknown>(
     err.data = input.data
   }
 
-  const statusCode
-    = input.statusCode
+  const statusCode = input.statusCode
     ?? input.status
     ?? (cause as _Error)?.statusCode
     ?? (cause as { status?: number })?.status
@@ -179,8 +180,7 @@ export function createError<DataT = unknown>(
     err.statusCode = sanitizeStatusCode(statusCode)
   }
 
-  const statusMessage
-    = input.statusMessage
+  const statusMessage = input.statusMessage
     ?? input.statusText
     ?? (cause as _Error)?.statusMessage
     ?? (cause as { statusText?: string })?.statusText
@@ -246,7 +246,6 @@ export interface IMessage<T = unknown> {
  *   data: { field: 'email' }
  * })
  *
- *
  * @return {IMessage} - An instance of success message.
  *
  * @remarks
@@ -266,7 +265,10 @@ export function createSuccess<DataT extends IMessage>(
   else {
     succ.data = input.data
     succ.statusCode = sanitizeStatusCode(input.statusCode ?? input.status)
-    succ.message = sanitizeStatusMessage(input.statusMessage ?? input.statusText ?? input.message ?? 'Request successful')
+    succ.message = sanitizeStatusMessage(
+      input.statusMessage ?? input.statusText ?? input.message
+      ?? 'Request successful',
+    )
   }
 
   return succ

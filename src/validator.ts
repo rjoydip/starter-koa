@@ -1,16 +1,14 @@
 import type { Context, Next } from 'koa'
 import type { IRouter } from './types'
-import { HttpMethodEnum } from 'koa-body/lib/types'
+import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
+import hooks from './hooks'
 import { createError } from './message'
-import resolvers from './resolvers'
 import { captureException, HTTP_STATUS_CODE } from './utils'
-
-const { Query } = resolvers
 
 /**
  * @export
- * @param {${2:*}} schema
+ * @param {any} schema
  * @returns (ctx: Context, next: Next) => Promise<void>
  */
 export function requestValidator(schema: any) {
@@ -45,9 +43,9 @@ export function requestValidator(schema: any) {
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
-      const user = await Query.getUser(null, { id: ctx.params.id })
-      if (user) {
-        ctx.state.user = user
+      const { data } = await hooks.callHook('getUser', ctx.params.id)
+      if (data) {
+        ctx.state.user = data
         await next()
       }
       else {
@@ -59,7 +57,7 @@ export function userValidator() {
         captureException('User Invalid')
       }
     }
-    catch (error: any) {
+    catch (error) {
       ctx.status = HTTP_STATUS_CODE[500]
       ctx.body = createError({
         message: 'Update user details failed',
@@ -88,12 +86,15 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router path must be a non-empty string')
   }
 
-  if (![HttpMethodEnum.GET, HttpMethodEnum.PATCH, HttpMethodEnum.POST, HttpMethodEnum.PUT, HttpMethodEnum.DELETE, HttpMethodEnum.HEAD].includes(router.method)) {
+  if (
+    ![
+      HttpMethodEnum.GET,
+      HttpMethodEnum.POST,
+      HttpMethodEnum.PUT,
+      HttpMethodEnum.DELETE,
+    ].includes(router.method)
+  ) {
     throw new Error('Router method must be a valid HTTP method')
-  }
-
-  if (!router.defineHandler || typeof router.defineHandler !== 'function') {
-    throw new Error('Router defineHandler must be a function')
   }
 
   if (!router.middleware && !Array.isArray(router.middleware)) {

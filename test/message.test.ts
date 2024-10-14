@@ -1,12 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import { createError, createSuccess, hasProp, sanitizeStatusCode, sanitizeStatusMessage } from '../src/message'
+import {
+  createError,
+  createSuccess,
+  hasProp,
+  sanitizeStatusCode,
+  sanitizeStatusMessage,
+} from '../src/message'
 
 describe('⬢ Validate message', () => {
   describe('⬢ Validate sanitizeStatusMessage', () => {
     it('● should validate statusMessage', () => {
-      expect(sanitizeStatusMessage('&<>"\'')).toStrictEqual('&amp;&lt;&gt;&quot;&#39;')
+      expect(sanitizeStatusMessage('&<>"\'')).toStrictEqual(
+        '&amp;&lt;&gt;&quot;&#39;',
+      )
       expect(sanitizeStatusMessage('🦄 & 🐐')).toStrictEqual('🦄 &amp; 🐐')
-      expect(sanitizeStatusMessage('Hello <em>World</em>')).toStrictEqual('Hello &lt;em&gt;World&lt;/em&gt;')
+      expect(sanitizeStatusMessage('Hello <em>World</em>')).toStrictEqual(
+        'Hello &lt;em&gt;World&lt;/em&gt;',
+      )
     })
   })
 
@@ -66,23 +76,32 @@ describe('⬢ Validate message', () => {
     it('● should return a message with data', () => {
       const data = { id: 1, name: 'Test User' }
 
-      expect(createSuccess({ data, message: 'Operation successful' })).toStrictEqual({
-        statusCode: 200,
-        message: 'Operation successful',
-        data,
-      })
+      expect(createSuccess({ data, message: 'Operation successful' }))
+        .toStrictEqual({
+          statusCode: 200,
+          message: 'Operation successful',
+          data,
+        })
     })
   })
 
   describe('⬢ Validate createError', () => {
     it('● should return an error message', () => {
-      expect(createError('Database connection failed').toJSON()).toStrictEqual({ message: 'Database connection failed', statusCode: 500 })
+      expect(createError('Database connection failed').toJSON()).toStrictEqual({
+        message: 'Database connection failed',
+        statusCode: 500,
+      })
     })
 
     it('● should return an custom error message', () => {
-      expect(createError({
+      expect(
+        createError({
+          message: 'Database connection occurred',
+        }).toJSON(),
+      ).toStrictEqual({
         message: 'Database connection occurred',
-      }).toJSON()).toStrictEqual({ message: 'Database connection occurred', statusCode: 500 })
+        statusCode: 500,
+      })
     })
 
     it('● should return an error message when native Error', () => {
@@ -113,10 +132,13 @@ describe('⬢ Validate message', () => {
     })
 
     it('● should return a failure response with missing error fields filled with defaults', () => {
-      expect(createError('Request failed').toJSON()).toStrictEqual({ message: 'Request failed', statusCode: 500 })
+      expect(createError('Request failed').toJSON()).toStrictEqual({
+        message: 'Request failed',
+        statusCode: 500,
+      })
     })
 
-    it('● should can inherit from cause', async () => {
+    it('● should can inherit from cause', () => {
       class CustomError extends Error {
         cause = createError({
           statusCode: 400,
@@ -132,7 +154,7 @@ describe('⬢ Validate message', () => {
       expect(t.fatal).toBe(true)
     })
 
-    it('● should can inherit from status', async () => {
+    it('● should can inherit from status', () => {
       class CustomError extends Error {
         cause = createError({
           status: 400,
@@ -147,7 +169,7 @@ describe('⬢ Validate message', () => {
       expect(t.fatal).toBe(true)
     })
 
-    it('● should can inherit from statusCode', async () => {
+    it('● should can inherit from statusCode', () => {
       class CustomError extends Error {
         cause = {
           statusCode: 400,
@@ -162,7 +184,7 @@ describe('⬢ Validate message', () => {
       expect(t.fatal).toBe(false)
     })
 
-    it('● should can inherit from statusMessage', async () => {
+    it('● should can inherit from statusMessage', () => {
       class CustomError extends Error {
         cause = {
           statusMessage: 'Bad Error',

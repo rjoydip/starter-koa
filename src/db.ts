@@ -20,9 +20,8 @@ export async function isDBUp(): Promise<boolean> {
   try {
     await db.execute(sql`select 1`)
     return true
-  }
-  /* eslint-disable unused-imports/no-unused-vars */
-  catch (_: any) {
+  } /* eslint-disable unused-imports/no-unused-vars */
+  catch (_: unknown) {
     return false
   }
 }
@@ -78,12 +77,14 @@ export async function updateUser(id: number, user: User): Promise<User> {
  * @returns Promise<void>
  */
 export async function deleteUser(id: number): Promise<{ id: number }> {
-  const result = await db.delete(users).where(eq(users.id, id)).returning({ id: users.id })
+  const result = await db.delete(users).where(eq(users.id, id)).returning({
+    id: users.id,
+  })
   return result[0]
 }
 /* User Queries - Start */
 
-export const schema = createSchema({
+export const graphqlSchema = createSchema({
   typeDefs,
   resolvers,
 })

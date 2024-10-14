@@ -38,7 +38,9 @@ describe('⬢ Validate scalar', () => {
     const result = apiReference({
       spec: mockOptions.spec,
     })
-    expect(result).toContain('https://cdn.jsdelivr.net/npm/@scalar/api-reference')
+    expect(result).toContain(
+      'https://cdn.jsdelivr.net/npm/@scalar/api-reference',
+    )
   })
 
   describe('⬢ Validate apiDocs', () => {

@@ -14,7 +14,7 @@ describe('⬢ Validate config', () => {
     faker.seed()
   })
 
-  it('● should validated config', async () => {
+  it('● should validated config', () => {
     const defaultConfig = config
     expect(defaultConfig?.port).toStrictEqual(8080)
     expect(defaultConfig?.log_level).toStrictEqual(3)
@@ -27,7 +27,7 @@ describe('⬢ Validate config', () => {
     expect(defaultConfig?.duration).toStrictEqual(6000)
   })
 
-  it('● should validated overwrite config value', async () => {
+  it('● should validated overwrite config value', () => {
     const port = internet.port()
     const isHTTPs = datatype.boolean()
     const duration = number.int({ min: 1000, max: 6000 })

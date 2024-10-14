@@ -21,9 +21,9 @@ describe('⬢ Validate schema', () => {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
-    isVerifed: datatype.boolean(),
     password: internet.password(),
-    address: `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
+    address:
+      `${location.streetAddress}, ${location.city}, ${location.state}, ${location.zipCode}, ${location.country}`,
     createdAt: new Date(),
     updatedAt: new Date(),
   }
@@ -49,7 +49,9 @@ describe('⬢ Validate schema', () => {
     expect(result.success).toBeFalsy()
     expect(result.issues?.length).toBeGreaterThan(0)
     result.issues?.forEach((issue) => {
-      expect(issue.message).toStrictEqual('Invalid length: Expected >=8 but received 4')
+      expect(issue.message).toStrictEqual(
+        'Invalid length: Expected >=8 but received 4',
+      )
     })
   })
 })

@@ -3,19 +3,24 @@ import type { IRouter } from './types'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
-import { schema } from './db'
+import { graphqlSchema } from './db'
+import hooks from './hooks'
 import { createError, createSuccess } from './message'
-import resolvers from './resolvers'
 import { apiDocs } from './scalar'
 import { UserSchema } from './schema'
-import { API_PREFIX, captureException, getOpenAPISpec, HTTP_STATUS_CODE } from './utils'
+import {
+  API_PREFIX,
+  captureException,
+  getOpenAPISpec,
+  HTTP_STATUS_CODE,
+  wsTemplete,
+} from './utils'
 import { requestValidator, userValidator } from './validator'
 
 const yoga = createYoga({
   landingPage: true,
-  schema,
+  schema: graphqlSchema,
 })
-const { Query, Mutation } = resolvers
 
 /**
  * Main application routes
@@ -27,9 +32,11 @@ const mainRoutes: IRouter[] = [
     path: '/',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Context) => {
+    defineHandler: (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
-      ctx.body = createSuccess(resolvers.Query.index())
+      ctx.body = createSuccess({
+        message: 'Welcome to Koa Starter',
+      })
     },
   },
   {
@@ -37,9 +44,11 @@ const mainRoutes: IRouter[] = [
     path: '/status',
     method: HttpMethodEnum.GET,
     middleware: [],
-    defineHandler: async (ctx: Context) => {
+    defineHandler: (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
-      ctx.body = createSuccess(resolvers.Query.status())
+      ctx.body = createSuccess({
+        data: { status: 'up' },
+      })
     },
   },
   {
@@ -48,18 +57,29 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await resolvers.Query.health()
+      const payload = await hooks.callHook('health')
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
   },
   {
     name: 'Metrics',
-    path: '/metrics',
+    path: '/_metrics',
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await resolvers.Query.metrics()
+      const payload = await hooks.callHook('_metrics')
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.body = createSuccess(payload)
+    },
+  },
+  {
+    name: 'Meta',
+    path: '/_meta',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: async (ctx: Context) => {
+      const payload = await hooks.callHook('_meta')
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
@@ -77,7 +97,7 @@ const mainRoutes: IRouter[] = [
   },
   {
     name: 'APIDocs',
-    path: '/apidocs',
+    path: '/references',
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
@@ -96,12 +116,26 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const response = await yoga.handleNodeRequestAndResponse(ctx.req, ctx.res)
+      const response = await yoga.handleNodeRequestAndResponse(
+        ctx.req,
+        ctx.res,
+      )
       ctx.status = response.status
       response.headers.forEach((value, key) => {
         ctx.append(key, value)
       })
       ctx.body = response.body
+    },
+  },
+  {
+    name: 'WSTest',
+    path: '/_ws',
+    method: HttpMethodEnum.GET,
+    middleware: [],
+    defineHandler: (ctx: Context) => {
+      ctx.status = HTTP_STATUS_CODE[200]
+      ctx.type = 'html'
+      ctx.body = wsTemplete()
     },
   },
 ]
@@ -117,15 +151,15 @@ const userRoutes: IRouter[] = [
     middleware: [],
     defineHandler: async (ctx: Context) => {
       try {
-        const users = await Query.getUsers()
+        const payload = await hooks.callHook('getUsers')
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           status: HTTP_STATUS_CODE[200],
           message: 'Fetched all user details successfully',
-          data: users,
+          ...payload,
         })
       }
-      catch (error: any) {
+      catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
           status: HTTP_STATUS_CODE[500],
@@ -140,13 +174,13 @@ const userRoutes: IRouter[] = [
     path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.GET,
     middleware: [userValidator()],
-    defineHandler: async (ctx: Context) => {
-      const user = ctx.state.user
+    defineHandler: (ctx: Context) => {
+      const payload = ctx.state.user
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess({
         message: 'Fetched user details successfully',
         status: HTTP_STATUS_CODE[200],
-        data: user,
+        data: payload,
       })
       ctx.state = undefined
     },
@@ -158,14 +192,14 @@ const userRoutes: IRouter[] = [
     middleware: [requestValidator(UserSchema)],
     defineHandler: async (ctx: Context) => {
       try {
-        const payload = await Mutation.createUser(null, { input: ctx.request.body })
+        const payload = await hooks.callHook('createUser', ctx.request.body)
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details stored successfully',
-          data: payload,
+          ...payload,
         })
       }
-      catch (error: any) {
+      catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
           message: 'User details stored failed',
@@ -176,21 +210,21 @@ const userRoutes: IRouter[] = [
     },
   },
   {
-    name: 'PatchUser',
+    name: 'PutUser',
     path: `${API_PREFIX}/user/:id`,
-    method: HttpMethodEnum.PATCH,
+    method: HttpMethodEnum.PUT,
     middleware: [requestValidator(UserSchema), userValidator()],
     defineHandler: async (ctx: Context) => {
       try {
-        const user = await Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
+        const payload = await hooks.callHook('updateUser', ctx.params.id, ctx.request.body)
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details updates successfully',
           status: HTTP_STATUS_CODE[200],
-          data: user,
+          ...payload,
         })
       }
-      catch (error: any) {
+      catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
           message: 'User details updates failed',
@@ -207,11 +241,14 @@ const userRoutes: IRouter[] = [
     middleware: [userValidator()],
     defineHandler: async (ctx: Context) => {
       try {
-        await Mutation.deleteUser(null, { id: ctx.params.id })
+        await hooks.callHook('deleteUser', ctx.params.id)
         ctx.status = HTTP_STATUS_CODE[200]
-        ctx.body = createSuccess({ message: 'User delete successfully', data: ctx.state.user })
+        ctx.body = createSuccess({
+          message: 'User delete successfully',
+          data: ctx.state.user,
+        })
       }
-      catch (error: any) {
+      catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
           message: 'User data deletetion failed',
@@ -233,5 +270,6 @@ export const routers: IRouter[] = [...mainRoutes, ...userRoutes]
  * @returns (IRouter | null)
  */
 export function getRouter(route: string): IRouter | null {
-  return routers.find(i => i.name.toLowerCase() === route.toLowerCase()) ?? null
+  return routers.find(i => i.name.toLowerCase() === route.toLowerCase())
+    ?? null
 }

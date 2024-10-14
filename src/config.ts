@@ -13,10 +13,6 @@ export interface IConfig {
    */
   port?: number
   /**
-   * @type {?number}
-   */
-  graphql_port?: number
-  /**
    * @type {?boolean}
    */
   isHTTPs?: boolean

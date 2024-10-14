@@ -11,6 +11,7 @@ node_modules
 temp
 .clinic
 *.env.*
+*.env
 !*.env.example
 drizzle/**/*.json
 drizzle/**/*.sql
