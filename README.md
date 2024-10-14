@@ -88,6 +88,11 @@ method=updateUser&id=<USER_ID>&<FIELD_1>:<VALUE_1>&<FIELD_2>:<VALUE_2> ...
 method=deleteUser&id=<USER_ID>
 ```
 
+## TODO
+
+- [ ] Mock DB in unit test
+- [ ] Support Deno
+
 ## License
 
 [MIT](./LICENSE) License © 2024-PRESENT [Joydip Roy](https://github.com/rjoydip)
