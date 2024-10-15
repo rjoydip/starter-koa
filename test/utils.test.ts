@@ -19,7 +19,6 @@ import {
   isDev,
   isProd,
   isTest,
-  wsTemplete,
 } from '../src/utils'
 
 vi.mock('fs/promises', () => ({
@@ -63,11 +62,6 @@ describe('⬢ Validate utils', () => {
   })
 
   describe('⬢ Validate utility methods', () => {
-    it('● should validated wsTemplate', () => {
-      expect(wsTemplete()).toBeDefined()
-      expect(wsTemplete({ sse: true })).toBeDefined()
-    })
-
     describe('⬢ Validate invariant', () => {
       it('● should validated invariant for prod', () => {
         expect(() => invariant(false, 'production message')).toThrowError(

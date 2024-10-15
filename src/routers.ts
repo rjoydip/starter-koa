@@ -13,9 +13,9 @@ import {
   captureException,
   getOpenAPISpec,
   HTTP_STATUS_CODE,
-  wsTemplete,
 } from './utils'
 import { requestValidator, userValidator } from './validator'
+import { wsTemplete } from './ws'
 
 const yoga = createYoga({
   landingPage: true,
