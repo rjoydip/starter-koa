@@ -10,13 +10,12 @@ import logger from './logger'
 import { captureException, environment, isProd } from './utils'
 import { ws } from './ws'
 
-const port = config?.port
-
 /**
  * @export
  * @returns Server
  */
 export function startServer(): Server {
+  const port = config?.port
   /* v8 ignore start */
   const server = config?.isHTTPs
     ? https.createServer(app.callback())
@@ -27,6 +26,7 @@ export function startServer(): Server {
 
   server.on('upgrade', ws.handleUpgrade)
   server.on('error', () => ws.closeAll())
+  server.on('close', () => ws.closeAll())
 
   logger.ready(`Server running on port ${port}`)
   return server

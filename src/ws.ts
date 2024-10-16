@@ -28,28 +28,30 @@ export const ws = crossws({
     async message(peer, message) {
       logger.log('[ws] message', peer.id, message.text())
       const qs = queryString.parse(message.text(), {
-        arrayFormat: 'bracket-separator',
-        arrayFormatSeparator: '|',
         parseNumbers: true,
         parseBooleans: true,
         types: {
-          method: 'string',
+          action: 'string',
           id: 'number',
-          input: 'string',
         },
       })
-      const { method, id, ...input } = qs
-      if (method === 'ping') {
-        peer.send('pong')
+      const { action, id, ...input } = qs
+      if (action === 'ping') {
+        peer.send('pong', {
+          compress: true,
+        })
       }
-      else if (Object.keys(hooksMapper).includes(method as THooksMapper)) {
-        logger.log('Hook matched:', method)
-        if (input) {
-          peer.send(await hooksMapper[method as THooksMapper](id as number, input))
-        }
+      else if (Object.keys(hooksMapper).includes(action as THooksMapper)) {
+        logger.log('Hook matched:', action)
+        peer.send(await hooksMapper[action as THooksMapper](id as number, input), {
+          compress: true,
+        })
       }
       else {
-        logger.log(`Hooks not matched: ${method}`)
+        logger.log(`Hooks not matched: ${action}`)
+        peer.send('invalid', {
+          compress: true,
+        })
       }
     },
 
@@ -61,13 +63,6 @@ export const ws = crossws({
       logger.log('[ws] error', peer.id, error)
       captureException(`[${peer.id}]: ${error}`)
     },
-
-    upgrade(req) {
-      logger.log(`[ws] upgrading ${req.url}...`)
-      return {
-        headers: {},
-      }
-    },
   }),
 })
 
@@ -76,7 +71,7 @@ export function wsTemplete(opts: { sse?: boolean } = { sse: false }): string {
   <!doctype html>
   <html lang="en" data-theme="dark">
     <head>
-      <title>WS Test Page</title>
+      <title>WS Playground</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <style>
         body {
@@ -174,7 +169,7 @@ export function wsTemplete(opts: { sse?: boolean } = { sse: false }): string {
           log("sse", "Connecting to", url, "...");
           sse = new EventSource(url);
 
-          sse.addEventListener("crossws-id", (event) => {
+          sse.addEventListener("ws", (event) => {
             const peerId = event.data;
 
             const sendWithFetch = _send = (message) => fetch(url, {
@@ -235,7 +230,7 @@ export function wsTemplete(opts: { sse?: boolean } = { sse: false }): string {
 
         const ping = () => {
           log("ws", "Sending ping");
-          _send("method=ping");
+          _send("action=ping");
         };
 
         createApp({
