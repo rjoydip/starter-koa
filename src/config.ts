@@ -49,7 +49,7 @@ export interface IConfig {
 const {
   LOG_LEVEL = 3,
   ENABLE_HTTPS = false,
-  PORT = 8080,
+  PORT = 8181,
   RATE_LIMIT = 70000,
   RATE_DURATION = 6000,
   GRACEFUL_DELAY = 500,

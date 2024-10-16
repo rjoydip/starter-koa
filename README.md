@@ -9,8 +9,14 @@ Koa application starter
 > is being used as package manager but application and some other script are
 > working through node.
 
-✅ Koa <br> ✅ Neon DB <br> ✅ Drizzle <br> ✅ Sentry <br> ✅ GraphQL Yoga <br>
-✅ Valibot <br> ✅ Vitest <br> ✅ Unbuild <br>
+✅ Koa <br>
+✅ Neon DB <br>
+✅ Drizzle <br>
+✅ Sentry <br>
+✅ GraphQL Yoga <br>
+✅ Valibot <br>
+✅ Vitest <br>
+✅ Unbuild <br>
 
 ## Development
 
@@ -65,7 +71,7 @@ For showing graphql playground visit `/graphql`.
 
 ## Websocket
 
-For showing graphql playground visit `/_ws`.
+For showing websocket playground visit `/_ws`. If want to use as API then use either `wss://<domain>` or `ws://<domain>`
 
 ```sh
 # Ping - Client on the the 'Ping' button - Response 'Pong' from server
@@ -90,8 +96,17 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Mock DB in unit test
+- [ ] Mock DB in test
+- [ ] CI job no parallel
+- [x] WS test
+- [ ] Cache
+- [ ] Password
+  - [ ] encrypt & decrypt
+  - [ ] Exclude from response
 - [ ] Support Deno
+- [ ] Authentication
+- [ ] Burno API client
+- [ ] Feature flag
 
 ## License
 

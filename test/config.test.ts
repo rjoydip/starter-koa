@@ -16,7 +16,7 @@ describe('⬢ Validate config', () => {
 
   it('● should validated config', () => {
     const defaultConfig = config
-    expect(defaultConfig?.port).toStrictEqual(8080)
+    expect(defaultConfig?.port).toStrictEqual(8181)
     expect(defaultConfig?.log_level).toStrictEqual(3)
     expect(defaultConfig?.ratelimit).toStrictEqual(70000)
     expect(defaultConfig?.graceful_delay).toStrictEqual(500)
@@ -38,7 +38,6 @@ describe('⬢ Validate config', () => {
     const overwriteConfig: IConfig = {
       ...config,
       port,
-      graphql_port: port,
       ratelimit: number$,
       graceful_delay: number$,
       monitor_dsn: dns,
