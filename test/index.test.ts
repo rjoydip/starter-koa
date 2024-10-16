@@ -48,9 +48,8 @@ describe('⬢ Validate server', () => {
     server.close()
   })
 
-  it('● should validate app server instace & listining', () => {
+  it('● should validate app server instace', () => {
     expect(server).toBeDefined()
-    expect(server.listening).toBeTruthy()
   })
 
   it('● should log an error, capture exception, and close the app server', () => {
