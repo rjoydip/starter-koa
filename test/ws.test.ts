@@ -1,5 +1,6 @@
 import type { Server } from 'node:http'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import WebSocket from 'ws'
 import { startServer } from '../src'
 import config from '../src/config'
 import { ws, wsTemplete } from '../src/ws'
