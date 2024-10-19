@@ -1,6 +1,6 @@
 import type { User } from '../src/types'
 import { faker } from '@faker-js/faker/locale/en'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import hooks from '../src/hooks'
 
 const {
@@ -24,9 +24,13 @@ describe('⬢ Validate hooks', () => {
     address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
+  beforeAll(async () => {})
+
   afterEach(() => {
     faker.seed()
   })
+
+  afterAll(async () => {})
 
   it('● should validate hook instance', () => {
     expect(hooks.hook).toBeDefined()
@@ -37,7 +41,7 @@ describe('⬢ Validate hooks', () => {
     expect(payload).toStrictEqual({
       data: {
         db: true,
-        redis: false,
+        redis: true,
       },
     })
   })

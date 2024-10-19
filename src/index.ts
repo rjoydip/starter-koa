@@ -1,46 +1,24 @@
 import type { Server } from 'node:http'
-import http from 'node:http'
-import https from 'node:https'
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import closeWithGrace from 'close-with-grace'
-import { app } from './app'
+import { cache } from './cache'
 import config from './config'
 import logger from './logger'
+import { createServer } from './server'
 import { captureException, environment, isProd } from './utils'
-import { ws } from './ws'
 
 /**
  * @export
- * @returns Server
- */
-export function startServer(): Server {
-  const port = config?.port
-  /* v8 ignore start */
-  const server = config?.isHTTPs
-    ? https.createServer(app.callback())
-    : http.createServer(app.callback())
-  /* v8 ignore stop */
-
-  server.listen(port)
-
-  server.on('upgrade', ws.handleUpgrade)
-  server.on('error', () => ws.closeAll())
-  server.on('close', () => ws.closeAll())
-
-  logger.ready(`Server running on port ${port}`)
-  return server
-}
-
-/**
- * @export
+ * @sync
+ * @param {Server} server
  */
 export function handleGracefulShutdown(server: Server): void {
   closeWithGrace(
     {
       delay: config.graceful_delay,
     },
-    ({ err }) => {
+    async ({ err }) => {
       logger.error(`[close-with-grace] ${err}`)
       if (err) {
         captureException(err)
@@ -67,7 +45,13 @@ async function main(): Promise<void> {
       tracesSampleRate: 1.0,
       profilesSampleRate: 1.0,
     })
-    const server = await startServer()
+    const server = createServer()
+    server.listen(config.port)
+    cache.on('error', async (err) => {
+      await cache.clear()
+      logger.error(err)
+      captureException(err)
+    })
     handleGracefulShutdown(server)
   }
   catch (error) {

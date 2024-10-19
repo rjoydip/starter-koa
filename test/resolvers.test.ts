@@ -1,6 +1,6 @@
 import type { User } from '../src/types'
 import { faker } from '@faker-js/faker/locale/en'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import resolvers from '../src/resolvers'
 
 const {
@@ -26,9 +26,13 @@ describe('⬢ Validate resolvers', () => {
       `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
+  beforeAll(async () => {})
+
   afterEach(() => {
     faker.seed()
   })
+
+  afterAll(async () => {})
 
   describe('⬢ Validate main resolvers', () => {
     it('● should validate query health', async () => {
@@ -36,7 +40,7 @@ describe('⬢ Validate resolvers', () => {
       expect(await health()).toStrictEqual({
         data: {
           db: true,
-          redis: false,
+          redis: true,
         },
       })
     })

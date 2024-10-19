@@ -11,8 +11,10 @@ import {
   it,
   vi,
 } from 'vitest'
-import { handleGracefulShutdown, startServer } from '../src/index'
+import config from '../src/config'
+import { handleGracefulShutdown } from '../src/index'
 import logger from '../src/logger'
+import { createServer } from '../src/server'
 import * as utils from '../src/utils'
 
 describe('⬢ Validate server', () => {
@@ -32,7 +34,8 @@ describe('⬢ Validate server', () => {
 
   beforeAll(async () => {
     consola.mockTypes(() => vi.fn())
-    server = await startServer()
+    server = createServer()
+    server.listen(config.port)
   })
 
   beforeEach(() => {
@@ -44,7 +47,7 @@ describe('⬢ Validate server', () => {
     vi.clearAllMocks()
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     server.close()
   })
 

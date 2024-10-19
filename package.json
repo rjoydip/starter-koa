@@ -63,6 +63,7 @@
     "db:preview": "dotenvx run -f .env -- drizzle-kit studio"
   },
   "dependencies": {
+    "@keyv/redis": "^3.0.1",
     "@neondatabase/serverless": "^0.9.5",
     "@sentry/node": "^8.34.0",
     "@sentry/profiling-node": "^8.34.0",
@@ -75,6 +76,7 @@
     "graphql": "^16.9.0",
     "graphql-yoga": "^5.7.0",
     "hookable": "^5.5.3",
+    "keyv": "^5.1.0",
     "koa": "^2.15.3",
     "koa-body": "^6.0.1",
     "koa-helmet": "^7.0.2",

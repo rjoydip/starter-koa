@@ -1,8 +1,8 @@
 import type { Server } from 'node:http'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import WebSocket from 'ws'
-import { startServer } from '../src'
 import config from '../src/config'
+import { createServer } from '../src/server'
 import { ws, wsTemplete } from '../src/ws'
 
 describe('⬢ Validate ws', () => {
@@ -10,12 +10,13 @@ describe('⬢ Validate ws', () => {
   let _ws: WebSocket
 
   beforeAll(async () => {
-    server = startServer()
+    server = createServer()
+    server.listen(config.port)
     _ws = new WebSocket(`ws://127.0.0.1:${config?.port}/`)
     await new Promise(resolve => _ws.addEventListener('open', resolve))
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     ws.closeAll()
     server.close()
   })

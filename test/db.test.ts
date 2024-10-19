@@ -43,11 +43,6 @@ describe('⬢ Validate db', () => {
     expect(await isDBUp()).toBeTruthy()
   })
 
-  it.skip('● should fetch users', async () => {
-    const users = await getUsers()
-    expect(users[0]).toBeUndefined()
-  })
-
   it.sequential('● should insert and retrieve a user', async () => {
     const user$ = await createUser(testUser)
     expect(user$).toBeDefined()
@@ -65,6 +60,15 @@ describe('⬢ Validate db', () => {
   it.sequential('● should fetch all users', async () => {
     const users = await getUsers()
     expect(users.length).toBeGreaterThan(0)
+  })
+
+  it.sequential('● should fetch all users multiple times', async () => {
+    const users1 = await getUsers()
+    const users2 = await getUsers()
+    const users3 = await getUsers()
+    expect(users1.length).toBeGreaterThan(0)
+    expect(users2.length).toBeGreaterThan(0)
+    expect(users3.length).toBeGreaterThan(0)
   })
 
   it.sequential('● should delete user', async () => {

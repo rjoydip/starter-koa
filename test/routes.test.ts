@@ -1,7 +1,7 @@
 import type { User } from '../src/types'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app'
 import { db } from '../src/db'
 import hooks from '../src/hooks'
@@ -29,9 +29,13 @@ describe('⬢ Validate routes', () => {
       `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
   }
 
+  beforeAll(async () => {})
+
   afterEach(() => {
     faker.seed()
   })
+
+  afterAll(async () => {})
 
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
@@ -80,7 +84,7 @@ describe('⬢ Validate routes', () => {
         message: 'Request successful',
         data: {
           db: true,
-          redis: false,
+          redis: true,
         },
       })
     })
