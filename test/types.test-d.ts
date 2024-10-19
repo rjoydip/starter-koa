@@ -30,7 +30,7 @@ describe('⬢ Validate types', () => {
 
     expectTypeOf({
       db: true,
-      redis: false,
+      redis: true,
     }).toMatchTypeOf<IHealth>()
 
     expectTypeOf({

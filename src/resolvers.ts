@@ -21,11 +21,11 @@ export default {
       }
     },
     async health() {
-      const db = await isDBUp()
+      const _isDBUp = await isDBUp()
       return {
         data: {
-          db,
-          redis: false,
+          db: _isDBUp,
+          redis: true,
         },
       }
     },

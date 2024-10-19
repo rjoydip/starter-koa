@@ -3,6 +3,7 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { eq, sql } from 'drizzle-orm/sql'
 import { createSchema } from 'graphql-yoga'
+import { cache } from './cache'
 import config from './config'
 import resolvers from './resolvers'
 import { users } from './schema'
@@ -32,7 +33,16 @@ export async function isDBUp(): Promise<boolean> {
  * @returns Promise<User[]>
  */
 export async function getUsers(): Promise<User[]> {
-  return await db.select().from(users)
+  const cacheKey = 'all_users'
+
+  const cachedUsers = await cache.get<User[]>(cacheKey)
+  if (cachedUsers) {
+    return cachedUsers
+  }
+
+  const result = await db.select().from(users)
+  cache.set(cacheKey, result)
+  return result
 }
 
 /* User Queries - Start */
@@ -43,8 +53,17 @@ export async function getUsers(): Promise<User[]> {
  * @returns Promise<User>
  */
 export async function getUser(id: number): Promise<User> {
+  const cacheKey = `user_${id}`
+
+  const cachedUser = await cache.get<User>(cacheKey)
+  if (cachedUser) {
+    return cachedUser
+  }
+
   const result = await db.select().from(users).where(eq(users.id, id))
-  return result[0]
+  const user = result[0]
+  cache.set(cacheKey, user)
+  return user
 }
 
 /**
@@ -55,6 +74,7 @@ export async function getUser(id: number): Promise<User> {
  */
 export async function createUser(user: User): Promise<User> {
   const result = await db.insert(users).values(user).returning()
+  await cache.delete('all_users')
   return result[0]
 }
 
@@ -67,6 +87,8 @@ export async function createUser(user: User): Promise<User> {
  */
 export async function updateUser(id: number, user: User): Promise<User> {
   const result = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning()
+  await cache.set(`user_${id}`, result[0])
+  await cache.delete('all_users')
   return result[0]
 }
 
@@ -80,6 +102,8 @@ export async function deleteUser(id: number): Promise<{ id: number }> {
   const result = await db.delete(users).where(eq(users.id, id)).returning({
     id: users.id,
   })
+  await cache.delete(`user_${id}`)
+  await cache.delete('all_users')
   return result[0]
 }
 /* User Queries - Start */

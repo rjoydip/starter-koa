@@ -44,6 +44,10 @@ export interface IConfig {
    * @type {?string}
    */
   db_url?: string
+  /**
+   * @type {?string}
+   */
+  cache_url?: string
 }
 
 const {
@@ -54,8 +58,9 @@ const {
   RATE_DURATION = 6000,
   GRACEFUL_DELAY = 500,
   RUNTIME = 'node',
-  MONITOR_DNS,
-  DATABASE_URL,
+  MONITOR_DNS = '',
+  DATABASE_URL = '',
+  CACHE_URL = '',
 } = env
 
 export default {
@@ -68,4 +73,5 @@ export default {
   monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
   db_url: DATABASE_URL,
+  cache_url: CACHE_URL,
 }

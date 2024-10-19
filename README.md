@@ -12,6 +12,7 @@ Koa application starter
 ✅ Koa <br>
 ✅ Neon DB <br>
 ✅ Drizzle <br>
+✅ PostgreSQL <br>
 ✅ Sentry <br>
 ✅ GraphQL Yoga <br>
 ✅ Valibot <br>
@@ -96,10 +97,17 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
+<<<<<<< HEAD
+- [ ] Mock DB & Redis
+- [ ] CI job no parallel
+- [x] WS test
+- [x] Cache
+=======
 - [ ] Mock DB in test
 - [ ] CI job no parallel
 - [x] WS test
 - [ ] Cache
+>>>>>>> main
 - [ ] Password
   - [ ] encrypt & decrypt
   - [ ] Exclude from response

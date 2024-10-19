@@ -21,10 +21,11 @@ describe('⬢ Validate config', () => {
     expect(defaultConfig?.ratelimit).toStrictEqual(70000)
     expect(defaultConfig?.graceful_delay).toStrictEqual(500)
     expect(defaultConfig?.runtime).toStrictEqual('node')
-    expect(defaultConfig?.monitor_dsn).toBeUndefined()
+    expect(defaultConfig?.monitor_dsn).toStrictEqual('')
     expect(defaultConfig?.db_url).toBeDefined()
     expect(defaultConfig?.isHTTPs).toStrictEqual(false)
     expect(defaultConfig?.duration).toStrictEqual(6000)
+    expect(defaultConfig?.cache_url).toBeDefined()
   })
 
   it('● should validated overwrite config value', () => {
@@ -33,6 +34,7 @@ describe('⬢ Validate config', () => {
     const duration = number.int({ min: 1000, max: 6000 })
     const dns = internet.url()
     const db_url = internet.url()
+    const cache_url = internet.url()
     const number$ = number.int({ min: 100, max: 1000 })
 
     const overwriteConfig: IConfig = {
@@ -46,6 +48,7 @@ describe('⬢ Validate config', () => {
       duration,
       runtime: 'bun',
       db_url,
+      cache_url,
     }
     expect(overwriteConfig?.port).toStrictEqual(port)
     expect(overwriteConfig?.log_level).toStrictEqual(3)
@@ -56,5 +59,6 @@ describe('⬢ Validate config', () => {
     expect(overwriteConfig?.monitor_dsn).toStrictEqual(dns)
     expect(overwriteConfig?.isHTTPs).toStrictEqual(isHTTPs)
     expect(overwriteConfig?.duration).toStrictEqual(duration)
+    expect(overwriteConfig?.cache_url).toStrictEqual(cache_url)
   })
 })
