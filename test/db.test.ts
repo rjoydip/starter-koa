@@ -1,4 +1,4 @@
-import type { User } from '../src/types'
+import type { User } from '../src/types.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -8,7 +8,7 @@ import {
   getUser,
   getUsers,
   isDBUp,
-} from '../src/db'
+} from '../src/db.ts'
 
 const {
   person,

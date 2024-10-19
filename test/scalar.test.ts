@@ -1,6 +1,6 @@
 import type { ReferenceConfiguration } from '@scalar/types/legacy'
 import { describe, expect, it } from 'vitest'
-import { apiDocs, apiReference, customThemeCSS } from '../src/scalar'
+import { apiDocs, apiReference, customThemeCSS } from '../src/scalar.ts'
 
 const mockOptions: ReferenceConfiguration = {
   spec: {

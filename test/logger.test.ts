@@ -9,8 +9,8 @@ import {
   it,
   vi,
 } from 'vitest'
-import logger from '../src/logger'
-import { captureException } from '../src/utils'
+import logger from '../src/logger.ts'
+import { captureException } from '../src/utils.ts'
 
 describe('⬢ Validate logger', () => {
   let originalEnv: NodeJS.ProcessEnv

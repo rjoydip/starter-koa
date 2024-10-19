@@ -1,5 +1,5 @@
 import { createConsola } from 'consola'
-import config from './config'
+import config from './config.ts'
 
 /**
  * @type {${2:*}}

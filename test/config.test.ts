@@ -1,7 +1,7 @@
-import type { IConfig } from '../src/config'
+import type { IConfig } from '../src/config.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { afterEach, describe, expect, it } from 'vitest'
-import config from '../src/config'
+import config from '../src/config.ts'
 
 const {
   internet,

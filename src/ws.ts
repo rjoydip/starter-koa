@@ -1,10 +1,10 @@
-import type { THooksMapper, UserInput } from './types'
+import type { THooksMapper, UserInput } from './types.ts'
 import { defineHooks } from 'crossws'
 import crossws from 'crossws/adapters/node'
 import queryString from 'query-string'
-import hooks from './hooks'
-import logger from './logger'
-import { captureException } from './utils'
+import hooks from './hooks.ts'
+import logger from './logger.ts'
+import { captureException } from './utils.ts'
 
 const hooksMapper: {
   [x in THooksMapper]: (id?: number | null, input?: UserInput) => Promise<any>

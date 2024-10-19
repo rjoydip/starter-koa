@@ -1,6 +1,6 @@
 import type { Context, Middleware, Next } from 'koa'
 import type { HttpMethodEnum } from 'koa-body/lib/types'
-import type { UserSchema } from './schema'
+import type { UserSchema } from './schema.ts'
 
 /**
  * @export

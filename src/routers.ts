@@ -1,21 +1,21 @@
 import type { Context } from 'koa'
-import type { IRouter } from './types'
+import type { IRouter } from './types.ts'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
-import { graphqlSchema } from './db'
-import hooks from './hooks'
-import { createError, createSuccess } from './message'
-import { apiDocs } from './scalar'
-import { UserSchema } from './schema'
+import { graphqlSchema } from './db.ts'
+import hooks from './hooks.ts'
+import { createError, createSuccess } from './message.ts'
+import { apiDocs } from './scalar.ts'
+import { UserSchema } from './schema.ts'
 import {
   API_PREFIX,
   captureException,
   getOpenAPISpec,
   HTTP_STATUS_CODE,
-} from './utils'
-import { requestValidator, userValidator } from './validator'
-import { wsTemplete } from './ws'
+} from './utils.ts'
+import { requestValidator, userValidator } from './validator.ts'
+import { wsTemplete } from './ws.ts'
 
 const yoga = createYoga({
   landingPage: true,

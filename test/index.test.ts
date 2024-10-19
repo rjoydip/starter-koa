@@ -1,85 +1,61 @@
-import type { Server } from 'node:http'
-import process from 'node:process'
-import consola from 'consola'
+import * as Sentry from '@sentry/node'
 import {
-  afterAll,
-  afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
   it,
   vi,
 } from 'vitest'
-import config from '../src/config'
-import { handleGracefulShutdown } from '../src/index'
-import logger from '../src/logger'
-import { createServer } from '../src/server'
-import * as utils from '../src/utils'
+import config from '../src/config.ts'
+import { main } from '../src/index.ts'
+import * as utils from '../src/utils.ts'
 
-describe('⬢ Validate server', () => {
-  let server: Server
-  let originalEnv: NodeJS.ProcessEnv
-  const mockErrorLogger = vi.spyOn(logger, 'error').mockImplementation(
-    () => {},
-  )
-  const mockCaptureException = vi.spyOn(utils, 'captureException')
-    .mockImplementation(() => {})
+vi.mock(import('@sentry/node'), () => ({
+  init: vi.fn(),
+}))
 
-  vi.mock('close-with-grace', () => ({
-    default: (_, callback) => {
-      callback({ err: new Error('Test error') })
-    },
-  }))
+vi.mock(import('../src/config.ts'), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    monitor_dsn: 'https://example.com/sentry',
+  }
+})
 
-  beforeAll(async () => {
-    consola.mockTypes(() => vi.fn())
-    server = createServer()
-    server.listen(config.port)
-  })
-
+describe('⬢ Validate main', () => {
   beforeEach(() => {
-    originalEnv = { ...process.env }
-  })
-
-  afterEach(() => {
-    process.env = originalEnv
     vi.clearAllMocks()
   })
 
-  afterAll(async () => {
-    server.close()
+  it('● should initialize Sentry with correct configuration when environemt is testing', async () => {
+    vi.spyOn(utils, 'environment').mockReturnValue('testing')
+    vi.spyOn(utils, 'isProd').mockReturnValue(false)
+
+    await main()
+
+    expect(Sentry.init).toHaveBeenCalledWith({
+      dsn: config.monitor_dsn,
+      environment: utils.environment(),
+      enabled: utils.isProd(),
+      integrations: utils.isProd() ? ['mockedIntegration'] : [],
+      tracesSampleRate: 1.0,
+      profilesSampleRate: 1.0,
+    })
   })
 
-  it('● should validate app server instace', () => {
-    expect(server).toBeDefined()
-  })
+  it('● should initialize Sentry with correct configuration when environemt is production', async () => {
+    vi.spyOn(utils, 'environment').mockReturnValue('production')
+    vi.spyOn(utils, 'isProd').mockReturnValue(true)
 
-  it('● should log an error, capture exception, and close the app server', () => {
-    process.env.GRACEFUL_DELAY = '0'
-    vi.useFakeTimers()
-    handleGracefulShutdown(server)
-    vi.advanceTimersByTime(0)
+    await main()
 
-    expect(mockErrorLogger).toHaveBeenCalledWith(
-      '[close-with-grace] Error: Test error',
-    )
-    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
-
-    vi.useRealTimers()
-  })
-
-  it('● should log an error, capture exception, and close the server after 500ms', () => {
-    process.env.GRACEFUL_DELAY = '500'
-    vi.useFakeTimers()
-    handleGracefulShutdown(server)
-    vi.advanceTimersByTime(500)
-
-    expect(mockErrorLogger).toHaveBeenCalledWith(
-      '[close-with-grace] Error: Test error',
-    )
-    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
-
-    vi.useRealTimers()
+    expect(Sentry.init).toHaveBeenCalledWith({
+      dsn: config.monitor_dsn,
+      environment: utils.environment(),
+      enabled: utils.isProd(),
+      integrations: utils.isProd() ? [expect.anything()] : [],
+      tracesSampleRate: 1.0,
+      profilesSampleRate: 1.0,
+    })
   })
 })

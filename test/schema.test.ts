@@ -1,8 +1,8 @@
-import type { User } from '../src/types'
+import type { User } from '../src/types.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { users, UserSchema } from '../src/schema'
+import { users, UserSchema } from '../src/schema.ts'
 
 const {
   person,

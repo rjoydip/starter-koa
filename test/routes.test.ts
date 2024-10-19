@@ -1,11 +1,11 @@
-import type { User } from '../src/types'
+import type { User } from '../src/types.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { app } from '../src/app'
-import { db } from '../src/db'
-import hooks from '../src/hooks'
-import resolvers from '../src/resolvers'
+import { app } from '../src/app.ts'
+import { db } from '../src/db.ts'
+import hooks from '../src/hooks.ts'
+import resolvers from '../src/resolvers.ts'
 
 const {
   person,

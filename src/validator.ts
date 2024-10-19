@@ -1,10 +1,10 @@
 import type { Context, Next } from 'koa'
-import type { IRouter } from './types'
+import type { IRouter } from './types.ts'
 import { HttpMethodEnum } from 'koa-body'
 import { safeParse } from 'valibot'
-import hooks from './hooks'
-import { createError } from './message'
-import { captureException, HTTP_STATUS_CODE } from './utils'
+import hooks from './hooks.ts'
+import { createError } from './message.ts'
+import { captureException, HTTP_STATUS_CODE } from './utils.ts'
 
 /**
  * @export

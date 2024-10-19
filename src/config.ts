@@ -1,5 +1,5 @@
 import type { LogLevel } from 'consola'
-import type { Runtime } from './types'
+import type { Runtime } from './types.ts'
 import { env } from 'node:process'
 
 /**

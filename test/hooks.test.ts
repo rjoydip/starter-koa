@@ -1,7 +1,7 @@
-import type { User } from '../src/types'
+import type { User } from '../src/types.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import hooks from '../src/hooks'
+import hooks from '../src/hooks.ts'
 
 const {
   person,

@@ -1,13 +1,13 @@
-import type { User } from './types'
+import type { User } from './types.ts'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { eq, sql } from 'drizzle-orm/sql'
 import { createSchema } from 'graphql-yoga'
-import { cache } from './cache'
-import config from './config'
-import resolvers from './resolvers'
-import { users } from './schema'
-import typeDefs from './typedefs'
+import { cache } from './cache.ts'
+import config from './config.ts'
+import resolvers from './resolvers.ts'
+import { users } from './schema.ts'
+import typeDefs from './typedefs.ts'
 
 const neonClient = neon(config.db_url!)
 export const db = drizzle(neonClient)

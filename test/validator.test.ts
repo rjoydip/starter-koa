@@ -1,12 +1,12 @@
-import type { User } from '../src/types'
+import type { User } from '../src/types.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { app } from '../src/app'
-import resolvers from '../src/resolvers'
-import { getRouter } from '../src/routers'
-import { validateRouter } from '../src/validator'
+import { app } from '../src/app.ts'
+import resolvers from '../src/resolvers.ts'
+import { getRouter } from '../src/routers.ts'
+import { validateRouter } from '../src/validator.ts'
 
 const {
   person,

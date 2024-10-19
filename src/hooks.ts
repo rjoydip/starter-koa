@@ -1,6 +1,6 @@
-import type { IHealth, IMetaData, IMetrics, User, UserInput } from './types'
+import type { IHealth, IMetaData, IMetrics, User, UserInput } from './types.ts'
 import { createHooks } from 'hookable'
-import resolvers from './resolvers'
+import resolvers from './resolvers.ts'
 
 const hooks = createHooks()
 const { Mutation, Query } = resolvers

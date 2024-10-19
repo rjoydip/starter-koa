@@ -97,21 +97,13 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-<<<<<<< HEAD
 - [ ] Mock DB & Redis
 - [ ] CI job no parallel
 - [x] WS test
 - [x] Cache
-=======
-- [ ] Mock DB in test
-- [ ] CI job no parallel
-- [x] WS test
-- [ ] Cache
->>>>>>> main
 - [ ] Password
   - [ ] encrypt & decrypt
   - [ ] Exclude from response
-- [ ] Support Deno
 - [ ] Authentication
 - [ ] Burno API client
 - [ ] Feature flag

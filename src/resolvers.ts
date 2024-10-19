@@ -1,4 +1,4 @@
-import type { IMetaData, User, UserInput } from './types'
+import type { IMetaData, User, UserInput } from './types.ts'
 import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
 import {
@@ -8,7 +8,7 @@ import {
   getUsers,
   isDBUp,
   updateUser,
-} from './db'
+} from './db.ts'
 
 export default {
   Query: {

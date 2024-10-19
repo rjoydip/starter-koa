@@ -1,6 +1,6 @@
 import type { Context, Next } from 'koa'
-import type { IConfig } from '../src/config'
-import type { IMessage } from '../src/message'
+import type { IConfig } from '../src/config.ts'
+import type { IMessage } from '../src/message.ts'
 import type {
   IHealth,
   IRegisteredRoutes,
@@ -8,7 +8,7 @@ import type {
   Runtime,
   THooksMapper,
   User,
-} from '../src/types'
+} from '../src/types.ts'
 import { HttpMethodEnum } from 'koa-body/lib/types'
 import { describe, expectTypeOf, it } from 'vitest'
 
