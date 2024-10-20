@@ -75,7 +75,7 @@ describe('⬢ Validate tRPC', () => {
     const createCaller = createCallerFactory(tRPCRouter)
     const caller = createCaller({})
     const r = await caller.deleteUser({ id: _id })
-    expect(r).toBeDefined()
+    expect(r).toBeUndefined()
   })
 
   it.sequential('● should getUser after delete', async () => {
