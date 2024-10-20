@@ -1,9 +1,9 @@
 import type { Server } from 'node:http'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import WebSocket from 'ws'
-import config from '../src/config'
-import { createServer } from '../src/server'
-import { ws, wsTemplete } from '../src/ws'
+import config from '../src/config.ts'
+import { createServer } from '../src/server.ts'
+import { ws, wsTemplete } from '../src/ws.ts'
 
 describe('⬢ Validate ws', () => {
   let server: Server

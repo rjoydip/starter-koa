@@ -1,22 +1,18 @@
 import type { Context, Next } from 'koa'
-import type { IConfig } from '../src/config'
-import type { IMessage } from '../src/message'
+import type { IConfig } from '../src/config.ts'
+import type { IMessage } from '../src/message.ts'
 import type {
   IHealth,
   IRegisteredRoutes,
   IRouter,
   Runtime,
   THooksMapper,
-  User,
-} from '../src/types'
+} from '../src/types.ts'
 import { HttpMethodEnum } from 'koa-body/lib/types'
 import { describe, expectTypeOf, it } from 'vitest'
 
 describe('⬢ Validate types', () => {
   it('● should validated types', () => {
-    expectTypeOf<User>().toMatchTypeOf<
-      { name: string, email: string, phone: string, address: string }
-    >()
     expectTypeOf<Runtime>().toMatchTypeOf<'node' | 'deno' | 'bun'>()
     expectTypeOf<THooksMapper>().toMatchTypeOf<'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'>()
   })

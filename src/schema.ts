@@ -1,9 +1,9 @@
-import { boolean, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
-import { createInsertSchema } from 'drizzle-valibot'
-import { minLength, pipe, string } from 'valibot'
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { z } from 'zod'
 
 export const users = pgTable('users', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   phone: text('phone').notNull().unique(),
@@ -15,6 +15,18 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
-export const UserSchema = createInsertSchema(users, {
-  name: () => pipe(string(), minLength(8)),
+export const insertUserSchema = createInsertSchema(users, {
+  name: z.string().min(8),
 })
+export const selectUserSchema = createSelectSchema(users)
+
+/**
+ * @export
+ * @typedef {UserSelect}
+ */
+export type UserSelect = z.infer<typeof selectUserSchema>
+/**
+ * @export
+ * @typedef {UserInput}
+ */
+export type UserInput = z.infer<typeof insertUserSchema>

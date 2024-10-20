@@ -5,7 +5,7 @@ import {
   hasProp,
   sanitizeStatusCode,
   sanitizeStatusMessage,
-} from '../src/message'
+} from '../src/message.ts'
 
 describe('⬢ Validate message', () => {
   describe('⬢ Validate sanitizeStatusMessage', () => {

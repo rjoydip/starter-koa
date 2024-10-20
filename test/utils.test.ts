@@ -7,7 +7,7 @@ import {
   captureException as sentryCaptureException,
 } from '@sentry/node'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import logger from '../src/logger'
+import logger from '../src/logger.ts'
 import {
   API_PREFIX,
   captureException,
@@ -19,9 +19,9 @@ import {
   isDev,
   isProd,
   isTest,
-} from '../src/utils'
+} from '../src/utils.ts'
 
-vi.mock('fs/promises', () => ({
+vi.mock(import('node:fs/promises'), () => ({
   readFile: vi.fn(),
 }))
 

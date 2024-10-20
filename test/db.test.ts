@@ -1,4 +1,4 @@
-import type { User } from '../src/types'
+import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -8,7 +8,7 @@ import {
   getUser,
   getUsers,
   isDBUp,
-} from '../src/db'
+} from '../src/db.ts'
 
 const {
   person,
@@ -19,15 +19,15 @@ const {
 } = faker
 
 describe('⬢ Validate db', () => {
-  let id: number
-  const testUser: User = {
+  let id: string
+  const testUser: UserInput = {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
     isVerified: datatype.boolean(),
     password: internet.password(),
-    address:
-      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    role: 'admin',
   }
 
   afterEach(() => {

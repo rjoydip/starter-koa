@@ -1,14 +1,15 @@
-import type { IRouter } from './types'
+import type { IRouter } from './types.ts'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
 import ratelimit from 'koa-ratelimit'
 import Router from 'koa-router'
-import config from './config'
-import logger from './logger'
-import { createSuccess } from './message'
-import { routers } from './routers'
-import { environment, isProd } from './utils'
+import config from './config.ts'
+import logger from './logger.ts'
+import { createSuccess } from './message.ts'
+import { routers } from './routers.ts'
+import { defindTRPCHandler } from './trpc.ts'
+import { environment, isProd } from './utils.ts'
 
 // Instances
 const app = new Koa({
@@ -97,6 +98,7 @@ app
 /* Internal middleware - [END] */
 
 // Custom routers
+router.all('/trpc', ctx => defindTRPCHandler(ctx.req, ctx.res))
 routers.forEach((r: IRouter) => methodMap[r.method](r))
 // Dispatch routes and allow OPTIONS request method
 app

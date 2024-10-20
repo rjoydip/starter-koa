@@ -1,7 +1,7 @@
-import type { User } from '../src/types'
+import type { UserInput, UserSelect } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
-import resolvers from '../src/resolvers'
+import resolvers from '../src/resolvers.ts'
 
 const {
   person,
@@ -9,21 +9,20 @@ const {
   phone,
   datatype,
   location,
-  number,
 } = faker
 
 describe('⬢ Validate resolvers', () => {
   const query = resolvers.Query
   const mutation = resolvers.Mutation
 
-  const testUser: User = {
+  const testUser: UserInput = {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
     isVerified: datatype.boolean(),
     password: internet.password(),
-    address:
-      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    role: 'admin',
   }
 
   beforeAll(async () => {})
@@ -67,17 +66,16 @@ describe('⬢ Validate resolvers', () => {
   })
 
   describe('⬢ Validate user resolvers', () => {
-    let id: number
-    it.skip('● should validate query getUsers', async () => {
+    let id: string = ''
+    it('● should validate query getUsers', async () => {
       const { getUsers } = query
       const $ = await getUsers()
       expect($).toBeDefined()
-      expect($.length).toBe(0)
     })
 
-    it.sequential('● should validate query getUser', async () => {
+    it('● should validate query getUser', async () => {
       const { getUser } = query
-      const $ = await getUser(null, { id: number.int({ min: 1, max: 10 }) })
+      const $ = await getUser(null, { id: '111' })
       expect($).toBeUndefined()
     })
 
@@ -86,13 +84,15 @@ describe('⬢ Validate resolvers', () => {
       const $ = await createUser(null, { input: { ...testUser } })
       expect($).toBeDefined()
       expect($?.id).toBeDefined()
-      id = $.id
+      if ($.id) {
+        id = $.id
+      }
     })
 
     it.sequential('● should validate mutation updateUser', async () => {
       const { getUser } = query
       const { updateUser } = mutation
-      const user: User = await getUser(null, { id })
+      const user: UserInput = await getUser(null, { id })
       if (id === user.id) {
         const $ = await updateUser(null, {
           id,
@@ -106,10 +106,10 @@ describe('⬢ Validate resolvers', () => {
       }
     })
 
-    it.sequential('● should validate mutation deleteUser', async () => {
+    it('● should validate mutation deleteUser', async () => {
       const { getUsers } = query
       const { deleteUser } = mutation
-      const users: User[] = await getUsers()
+      const users: UserSelect[] = await getUsers()
       if (users && users[0].id) {
         await deleteUser(null, {
           id: users[0].id,

@@ -1,8 +1,8 @@
-import type { Runtime } from './types'
+import type { Runtime } from './types.ts'
 import { readFile } from 'node:fs/promises'
 import { env } from 'node:process'
 import { captureException as sentryCaptureException } from '@sentry/node'
-import logger from './logger'
+import logger from './logger.ts'
 
 /**
  * @type {string}
