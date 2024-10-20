@@ -26,9 +26,10 @@ describe('⬢ Validate server', () => {
 
   it('● should validated server instance', () => {
     const server = createServer()
-    server.listen(config.port)
-    expect(server.listening).toBeTruthy()
-    server.close()
+    server.listen(config.port, () => {
+      expect(server.listening).toBeTruthy()
+      server.close()
+    })
   })
 
   it('● should log an error, capture exception, and close the app server', () => {

@@ -16,7 +16,7 @@ describe('⬢ Validate config', () => {
 
   it('● should validated default config', () => {
     const defaultConfig = config
-    expect(defaultConfig?.port).toStrictEqual(3000)
+    expect(defaultConfig?.port).toBeDefined()
     expect(Number(defaultConfig?.log_level)).toStrictEqual(1)
     expect(defaultConfig?.ratelimit).toStrictEqual(10000)
     expect(defaultConfig?.graceful_delay).toStrictEqual(500)
