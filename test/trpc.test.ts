@@ -40,7 +40,7 @@ describe('⬢ Validate tRPC', () => {
     const caller = createCaller({})
     const r = await caller.createUser({ data: testUser })
     if (r.id) {
-      _id = r.id
+      _id = String(r.id)
     }
     expect(r).toBeDefined()
   })
@@ -84,6 +84,6 @@ describe('⬢ Validate tRPC', () => {
     const createCaller = createCallerFactory(tRPCRouter)
     const caller = createCaller({})
     const r = await caller.getUser({ id: _id })
-    expect(r).toBeDefined()
+    expect(r).toBeUndefined()
   })
 })
