@@ -75,7 +75,7 @@ describe('⬢ Validate resolvers', () => {
 
     it('● should validate query getUser', async () => {
       const { getUser } = query
-      const $ = await getUser(null, { id: testUser.id ?? '' })
+      const $ = await getUser(null, { id: '111' })
       expect($).toBeUndefined()
     })
 
