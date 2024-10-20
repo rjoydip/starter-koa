@@ -22,14 +22,13 @@ jobs:
       - run: nr typecheck
 
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.platform }}
 
     strategy:
       matrix:
         node: [lts/*]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        platform: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: true
-      max-parallel: 1
 
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +46,7 @@ jobs:
         id: create-branch
         with:
           project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch_name: testing/${{ steps.branch-name.outputs.current_branch }}
+          branch_name: testing/${{ matrix.platform }}/${{ steps.branch-name.outputs.current_branch }}
           username: koadb_owner
           database: koadb
           api_key: ${{ secrets.NEON_API_KEY }}

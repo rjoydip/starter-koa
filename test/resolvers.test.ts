@@ -73,7 +73,7 @@ describe('⬢ Validate resolvers', () => {
       expect($).toBeDefined()
     })
 
-    it.runIf(testUser.id)('● should validate query getUser', async () => {
+    it('● should validate query getUser', async () => {
       const { getUser } = query
       const $ = await getUser(null, { id: testUser.id ?? '' })
       expect($).toBeUndefined()
@@ -89,7 +89,7 @@ describe('⬢ Validate resolvers', () => {
       }
     })
 
-    it.runIf(id !== '')('● should validate mutation updateUser', async () => {
+    it.sequential('● should validate mutation updateUser', async () => {
       const { getUser } = query
       const { updateUser } = mutation
       const user: UserInput = await getUser(null, { id })
