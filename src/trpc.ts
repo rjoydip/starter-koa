@@ -40,7 +40,4 @@ export type TRPCRouter = typeof tRPCRouter
 
 export const defindTRPCHandler = createHTTPHandler({
   router: tRPCRouter,
-  createContext() {
-    return {}
-  },
 })

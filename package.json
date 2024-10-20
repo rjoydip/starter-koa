@@ -51,16 +51,16 @@
     "lint": "eslint . --fix",
     "start": "node --env-file=.env dist/index.mjs",
     "dev": "tsx watch --env-file=.env src/index.ts",
-    "test": "dotenvx run -f .env -- vitest run --typecheck --coverage",
+    "test": "vitest run --typecheck --coverage",
     "benchmark": "autocannon -c 1 -d 1 -p 1 127.0.0.1:3000/health",
     "benchmark:doctor": "clinic doctor --on-port 'autocannon -c 10 -d 10 -p 10 127.0.0.1:3000/health' -- node --env-file=.env dist/index.mjs",
     "benchmark:flame": "clinic flame --on-port 'autocannon -c 10 -d 10 -p 10 127.0.0.1:3000/health' -- node --env-file=.env dist/index.mjs",
     "prepare": "simple-git-hooks",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "db:generate": "dotenvx run -f .env -- drizzle-kit generate",
-    "db:drop": "dotenvx run -f .env -- drizzle-kit drop",
-    "db:migrate": "dotenvx run -f .env -- drizzle-kit migrate",
-    "db:preview": "dotenvx run -f .env -- drizzle-kit studio"
+    "db:generate": "drizzle-kit generate",
+    "db:drop": "drizzle-kit drop",
+    "db:migrate": "drizzle-kit migrate",
+    "db:preview": "drizzle-kit studio"
   },
   "dependencies": {
     "@keyv/redis": "^3.0.1",
@@ -89,7 +89,6 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
-    "@dotenvx/dotenvx": "^1.20.0",
     "@faker-js/faker": "^9.0.3",
     "@scalar/types": "^0.0.11",
     "@types/bun": "^1.1.11",
