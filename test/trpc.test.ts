@@ -42,7 +42,7 @@ describe('⬢ Validate tRPC', () => {
     if (r.id) {
       _id = String(r.id)
     }
-    expect(r).toBeDefined()
+    expect(r.id).toBeDefined()
   })
 
   it.sequential('● should getUser', async () => {
@@ -51,7 +51,7 @@ describe('⬢ Validate tRPC', () => {
     const createCaller = createCallerFactory(tRPCRouter)
     const caller = createCaller({})
     const r = await caller.getUser({ id: _id })
-    expect(r).toBeDefined()
+    expect(r.id).toBe(Number(_id))
   })
 
   it.sequential('● should updateUser', async () => {
@@ -66,7 +66,7 @@ describe('⬢ Validate tRPC', () => {
         address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
       },
     })
-    expect(r).toBeDefined()
+    expect(r.id).toBe(Number(_id))
   })
 
   it.sequential('● should deleteUser', async () => {
@@ -75,7 +75,7 @@ describe('⬢ Validate tRPC', () => {
     const createCaller = createCallerFactory(tRPCRouter)
     const caller = createCaller({})
     const r = await caller.deleteUser({ id: _id })
-    expect(r).toBeUndefined()
+    expect(r.id).toBe(Number(_id))
   })
 
   it.sequential('● should getUser after delete', async () => {
