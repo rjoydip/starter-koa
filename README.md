@@ -98,10 +98,11 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Mock DB & Redis
-- [ ] CI job no parallel
+- [ ] Mock DB
+- [x] CI job no parallel
 - [x] WS test
 - [x] Cache
+  - [x] In memory during test
 - [ ] Password
   - [ ] encrypt & decrypt
   - [ ] Exclude from response
