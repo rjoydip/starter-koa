@@ -1,4 +1,4 @@
-import type { User } from '../src/types.ts'
+import type { UserSelect } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
@@ -14,6 +14,7 @@ const {
   phone,
   datatype,
   location,
+  date,
   string,
 } = faker
 
@@ -21,14 +22,17 @@ describe('⬢ Validate validator', () => {
   const { Query } = resolvers
   const app$ = app.callback()
 
-  const testUser: User = {
+  const testUser: UserSelect = {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
     isVerified: datatype.boolean(),
     password: internet.password(),
-    address:
-      `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
+    id: string.uuid(),
+    role: 'admin',
+    createdAt: date.anytime(),
+    updatedAt: date.anytime(),
   }
 
   afterEach(() => {
@@ -76,9 +80,7 @@ describe('⬢ Validate validator', () => {
     })
 
     it('● should validated userValidator GET /api/user/422', async () => {
-      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(
-        undefined,
-      )
+      const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(undefined as unknown as UserSelect)
       const { headers, status, body } = await request(app$)
         .get('/api/user/422')
         .set('Accept', 'application/json')

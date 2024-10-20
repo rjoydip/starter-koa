@@ -1,20 +1,22 @@
 import type { Context, Next } from 'koa'
+import type { ZodSchema } from 'zod'
 import type { IRouter } from './types.ts'
 import { HttpMethodEnum } from 'koa-body'
-import { safeParse } from 'valibot'
-import hooks from './hooks.ts'
 import { createError } from './message.ts'
+import resolvers from './resolvers.ts'
 import { captureException, HTTP_STATUS_CODE } from './utils.ts'
+
+const { Query } = resolvers
 
 /**
  * @export
- * @param {any} schema
+ * @param {ZodSchema} schema
  * @returns (ctx: Context, next: Next) => Promise<void>
  */
-export function requestValidator(schema: any) {
+export function requestValidator<T>(schema: ZodSchema<T>) {
   return async function (ctx: Context, next: Next): Promise<void> {
     if (ctx.request.body) {
-      const result = safeParse(schema, ctx.request.body)
+      const result = schema.safeParse(ctx.request.body)
       if (result.success) {
         await next()
       }
@@ -43,9 +45,9 @@ export function requestValidator(schema: any) {
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
-      const { data } = await hooks.callHook('getUser', ctx.params.id)
-      if (data) {
-        ctx.state.user = data
+      const user = await Query.getUser(null, { id: ctx.params.id })
+      if (user) {
+        ctx.state.user = user
         await next()
       }
       else {

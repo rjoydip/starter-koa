@@ -11,11 +11,12 @@ Koa application starter
 
 ✅ Koa <br>
 ✅ Neon DB <br>
+  ✅ PostgreSQL <br>
 ✅ Drizzle <br>
-✅ PostgreSQL <br>
+✅ tRPC <br>
 ✅ Sentry <br>
 ✅ GraphQL Yoga <br>
-✅ Valibot <br>
+✅ Zod <br>
 ✅ Vitest <br>
 ✅ Unbuild <br>
 

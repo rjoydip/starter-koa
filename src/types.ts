@@ -1,13 +1,6 @@
 import type { Context, Middleware, Next } from 'koa'
 import type { HttpMethodEnum } from 'koa-body/lib/types'
-import type { UserSchema } from './schema.ts'
 
-/**
- * @export
- * @typedef {User}
- */
-export type User = typeof UserSchema
-export interface UserInput extends Omit<typeof UserSchema, 'id'> {}
 /**
  * @export
  * @interface IRegisteredRoutes

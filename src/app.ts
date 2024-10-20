@@ -8,6 +8,7 @@ import config from './config.ts'
 import logger from './logger.ts'
 import { createSuccess } from './message.ts'
 import { routers } from './routers.ts'
+import { defindTRPCHandler } from './trpc.ts'
 import { environment, isProd } from './utils.ts'
 
 // Instances
@@ -97,6 +98,7 @@ app
 /* Internal middleware - [END] */
 
 // Custom routers
+router.all('/trpc', ctx => defindTRPCHandler(ctx.req, ctx.res))
 routers.forEach((r: IRouter) => methodMap[r.method](r))
 // Dispatch routes and allow OPTIONS request method
 app

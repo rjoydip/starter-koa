@@ -7,16 +7,12 @@ import type {
   IRouter,
   Runtime,
   THooksMapper,
-  User,
 } from '../src/types.ts'
 import { HttpMethodEnum } from 'koa-body/lib/types'
 import { describe, expectTypeOf, it } from 'vitest'
 
 describe('⬢ Validate types', () => {
   it('● should validated types', () => {
-    expectTypeOf<User>().toMatchTypeOf<
-      { name: string, email: string, phone: string, address: string }
-    >()
     expectTypeOf<Runtime>().toMatchTypeOf<'node' | 'deno' | 'bun'>()
     expectTypeOf<THooksMapper>().toMatchTypeOf<'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'>()
   })

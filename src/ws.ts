@@ -1,22 +1,25 @@
-import type { THooksMapper, UserInput } from './types.ts'
+import type { UserInput } from './schema.ts'
+import type { THooksMapper } from './types.ts'
 import { defineHooks } from 'crossws'
 import crossws from 'crossws/adapters/node'
 import queryString from 'query-string'
-import hooks from './hooks.ts'
 import logger from './logger.ts'
+import resolvers from './resolvers.ts'
 import { captureException } from './utils.ts'
 
+const { Mutation, Query } = resolvers
+
 const hooksMapper: {
-  [x in THooksMapper]: (id?: number | null, input?: UserInput) => Promise<any>
+  [x in THooksMapper]: (id: string, input: UserInput) => Promise<any>
 } = {
-  health: async () => await hooks.callHook('health'),
-  _metrics: async () => await hooks.callHook('_metrics'),
-  _meta: async () => await hooks.callHook('_meta'),
-  getUsers: async () => await hooks.callHook('getUsers'),
-  getUser: async id => await hooks.callHook('getUser', id),
-  createUser: async (_, input) => await hooks.callHook('createUser', input),
-  updateUser: async (id, input) => await hooks.callHook('updateUser', id, input),
-  deleteUser: async id => await hooks.callHook('deleteUser', id),
+  health: async () => await Query.health(),
+  _metrics: async () => await Query._metrics(),
+  _meta: async () => await Query._meta(),
+  getUsers: async () => await Query.getUsers(),
+  getUser: async id => await Query.getUser(null, { id }),
+  createUser: async (_, input) => await Mutation.createUser(null, { input }),
+  updateUser: async (id, input) => await Mutation.updateUser(null, { id, input }),
+  deleteUser: async id => await Mutation.deleteUser(null, { id }),
 }
 
 export const ws = crossws({
@@ -43,7 +46,7 @@ export const ws = crossws({
       }
       else if (Object.keys(hooksMapper).includes(action as THooksMapper)) {
         logger.log('Hook matched:', action)
-        peer.send(await hooksMapper[action as THooksMapper](id as number, input), {
+        peer.send(await hooksMapper[action as THooksMapper](id as string, input as unknown as UserInput), {
           compress: true,
         })
       }

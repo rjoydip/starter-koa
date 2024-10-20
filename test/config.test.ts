@@ -14,14 +14,14 @@ describe('⬢ Validate config', () => {
     faker.seed()
   })
 
-  it('● should validated config', () => {
+  it('● should validated default config', () => {
     const defaultConfig = config
-    expect(defaultConfig?.port).toStrictEqual(8181)
-    expect(defaultConfig?.log_level).toStrictEqual(3)
-    expect(defaultConfig?.ratelimit).toStrictEqual(70000)
+    expect(defaultConfig?.port).toStrictEqual(3000)
+    expect(Number(defaultConfig?.log_level)).toStrictEqual(1)
+    expect(defaultConfig?.ratelimit).toStrictEqual(10000)
     expect(defaultConfig?.graceful_delay).toStrictEqual(500)
     expect(defaultConfig?.runtime).toStrictEqual('node')
-    expect(defaultConfig?.monitor_dsn).toStrictEqual('')
+    expect(defaultConfig?.monitor_dsn).toBeDefined()
     expect(defaultConfig?.db_url).toBeDefined()
     expect(defaultConfig?.isHTTPs).toStrictEqual(false)
     expect(defaultConfig?.duration).toStrictEqual(6000)

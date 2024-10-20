@@ -1,8 +1,7 @@
-import type { User } from '../src/types.ts'
+import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
-import { safeParse } from 'valibot'
 import { describe, expect, it } from 'vitest'
-import { users, UserSchema } from '../src/schema.ts'
+import { insertUserSchema, users } from '../src/schema.ts'
 
 const {
   person,
@@ -10,12 +9,12 @@ const {
   phone,
   datatype,
   location,
-  number,
+  string,
 } = faker
 
 describe('⬢ Validate schema', () => {
-  const playload: User = {
-    id: number.int({ min: 1, max: 10 }),
+  const playload: UserInput = {
+    id: string.uuid(),
     role: 'user',
     isVerified: datatype.boolean(),
     name: person.fullName(),
@@ -33,24 +32,23 @@ describe('⬢ Validate schema', () => {
   })
 
   it('● should validated UserSchema for correct user details', () => {
-    const result = safeParse(UserSchema, playload)
+    const result = insertUserSchema.safeParse(playload)
     expect(result.success).toBeTruthy()
-    expect(result.issues).toBeUndefined()
+    expect(result.error).toBeUndefined()
   })
 
   it('● should validated UserSchema for incorrect user public id', () => {
-    const result = safeParse(UserSchema, { ...playload, id: null })
+    const result = insertUserSchema.safeParse({ ...playload, id: null })
     expect(result.success).toBeFalsy()
-    expect(result.issues?.length).toBeGreaterThan(0)
+    expect(result.error?.issues.length).toBeGreaterThan(0)
   })
 
   it('● should validated UserSchema for incorrect user name', () => {
-    const result = safeParse(UserSchema, { ...playload, name: 'test' })
+    const result = insertUserSchema.safeParse({ ...playload, name: 'test' })
     expect(result.success).toBeFalsy()
-    expect(result.issues?.length).toBeGreaterThan(0)
-    result.issues?.forEach((issue) => {
+    result.error?.issues.forEach((issue) => {
       expect(issue.message).toStrictEqual(
-        'Invalid length: Expected >=8 but received 4',
+        'String must contain at least 8 character(s)',
       )
     })
   })

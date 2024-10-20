@@ -27,7 +27,7 @@ export async function main(): Promise<void> {
     })
     const server = createServer()
     server.listen(config.port)
-    logger.ready(`Server running on port ${server.address()?.toString()}`)
+    logger.ready('Server info: ', server.address())
     cache.on('error', async (err: Error) => {
       await cache.clear()
       logger.error(err)
