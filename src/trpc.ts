@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import { z } from 'zod'
 import resolvers from './resolvers'
-import { insertUserSchema } from './schema'
+import { selectUserSchema } from './schema'
 
 const { Mutation, Query } = resolvers
 
@@ -10,34 +10,43 @@ const t = initTRPC.create()
 const { procedure, router } = t
 
 export const tRPCRouter = router({
+  welcome: procedure
+    .meta({ openapi: { method: 'GET', path: '/welcome' } })
+    .input(z.void())
+    .output(z.literal('Welcome to Koa Starter'))
+    .query(() => 'Welcome to Koa Starter' as const),
   getUsers: procedure
-    .input(z.undefined())
+    .meta({ openapi: { method: 'GET', path: '/users' } })
     .query(async () => {
       return await Query.getUsers()
     }),
   getUser: procedure
-    .input(z.object({ id: z.string() }))
+    .input(z.string())
     .query(async ({ input }) => {
-      return await Query.getUser(null, { id: input.id })
+      return await Query.getUser(null, { id: input })
     }),
   createUser: procedure
-    .input(z.object({ data: insertUserSchema }))
+    .meta({ openapi: { method: 'POST', path: '/user' } })
+    .input(selectUserSchema)
     .mutation(async ({ input }) => {
-      return await Mutation.createUser(null, { input: input.data })
+      return await Mutation.createUser(null, { input })
     }),
   updateUser: procedure
-    .input(z.object({ id: z.string(), data: insertUserSchema }))
+    .input(z.object({ id: z.string(), payload: selectUserSchema }))
     .mutation(async ({ input }) => {
-      return await Mutation.updateUser(null, { id: input.id, input: input.data })
+      return await Mutation.updateUser(null, { id: input.id, input: input.payload })
     }),
   deleteUser: procedure
-    .input(z.object({ id: z.string() }))
+    .input(z.string())
     .mutation(async ({ input }) => {
-      return await Mutation.deleteUser(null, { id: input.id })
+      return await Mutation.deleteUser(null, { id: input })
     }),
 })
 export type TRPCRouter = typeof tRPCRouter
 
 export const defindTRPCHandler = createHTTPHandler({
   router: tRPCRouter,
+  createContext() {
+    return {}
+  },
 })

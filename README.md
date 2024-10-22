@@ -57,10 +57,10 @@ For test
 pnpm test # or nr test
 ```
 
-For all scripts
+For setup and verify
 
 ```sh
-pnpm run all # or nr all
+pnpm run _setup # or nr _setup
 ```
 
 ## API
