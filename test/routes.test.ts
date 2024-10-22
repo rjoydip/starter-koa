@@ -1,7 +1,7 @@
 import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { app } from '../src/app.ts'
 import { db } from '../src/db.ts'
 import resolvers from '../src/resolvers.ts'
@@ -28,13 +28,9 @@ describe('⬢ Validate routes', () => {
     role: 'admin',
   }
 
-  beforeAll(async () => {})
-
   afterEach(() => {
     faker.seed()
   })
-
-  afterAll(async () => {})
 
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
@@ -194,7 +190,6 @@ describe('⬢ Validate routes', () => {
         'name',
         'email',
         'phone',
-        'password',
         'address',
         'isVerified',
         'role',

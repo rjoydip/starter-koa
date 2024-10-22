@@ -3,6 +3,7 @@ import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { eq, sql } from 'drizzle-orm/sql'
 import { createSchema } from 'graphql-yoga'
+import { sha256 } from 'ohash'
 import { cache } from './cache.ts'
 import config from './config.ts'
 import resolvers from './resolvers.ts'
@@ -11,6 +12,18 @@ import typeDefs from './typedefs.ts'
 
 const neonClient = neon(config.db_url!)
 export const db = drizzle(neonClient)
+
+const returningFields = {
+  id: users.id,
+  name: users.name,
+  email: users.email,
+  phone: users.phone,
+  address: users.address,
+  isVerified: users.isVerified,
+  role: users.role,
+  createdAt: users.createdAt,
+  updatedAt: users.updatedAt,
+}
 
 /**
  * @export
@@ -40,7 +53,7 @@ export async function getUsers(): Promise<UserSelect[]> {
     return cachedUsers
   }
 
-  const result = await db.select().from(users)
+  const result = await db.select(returningFields).from(users)
   cache.set(cacheKey, result)
   return result
 }
@@ -60,7 +73,7 @@ export async function getUser(id: string): Promise<UserSelect> {
     return cachedUser
   }
 
-  const result = await db.select().from(users).where(eq(users.id, id))
+  const result = await db.select(returningFields).from(users).where(eq(users.id, id))
   const user = result[0]
   cache.set(cacheKey, user)
   return user
@@ -72,10 +85,13 @@ export async function getUser(id: string): Promise<UserSelect> {
  * @param {UserInput} user
  * @returns Promise<UserInput>
  */
-export async function createUser(user: UserInput): Promise<UserInput> {
-  const result = await db.insert(users).values(user).returning()
+export async function createUser(user: UserInput): Promise<UserSelect> {
+  const [newUser] = await db.insert(users).values({
+    ...user,
+    password: sha256(user.password),
+  }).returning(returningFields)
   await cache.delete('all_users')
-  return result[0]
+  return newUser
 }
 
 /**
@@ -85,11 +101,11 @@ export async function createUser(user: UserInput): Promise<UserInput> {
  * @param {UserInput} user
  * @returns Promise<UserInput>
  */
-export async function updateUser(id: string, user: UserInput): Promise<UserInput> {
-  const result = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning()
-  await cache.set(`user_${id}`, result[0])
+export async function updateUser(id: string, user: Omit<UserInput, 'password'>): Promise<UserSelect> {
+  const [updatedUser] = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning(returningFields)
+  await cache.set(`user_${id}`, updatedUser)
   await cache.delete('all_users')
-  return result[0]
+  return updatedUser
 }
 
 /**
@@ -99,12 +115,12 @@ export async function updateUser(id: string, user: UserInput): Promise<UserInput
  * @returns Promise<void>
  */
 export async function deleteUser(id: string): Promise<{ id: string }> {
-  const result = await db.delete(users).where(eq(users.id, id)).returning({
+  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning({
     id: users.id,
   })
   await cache.delete(`user_${id}`)
   await cache.delete('all_users')
-  return result[0]
+  return deletedUser
 }
 /* User Queries - Start */
 

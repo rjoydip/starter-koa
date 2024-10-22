@@ -1,10 +1,11 @@
-import type { UserSelect } from '../src/schema'
-import { Server } from 'node:http'
+import type { UserInput } from '../src/schema'
 import { faker } from '@faker-js/faker/locale/en'
 import { initTRPC } from '@trpc/server'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import request from 'supertest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { app } from '../src/app'
 import { cache } from '../src/cache'
-import { defindTRPCHandler, tRPCRouter } from '../src/trpc'
+import { tRPCRouter } from '../src/trpc'
 
 const {
   person,
@@ -17,7 +18,7 @@ const {
 describe('⬢ Validate tRPC', () => {
   let _id: string
 
-  const testUser: UserSelect = {
+  const testUser: UserInput = {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
@@ -55,7 +56,7 @@ describe('⬢ Validate tRPC', () => {
       const createCaller = createCallerFactory(tRPCRouter)
       const caller = createCaller({})
       const r = await caller.getUser(_id)
-      expect(r.id).toBe(Number(_id))
+      expect(String(r.id)).toBe(String(_id))
     })
 
     it.sequential('● should get response form updateUser', async () => {
@@ -70,7 +71,7 @@ describe('⬢ Validate tRPC', () => {
           address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
         },
       })
-      expect(r.id).toBe(Number(_id))
+      expect(String(r.id)).toBe(String(_id))
     })
 
     it.sequential('● should get response form deleteUser', async () => {
@@ -79,7 +80,7 @@ describe('⬢ Validate tRPC', () => {
       const createCaller = createCallerFactory(tRPCRouter)
       const caller = createCaller({})
       const r = await caller.deleteUser(_id)
-      expect(r.id).toBe(Number(_id))
+      expect(String(r.id)).toBe(String(_id))
     })
 
     it.sequential('● should get response form getUser after delete', async () => {
@@ -93,45 +94,18 @@ describe('⬢ Validate tRPC', () => {
   })
 
   describe('⬢ Validate handler', () => {
-    let server: Server
-    let url: string
+    const app$ = app.callback()
 
     beforeAll(() => {
       cache.opts.ttl = 0
-      server = new Server((req, res) => {
-        if (req.url!.startsWith('/trpc')) {
-          req.url = req.url!.replace('/trpc', '')
-          return defindTRPCHandler(req, res)
-        }
-      })
-      server.listen(0)
-      const port = (server.address() as any).port as number
-      url = `http://127.0.0.1:${port}`
     })
 
-    afterAll(() => {
-      server.close()
-    })
-
-    it('● should get response form ping', async () => {
-      const res = await fetch(`${url}/trpc/welcome`, { method: 'GET' })
-      const { result } = await res.json()
-      expect(res.status).toBe(200)
-      expect(result.data).toEqual('Welcome to Koa Starter')
-    })
-
-    it.skip('● should get response form getUsers', async () => {
-      const res = await fetch(`${url}/trpc/users`, { method: 'GET' })
-      const { result } = await res.json()
-      expect(res.status).toBe(200)
-      expect(result.data).toEqual([])
-    })
-
-    it.skip('● should get response form createUser', async () => {
-      const res = await fetch(`${url}/trpc/user`, { method: 'POST', body: JSON.stringify(testUser) })
-      const { result } = await res.json()
-      expect(res.status).toBe(200)
-      expect(result).toBeDefined()
+    it('● should get response form welcome', async () => {
+      const { status, body } = await request(app$)
+        .get('/api/trpc/welcome')
+        .set('Accept', 'application/json')
+      expect(status).toEqual(200)
+      expect(body.result.data).toEqual('Welcome to Koa Starter')
     })
   })
 })

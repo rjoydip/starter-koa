@@ -2,7 +2,7 @@
 
 [![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
 
-Koa application starter
+Koa application starter. A simple and single file logic separation.
 
 > [!NOTE]
 > This project is in the early stages and under development. Although the pnpm
@@ -13,6 +13,7 @@ Koa application starter
 ✅ Neon DB <br>
   ✅ PostgreSQL <br>
 ✅ Drizzle <br>
+✅ Upstash <br>
 ✅ tRPC <br>
 ✅ Sentry <br>
 ✅ GraphQL Yoga <br>
@@ -71,6 +72,10 @@ After running dev command visit `/references` endpoint. Play around with endpoin
 
 For showing graphql playground visit `/graphql`.
 
+## tRPC
+
+Access trpc routes on `/api/trpc`.
+
 ## Websocket
 
 For showing websocket playground visit `/_ws`. If want to use as API then use either `wss://<domain>` or `ws://<domain>`
@@ -98,16 +103,20 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Mock DB
-- [x] CI job no parallel
+- [ ] Unit test
+  - [ ] Mock DB
+  - [ ] Mock Redis
+- [x] CI - Parallel
 - [x] WS test
 - [x] Cache
-  - [x] In memory during test
+  - [ ] Upstash
 - [ ] Password
-  - [ ] encrypt & decrypt
-  - [ ] Exclude from response
+  - [x] Encrypt during insert
+  - [x] Exclude from return
+- [ ] Seeding
+- [ ] Searching users
 - [ ] Authentication
-- [ ] Burno API client
+- [ ] Step CI
 - [ ] Feature flag
 
 ## License

@@ -97,9 +97,9 @@ app
   })
   .use(async (ctx, next) => { // tRPC
     await next()
-    if (ctx.req.url!.startsWith('/trpc')) {
+    if (ctx.req.url!.startsWith('/api/trpc')) {
       ctx.status = 200
-      ctx.req.url = ctx.req.url!.replace('/trpc', '')
+      ctx.req.url = ctx.req.url!.replace('/api/trpc', '')
       await defindTRPCHandler(ctx.req, ctx.res)
     }
   })
