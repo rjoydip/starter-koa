@@ -95,10 +95,17 @@ app
     logger.debug('Authentication Middleware')
     await next()
   })
+  .use(async (ctx, next) => { // tRPC
+    await next()
+    if (ctx.req.url!.startsWith('/trpc')) {
+      ctx.status = 200
+      ctx.req.url = ctx.req.url!.replace('/trpc', '')
+      await defindTRPCHandler(ctx.req, ctx.res)
+    }
+  })
 /* Internal middleware - [END] */
 
 // Custom routers
-router.all('/trpc', ctx => defindTRPCHandler(ctx.req, ctx.res))
 routers.forEach((r: IRouter) => methodMap[r.method](r))
 // Dispatch routes and allow OPTIONS request method
 app

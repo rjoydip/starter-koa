@@ -1,4 +1,4 @@
-import type { UserInput, UserSelect } from './schema.ts'
+import type { UserInput } from './schema.ts'
 import type { IMetaData, IMetrics } from './types.ts'
 import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
@@ -44,10 +44,10 @@ export default {
         },
       }
     },
-    async getUsers(): Promise<UserSelect[]> {
+    async getUsers(): Promise<UserInput[]> {
       return await getUsers()
     },
-    async getUser(_: unknown, { id }: { id: string }) {
+    async getUser(_: unknown, { id }: { id: string }): Promise<UserInput> {
       return await getUser(id)
     },
   },
@@ -61,7 +61,7 @@ export default {
     ) {
       return await updateUser(id, input)
     },
-    async deleteUser(_: unknown, { id }: { id: string }) {
+    async deleteUser(_: unknown, { id }: { id: string }): Promise<{ id: string }> {
       return await deleteUser(id)
     },
   },
