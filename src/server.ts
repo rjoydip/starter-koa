@@ -2,7 +2,7 @@ import type { Server } from 'node:http'
 import http from 'node:http'
 import https from 'node:https'
 import closeWithGrace from 'close-with-grace'
-import { app } from './app.ts'
+import { createApplication } from './app.ts'
 import config from './config.ts'
 import logger from './logger.ts'
 import { captureException } from './utils.ts'
@@ -33,6 +33,7 @@ export function handleGracefulShutdown(server: Server): void {
  * @returns Server
  */
 export function createServer(): Server {
+  const app = createApplication()
   /* v8 ignore start */
   const server = config?.isHTTPs
     ? https.createServer(app.callback())

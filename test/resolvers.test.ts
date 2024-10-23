@@ -39,7 +39,7 @@ describe('⬢ Validate resolvers', () => {
       expect(await health()).toStrictEqual({
         data: {
           db: true,
-          redis: true,
+          cache: true,
         },
       })
     })
@@ -92,7 +92,7 @@ describe('⬢ Validate resolvers', () => {
     it.sequential('● should validate mutation updateUser', async () => {
       const { getUser } = query
       const { updateUser } = mutation
-      const user: UserInput = await getUser(null, { id })
+      const user: UserSelect = await getUser(null, { id })
       if (id === user.id) {
         const $ = await updateUser(null, {
           id,

@@ -2,7 +2,7 @@ import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { app } from '../src/app.ts'
+import { createApplication } from '../src/app.ts'
 import { db } from '../src/db.ts'
 import resolvers from '../src/resolvers.ts'
 
@@ -15,9 +15,10 @@ const {
   string,
 } = faker
 
-describe('⬢ Validate routes', () => {
-  const app$ = app.callback()
+const app = createApplication()
+const app$ = app.callback()
 
+describe('⬢ Validate routes', () => {
   const testUser: UserInput = {
     name: person.fullName(),
     email: internet.email(),
@@ -79,7 +80,7 @@ describe('⬢ Validate routes', () => {
         message: 'Request successful',
         data: {
           db: true,
-          redis: true,
+          cache: true,
         },
       })
     })

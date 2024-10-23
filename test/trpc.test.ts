@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker/locale/en'
 import { initTRPC } from '@trpc/server'
 import request from 'supertest'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { app } from '../src/app'
+import { createApplication } from '../src/app'
 import { cache } from '../src/cache'
 import { tRPCRouter } from '../src/trpc'
 
@@ -14,6 +14,9 @@ const {
   datatype,
   location,
 } = faker
+
+const app = createApplication()
+const app$ = app.callback()
 
 describe('⬢ Validate tRPC', () => {
   let _id: string
@@ -94,8 +97,6 @@ describe('⬢ Validate tRPC', () => {
   })
 
   describe('⬢ Validate handler', () => {
-    const app$ = app.callback()
-
     beforeAll(() => {
       cache.opts.ttl = 0
     })

@@ -2,6 +2,7 @@ import type { UserInput, UserSelect } from './schema.ts'
 import type { IMetaData, IMetrics } from './types.ts'
 import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
+import { cache } from './cache.ts'
 import {
   createUser,
   deleteUser,
@@ -25,10 +26,11 @@ export default {
     },
     async health() {
       const _isDBUp = await isDBUp()
+      const _isCacheUp = !!cache.namespace
       return {
         data: {
           db: _isDBUp,
-          redis: true,
+          cache: _isCacheUp,
         },
       }
     },
