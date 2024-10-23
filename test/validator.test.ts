@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker/locale/en'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { app } from '../src/app.ts'
+import { createApplication } from '../src/app.ts'
 import resolvers from '../src/resolvers.ts'
 import { getRouter } from '../src/routers.ts'
 import { validateRouter } from '../src/validator.ts'
@@ -18,16 +18,16 @@ const {
   string,
 } = faker
 
-describe('⬢ Validate validator', () => {
-  const { Query } = resolvers
-  const app$ = app.callback()
+const { Query } = resolvers
+const app = createApplication()
+const app$ = app.callback()
 
+describe('⬢ Validate validator', () => {
   const testUser: UserSelect = {
     name: person.fullName(),
     email: internet.email(),
     phone: phone.number({ style: 'international' }),
     isVerified: datatype.boolean(),
-    password: internet.password(),
     address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
     id: string.uuid(),
     role: 'admin',

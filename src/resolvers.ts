@@ -1,7 +1,8 @@
-import type { UserInput } from './schema.ts'
+import type { UserInput, UserSelect } from './schema.ts'
 import type { IMetaData, IMetrics } from './types.ts'
 import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
+import { cache } from './cache.ts'
 import {
   createUser,
   deleteUser,
@@ -25,10 +26,11 @@ export default {
     },
     async health() {
       const _isDBUp = await isDBUp()
+      const _isCacheUp = !!cache.namespace
       return {
         data: {
           db: _isDBUp,
-          redis: true,
+          cache: _isCacheUp,
         },
       }
     },
@@ -44,21 +46,21 @@ export default {
         },
       }
     },
-    async getUsers(): Promise<UserInput[]> {
+    async getUsers(): Promise<UserSelect[]> {
       return await getUsers()
     },
-    async getUser(_: unknown, { id }: { id: string }): Promise<UserInput> {
+    async getUser(_: unknown, { id }: { id: string }): Promise<UserSelect> {
       return await getUser(id)
     },
   },
   Mutation: {
-    async createUser(_: unknown, { input }: { input: UserInput }) {
+    async createUser(_: unknown, { input }: { input: UserInput }): Promise<UserSelect> {
       return await createUser(input)
     },
     async updateUser(
       _: unknown,
       { id, input }: { id: string, input: UserInput },
-    ) {
+    ): Promise<UserSelect> {
       return await updateUser(id, input)
     },
     async deleteUser(_: unknown, { id }: { id: string }): Promise<{ id: string }> {

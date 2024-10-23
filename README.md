@@ -2,7 +2,7 @@
 
 [![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
 
-Koa application starter
+Koa application starter. A simple and single file logic separation.
 
 > [!NOTE]
 > This project is in the early stages and under development. Although the pnpm
@@ -10,12 +10,18 @@ Koa application starter
 > working through node.
 
 ✅ Koa <br>
-✅ Neon DB <br>
+✅ NeonDB <br>
   ✅ PostgreSQL <br>
 ✅ Drizzle <br>
-✅ tRPC <br>
-✅ Sentry <br>
 ✅ GraphQL Yoga <br>
+✅ Upstash <br>
+  ✅ Redis <br>
+    ✅ Keyv <br>
+✅ tRPC <br>
+✅ Cossws <br>
+✅ Scalar <br>
+✅ OpenAPI <br>
+✅ Sentry <br>
 ✅ Zod <br>
 ✅ Vitest <br>
 ✅ Unbuild <br>
@@ -71,6 +77,10 @@ After running dev command visit `/references` endpoint. Play around with endpoin
 
 For showing graphql playground visit `/graphql`.
 
+## tRPC
+
+Access trpc routes on `/api/trpc`.
+
 ## Websocket
 
 For showing websocket playground visit `/_ws`. If want to use as API then use either `wss://<domain>` or `ws://<domain>`
@@ -98,16 +108,20 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Mock DB
-- [x] CI job no parallel
-- [x] WS test
+- [ ] Unit test
+  - [ ] Mock DB
+  - [ ] Mock Redis
+  - [x] Websocket
+- [x] CI - Parallel
 - [x] Cache
-  - [x] In memory during test
+  - [x] Upstash
 - [ ] Password
-  - [ ] encrypt & decrypt
-  - [ ] Exclude from response
+  - [x] Encrypt during insert
+  - [x] Exclude from return
+- [ ] Seeding
+- [ ] Searching users
 - [ ] Authentication
-- [ ] Burno API client
+- [ ] Step CI
 - [ ] Feature flag
 
 ## License

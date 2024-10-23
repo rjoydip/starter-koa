@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import { z } from 'zod'
 import resolvers from './resolvers'
-import { selectUserSchema } from './schema'
+import { insertUserSchema } from './schema'
 
 const { Mutation, Query } = resolvers
 
@@ -27,12 +27,12 @@ export const tRPCRouter = router({
     }),
   createUser: procedure
     .meta({ openapi: { method: 'POST', path: '/user' } })
-    .input(selectUserSchema)
+    .input(insertUserSchema)
     .mutation(async ({ input }) => {
       return await Mutation.createUser(null, { input })
     }),
   updateUser: procedure
-    .input(z.object({ id: z.string(), payload: selectUserSchema }))
+    .input(z.object({ id: z.string(), payload: insertUserSchema }))
     .mutation(async ({ input }) => {
       return await Mutation.updateUser(null, { id: input.id, input: input.payload })
     }),

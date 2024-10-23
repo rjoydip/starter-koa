@@ -3,6 +3,13 @@ import type { HttpMethodEnum } from 'koa-body/lib/types'
 
 /**
  * @export
+ * @interface TApplication
+ * @typedef {TApplication}
+ */
+export interface TApplication {}
+
+/**
+ * @export
  * @interface IRegisteredRoutes
  * @typedef {IRegisteredRoutes}
  */
@@ -29,7 +36,7 @@ export interface IHealth {
   /**
    * @type {boolean}
    */
-  redis: boolean
+  cache: boolean
 }
 /**
  * @export

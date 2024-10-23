@@ -1,10 +1,11 @@
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
-import { app } from '../src/app.ts'
+import { createApplication } from '../src/app.ts'
+
+const app = createApplication()
+const app$ = app.callback()
 
 describe('⬢ Validate app', () => {
-  const app$ = app.callback()
-
   describe('⬢ Validate IP middleware', () => {
     it('● should allow access from whitelisted IP', async () => {
       const res = await request(app$)

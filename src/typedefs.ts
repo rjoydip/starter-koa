@@ -50,7 +50,7 @@ type MemoryUsage {
 
 type HealthData {
   db: Boolean
-  redis: Boolean
+  cache: Boolean
 }
 
 type User {

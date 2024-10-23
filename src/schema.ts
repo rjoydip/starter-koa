@@ -17,8 +17,10 @@ export const users = pgTable('users', {
 
 export const insertUserSchema = createInsertSchema(users, {
   name: z.string().min(8),
-})
-export const selectUserSchema = createSelectSchema(users).omit({ id: true, createdAt: true, updatedAt: true })
+}).omit({ id: true, createdAt: true, updatedAt: true })
+export const selectUserSchema = createSelectSchema(users, {
+  name: z.string().min(8),
+}).omit({ password: true })
 
 /**
  * @export
