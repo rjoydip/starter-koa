@@ -14,9 +14,9 @@ Koa application starter. A simple and single file logic separation.
   ✅ PostgreSQL <br>
 ✅ Drizzle <br>
 ✅ GraphQL Yoga <br>
-✅ Upstash <br>
-  ✅ Redis <br>
-    ✅ Keyv <br>
+✅ Unstorage <br>
+  ✅ Cloudflare <br>
+    ✅ KV <br>
 ✅ tRPC <br>
 ✅ Cossws <br>
 ✅ Scalar <br>

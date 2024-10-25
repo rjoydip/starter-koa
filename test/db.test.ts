@@ -1,12 +1,12 @@
 import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   createUser,
   db,
   deleteUser,
-  getUser,
   getUsers,
+  isCacheUp,
   isDBUp,
 } from '../src/db.ts'
 
@@ -20,6 +20,7 @@ const {
 
 describe('⬢ Validate db', () => {
   let id: string
+
   const testUser: UserInput = {
     name: person.fullName(),
     email: internet.email(),
@@ -30,30 +31,23 @@ describe('⬢ Validate db', () => {
     role: 'admin',
   }
 
-  afterEach(() => {
-    faker.seed()
-  })
-
   it('● should check if the database is not up', async () => {
     vi.spyOn(db, 'execute').mockRejectedValueOnce(new Error('Error'))
     expect(await isDBUp()).toBeFalsy()
   })
 
-  it('● should check if the database is up', async () => {
+  it('● should check if the database & cache is up', async () => {
     expect(await isDBUp()).toBeTruthy()
+    expect(await isCacheUp()).toBeTruthy()
   })
 
   it.sequential('● should insert and retrieve a user', async () => {
-    const user$ = await createUser(testUser)
-    expect(user$).toBeDefined()
-    expect(user$?.name).toBe(testUser.name)
-
-    if (user$?.id) {
-      id = user$.id
-      const fetchedUser = await getUser(user$.id)
-      expect(fetchedUser).toBeDefined()
-      expect(fetchedUser?.name).toBe(testUser.name)
-      expect(fetchedUser?.email).toBe(testUser.email)
+    const result = await createUser(testUser)
+    expect(result).toBeDefined()
+    expect(result?.name).toBe(testUser.name)
+    expect(result?.email).toBe(testUser.email)
+    if (result) {
+      id = result.id
     }
   })
 

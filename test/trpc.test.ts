@@ -2,9 +2,8 @@ import type { UserInput } from '../src/schema'
 import { faker } from '@faker-js/faker/locale/en'
 import { initTRPC } from '@trpc/server'
 import request from 'supertest'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createApplication } from '../src/app'
-import { cache } from '../src/cache'
 import { tRPCRouter } from '../src/trpc'
 
 const {
@@ -97,10 +96,6 @@ describe('⬢ Validate tRPC', () => {
   })
 
   describe('⬢ Validate handler', () => {
-    beforeAll(() => {
-      cache.opts.ttl = 0
-    })
-
     it('● should get response form welcome', async () => {
       const { status, body } = await request(app$)
         .get('/api/trpc/welcome')

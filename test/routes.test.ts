@@ -1,7 +1,7 @@
 import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createApplication } from '../src/app.ts'
 import { db } from '../src/db.ts'
 import resolvers from '../src/resolvers.ts'
@@ -28,10 +28,6 @@ describe('⬢ Validate routes', () => {
     address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
     role: 'admin',
   }
-
-  afterEach(() => {
-    faker.seed()
-  })
 
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
@@ -270,10 +266,6 @@ describe('⬢ Validate routes', () => {
 
   describe('⬢ Validate routing when DB error', () => {
     const id: string = string.uuid()
-
-    afterEach(() => {
-      vi.clearAllMocks()
-    })
 
     it('● GET /api/users 500', async () => {
       vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('Error'))

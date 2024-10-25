@@ -2,7 +2,7 @@ import type { UserSelect } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createApplication } from '../src/app.ts'
 import resolvers from '../src/resolvers.ts'
 import { getRouter } from '../src/routers.ts'
@@ -34,10 +34,6 @@ describe('⬢ Validate validator', () => {
     createdAt: date.anytime(),
     updatedAt: date.anytime(),
   }
-
-  afterEach(() => {
-    faker.seed()
-  })
 
   describe('⬢ Validate middleware', () => {
     it('● should validated requestValidator POST /api/user', async () => {

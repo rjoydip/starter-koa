@@ -1,6 +1,6 @@
 import type { IConfig } from '../src/config.ts'
 import { faker } from '@faker-js/faker/locale/en'
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import config from '../src/config.ts'
 
 const {
@@ -10,10 +10,6 @@ const {
 } = faker
 
 describe('⬢ Validate config', () => {
-  afterEach(() => {
-    faker.seed()
-  })
-
   it('● should validated default config', () => {
     const defaultConfig = config
     expect(defaultConfig?.port).toBeDefined()
@@ -25,16 +21,14 @@ describe('⬢ Validate config', () => {
     expect(defaultConfig?.db_url).toBeDefined()
     expect(defaultConfig?.isHTTPs).toBeDefined()
     expect(defaultConfig?.duration).toBeDefined()
-    expect(defaultConfig?.cache_url).toBeDefined()
   })
 
-  it('● should validated overwrite config value', () => {
+  it('● should validated overwrite config value', async () => {
     const port = internet.port()
     const isHTTPs = datatype.boolean()
     const duration = number.int({ min: 1000, max: 6000 })
     const dns = internet.url()
     const db_url = internet.url()
-    const cache_url = internet.url()
     const number$ = number.int({ min: 100, max: 1000 })
 
     const overwriteConfig: IConfig = {
@@ -48,8 +42,8 @@ describe('⬢ Validate config', () => {
       duration,
       runtime: 'bun',
       db_url,
-      cache_url,
     }
+
     expect(overwriteConfig?.port).toStrictEqual(port)
     expect(overwriteConfig?.log_level).toStrictEqual(3)
     expect(overwriteConfig?.ratelimit).toStrictEqual(number$)
@@ -59,6 +53,5 @@ describe('⬢ Validate config', () => {
     expect(overwriteConfig?.monitor_dsn).toStrictEqual(dns)
     expect(overwriteConfig?.isHTTPs).toStrictEqual(isHTTPs)
     expect(overwriteConfig?.duration).toStrictEqual(duration)
-    expect(overwriteConfig?.cache_url).toStrictEqual(cache_url)
   })
 })

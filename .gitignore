@@ -15,3 +15,4 @@ temp
 !*.env.example
 drizzle/**/*.json
 drizzle/**/*.sql
+wrangler.toml

@@ -1,6 +1,9 @@
 import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
+import { createSchema } from 'graphql-yoga'
 import { z } from 'zod'
+import resolvers from './resolvers.ts'
+import typeDefs from './typedefs.ts'
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -32,3 +35,8 @@ export type UserSelect = z.infer<typeof selectUserSchema>
  * @typedef {UserInput}
  */
 export type UserInput = z.infer<typeof insertUserSchema>
+
+export const graphqlSchema = createSchema({
+  typeDefs,
+  resolvers,
+})
