@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
-import { cache } from './cache.ts'
 import config from './config.ts'
 import logger from './logger.ts'
 import { createServer } from './server.ts'
@@ -28,11 +27,6 @@ export async function main(): Promise<void> {
     const server = createServer()
     server.listen(config.port)
     logger.ready('Server info: ', server.address())
-    cache.on('error', async (err: Error) => {
-      await cache.clear()
-      logger.error(err)
-      captureException(err)
-    })
   }
   catch (error) {
     captureException(`Error starting server: ${error}`)

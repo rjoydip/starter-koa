@@ -1,6 +1,6 @@
 import type { UserInput, UserSelect } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import resolvers from '../src/resolvers.ts'
 
 const {
@@ -24,14 +24,6 @@ describe('⬢ Validate resolvers', () => {
     address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
     role: 'admin',
   }
-
-  beforeAll(async () => {})
-
-  afterEach(() => {
-    faker.seed()
-  })
-
-  afterAll(async () => {})
 
   describe('⬢ Validate main resolvers', () => {
     it('● should validate query health', async () => {

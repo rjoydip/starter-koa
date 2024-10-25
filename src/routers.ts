@@ -4,11 +4,11 @@ import type { IRouter } from './types.ts'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
-import { graphqlSchema } from './db.ts'
 import { createError, createSuccess } from './message.ts'
 import resolvers from './resolvers.ts'
 import { apiDocs } from './scalar.ts'
-import { insertUserSchema } from './schema.ts'
+import { graphqlSchema, insertUserSchema } from './schema.ts'
+
 import {
   API_PREFIX,
   captureException,

@@ -2,27 +2,49 @@ import type { UserInput, UserSelect } from './schema.ts'
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
 import { eq, sql } from 'drizzle-orm/sql'
-import { createSchema } from 'graphql-yoga'
 import { sha256 } from 'ohash'
-import { cache } from './cache.ts'
+import cloudflareKVBindingDriver from 'unstorage/drivers/cloudflare-kv-binding'
+import { defineCache } from './cache.ts'
 import config from './config.ts'
-import resolvers from './resolvers.ts'
+import logger from './logger.ts'
 import { users } from './schema.ts'
-import typeDefs from './typedefs.ts'
 
 const neonClient = neon(config.db_url!)
 export const db = drizzle(neonClient)
+const cache = defineCache(
+  cloudflareKVBindingDriver({
+    binding: 'DB',
+  }),
+)
 
-const returningFields = {
-  id: users.id,
-  name: users.name,
-  email: users.email,
-  phone: users.phone,
-  address: users.address,
-  isVerified: users.isVerified,
-  role: users.role,
-  createdAt: users.createdAt,
-  updatedAt: users.updatedAt,
+function returningFields(): Record<keyof UserSelect, any> {
+  return {
+    id: users.id,
+    name: users.name,
+    email: users.email,
+    phone: users.phone,
+    address: users.address,
+    isVerified: users.isVerified,
+    role: users.role,
+    createdAt: users.createdAt,
+    updatedAt: users.updatedAt,
+  }
+}
+
+/**
+ * @export
+ * @async
+ * @returns Promise<boolean>
+ */
+export async function isCacheUp(): Promise<boolean> {
+  try {
+    await cache.getItem('random')
+    return true
+  }
+  catch (err) {
+    logger.error(err)
+    return false
+  }
 }
 
 /**
@@ -34,8 +56,9 @@ export async function isDBUp(): Promise<boolean> {
   try {
     await db.execute(sql`select 1`)
     return true
-  } /* eslint-disable unused-imports/no-unused-vars */
-  catch (_: unknown) {
+  }
+  catch (err) {
+    logger.error(err)
     return false
   }
 }
@@ -53,8 +76,8 @@ export async function getUsers(): Promise<UserSelect[]> {
     return cachedUsers
   }
 
-  const result = await db.select(returningFields).from(users)
-  cache.set(cacheKey, result)
+  const result = await db.select(returningFields()).from(users)
+  await cache.set(cacheKey, result)
   return result
 }
 
@@ -73,9 +96,9 @@ export async function getUser(id: string): Promise<UserSelect> {
     return cachedUser
   }
 
-  const result = await db.select(returningFields).from(users).where(eq(users.id, id))
+  const result = await db.select(returningFields()).from(users).where(eq(users.id, id))
   const user = result[0]
-  cache.set(cacheKey, user)
+  await cache.set(cacheKey, user)
   return user
 }
 
@@ -89,8 +112,8 @@ export async function createUser(user: UserInput): Promise<UserSelect> {
   const [newUser] = await db.insert(users).values({
     ...user,
     password: sha256(user.password),
-  }).returning(returningFields)
-  await cache.delete('all_users')
+  }).returning(returningFields())
+  await cache.del('all_users')
   return newUser
 }
 
@@ -102,9 +125,9 @@ export async function createUser(user: UserInput): Promise<UserSelect> {
  * @returns Promise<UserInput>
  */
 export async function updateUser(id: string, user: Omit<UserInput, 'password'>): Promise<UserSelect> {
-  const [updatedUser] = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning(returningFields)
+  const [updatedUser] = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning(returningFields())
   await cache.set(`user_${id}`, updatedUser)
-  await cache.delete('all_users')
+  await cache.del('all_users')
   return updatedUser
 }
 
@@ -118,13 +141,8 @@ export async function deleteUser(id: string): Promise<{ id: string }> {
   const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning({
     id: users.id,
   })
-  await cache.delete(`user_${id}`)
-  await cache.delete('all_users')
+  await cache.del(`user_${id}`)
+  await cache.del('all_users')
   return deletedUser
 }
 /* User Queries - Start */
-
-export const graphqlSchema = createSchema({
-  typeDefs,
-  resolvers,
-})
