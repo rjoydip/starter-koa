@@ -1,4 +1,5 @@
-import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { v4 as uuid } from '@lukeed/uuid/secure'
+import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { createSchema } from 'graphql-yoga'
 import { z } from 'zod'
@@ -6,7 +7,7 @@ import resolvers from './resolvers.ts'
 import typeDefs from './typedefs.ts'
 
 export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: text('id').$defaultFn(() => uuid()).primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   phone: text('phone').notNull().unique(),
@@ -19,6 +20,7 @@ export const users = pgTable('users', {
 })
 
 export const insertUserSchema = createInsertSchema(users, {
+  id: schema => schema.id.uuid(),
   name: z.string().min(8),
 }).omit({ id: true, createdAt: true, updatedAt: true })
 export const selectUserSchema = createSelectSchema(users, {

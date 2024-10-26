@@ -1,9 +1,10 @@
 import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import { describe, expect, it, vi } from 'vitest'
+import cache from '../src/cache.ts'
 import {
   createUser,
-  db,
+  dbInterface,
   deleteUser,
   getUsers,
   isCacheUp,
@@ -32,12 +33,20 @@ describe('⬢ Validate db', () => {
   }
 
   it('● should check if the database is not up', async () => {
-    vi.spyOn(db, 'execute').mockRejectedValueOnce(new Error('Error'))
+    vi.spyOn(dbInterface(), 'exec').mockRejectedValueOnce(new Error('Error'))
     expect(await isDBUp()).toBeFalsy()
   })
 
-  it('● should check if the database & cache is up', async () => {
+  it('● should check if the cache is not up', async () => {
+    vi.spyOn(cache, 'getItem').mockRejectedValueOnce(new Error('Error'))
+    expect(await isCacheUp()).toBeFalsy()
+  })
+
+  it('● should check if the database is up', async () => {
     expect(await isDBUp()).toBeTruthy()
+  })
+
+  it('● should check if the cache is up', async () => {
     expect(await isCacheUp()).toBeTruthy()
   })
 

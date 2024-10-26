@@ -1,15 +1,14 @@
+import type { Database } from 'db0'
 import type { UserInput, UserSelect } from './schema.ts'
-import { neon } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-http'
+import { createDatabase } from 'db0'
+import postgresql from 'db0/connectors/postgresql'
+import { drizzle } from 'db0/integrations/drizzle'
 import { eq, sql } from 'drizzle-orm/sql'
 import { sha256 } from 'ohash'
 import cache from './cache.ts'
 import config from './config.ts'
 import logger from './logger.ts'
 import { users } from './schema.ts'
-
-const neonClient = neon(config.db_url!)
-export const db = drizzle(neonClient)
 
 function returningFields(): Record<keyof UserSelect, any> {
   return {
@@ -24,6 +23,15 @@ function returningFields(): Record<keyof UserSelect, any> {
     updatedAt: users.updatedAt,
   }
 }
+
+export function dbInterface(): Database {
+  return createDatabase(
+    postgresql({
+      url: config.db_url,
+    }),
+  )
+}
+export const db = drizzle(dbInterface())
 
 /**
  * @export
@@ -48,10 +56,11 @@ export async function isCacheUp(): Promise<boolean> {
  */
 export async function isDBUp(): Promise<boolean> {
   try {
-    await db.execute(sql`select 1`)
+    await dbInterface().exec(`select 1`)
     return true
   }
   catch (err) {
+    console.warn(err)
     logger.error(err)
     return false
   }
@@ -129,12 +138,10 @@ export async function updateUser(id: string, user: Omit<UserInput, 'password'>):
  * @export
  * @async
  * @param {string} id
- * @returns Promise<void>
+ * @returns Promise<UserSelect>
  */
-export async function deleteUser(id: string): Promise<{ id: string }> {
-  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning({
-    id: users.id,
-  })
+export async function deleteUser(id: string): Promise<UserSelect> {
+  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning(returningFields())
   await cache.del(`user_${id}`)
   await cache.del('all_users')
   return deletedUser

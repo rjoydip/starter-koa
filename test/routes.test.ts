@@ -187,10 +187,10 @@ describe('⬢ Validate routes', () => {
         'email',
         'phone',
         'address',
-        'isVerified',
+        'is_verified',
         'role',
-        'createdAt',
-        'updatedAt',
+        'created_at',
+        'updated_at',
       ])
     })
 
@@ -256,10 +256,10 @@ describe('⬢ Validate routes', () => {
 
     it.sequential('● DELETE /api/user:/:wrong-id', async () => {
       const deleteUserResponse = await request(app$)
-        .delete('/api/user/wrong-id')
+        .delete(`/api/user/${string.uuid()}`)
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)
-      expect(deleteUserResponse.status).toEqual(500)
+      expect(deleteUserResponse.status).toEqual(422)
     })
   })
 

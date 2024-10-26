@@ -132,6 +132,7 @@ method=deleteUser&id=<USER_ID>
 - [ ] Features
   - [ ] Filtering
   - [ ] Authentication
+  - [ ] Benchmarking
 
 ## License
 
