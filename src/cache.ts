@@ -1,8 +1,11 @@
-import type { Driver, Storage } from 'unstorage'
 import { createStorage } from 'unstorage'
+import redisDriver from 'unstorage/drivers/redis'
+import config from './config'
 
-export function defineCache(driver: Driver): Storage {
-  return createStorage({
-    driver,
-  })
-}
+const cache = createStorage({
+  driver: redisDriver({
+    url: config.cache_url,
+  }),
+})
+
+export default cache

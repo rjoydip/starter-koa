@@ -100,7 +100,6 @@ describe('⬢ Validate routes', () => {
       expect(body.message).toStrictEqual('Request successful')
       expect(body.data).toBeDefined()
       expect(Object.keys(body.data)).toStrictEqual([
-        'description',
         'name',
         'license',
         'version',

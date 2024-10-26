@@ -10,13 +10,14 @@ Koa application starter. A simple and single file logic separation.
 > working through node.
 
 ✅ Koa <br>
-✅ NeonDB <br>
-  ✅ PostgreSQL <br>
 ✅ Drizzle <br>
 ✅ GraphQL Yoga <br>
 ✅ Unstorage <br>
-  ✅ Cloudflare <br>
-    ✅ KV <br>
+  ✅ Cache <br>
+    ✅ Upstash <br>
+  ✅ DB <br>
+    ✅ PostgreSQL <br>
+      ✅ NeonDB <br>
 ✅ tRPC <br>
 ✅ Cossws <br>
 ✅ Scalar <br>
@@ -108,21 +109,29 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Unit test
-  - [ ] Mock DB
-  - [ ] Mock Redis
-  - [x] Websocket
-- [x] CI - Parallel
+- [ ] Testing
+  - [ ] Unit test
+    - [ ] Mock
+      - [ ] DB
+      - [x] Cache
+    - [x] Websocket
+  - [ ] StepCI
+- [x] CI
+  - [x] Actions
+    - [x] Parallel
 - [x] Cache
   - [x] Upstash
-- [ ] Password
-  - [x] Encrypt during insert
+    - [x] Redis
+- [x] Password
+  - [x] Encryption
   - [x] Exclude from return
-- [ ] Seeding
-- [ ] Searching users
-- [ ] Authentication
-- [ ] Step CI
-- [ ] Feature flag
+- [] DB
+  - [x] NeonDB
+    - [x] PostgresSQL
+  - [ ] Seed
+- [ ] Features
+  - [ ] Filtering
+  - [ ] Authentication
 
 ## License
 

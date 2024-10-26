@@ -1,16 +1,23 @@
 import { faker } from '@faker-js/faker/locale/en'
-import { createStorage } from 'unstorage'
-import cloudflareKVBindingDriver from 'unstorage/drivers/cloudflare-kv-binding'
+import { RedisMemoryServer } from 'redis-memory-server'
+import redisDriver from 'unstorage/drivers/redis'
 import { afterEach, beforeEach, vi } from 'vitest'
-import * as cache from '../src/cache.ts'
-import { mockBinding } from './_utils'
 
-vi.spyOn(cache, 'defineCache').mockImplementation(() => createStorage({
-  driver: cloudflareKVBindingDriver({
-    binding: mockBinding,
-    base: 'base',
-  }),
-}))
+vi.mock('../src/cache.ts', async () => {
+  const { createStorage } = await import('unstorage')
+  const redisServer = new RedisMemoryServer()
+  const host = await redisServer.getHost()
+  const port = await redisServer.getPort()
+  return {
+    default: createStorage({
+      driver: redisDriver({
+        base: 'test:',
+        url: `redis://${host}:${port}`,
+        ttl: 0,
+      }),
+    }),
+  }
+})
 
 beforeEach(() => {
   vi.clearAllMocks()
