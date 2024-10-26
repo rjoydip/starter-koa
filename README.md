@@ -126,7 +126,7 @@ method=deleteUser&id=<USER_ID>
   - [x] Encryption
   - [x] Exclude from return
 - [] DB
-  - [x] NeonDB
+  - [x] DB0
     - [x] PostgresSQL
   - [ ] Seed
 - [ ] Features
