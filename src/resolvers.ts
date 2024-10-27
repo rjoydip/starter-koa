@@ -35,11 +35,10 @@ export default {
       }
     },
     async _meta() {
-      const { description, license, name, version }: IMetaData = await import('../package.json')
+      const { license, name, version }: IMetaData = await import('../package.json')
 
       return {
         data: {
-          description,
           name,
           license,
           version,

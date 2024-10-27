@@ -51,7 +51,6 @@ describe('⬢ Validate resolvers', () => {
       expect($).toBeDefined()
       expect($.data).toBeDefined()
       expect($.data.name).toBeDefined()
-      expect($.data.description).toBeDefined()
       expect($.data.license).toBeDefined()
       expect($.data.version).toBeDefined()
     })

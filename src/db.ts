@@ -1,21 +1,15 @@
 import type { UserInput, UserSelect } from './schema.ts'
-import { neon } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-http'
+import { v4 as uuid } from '@lukeed/uuid/secure'
+import { createDatabase } from 'db0'
+import postgresql from 'db0/connectors/postgresql'
+import { drizzle } from 'db0/integrations/drizzle'
 import { eq, sql } from 'drizzle-orm/sql'
 import { sha256 } from 'ohash'
-import cloudflareKVBindingDriver from 'unstorage/drivers/cloudflare-kv-binding'
-import { defineCache } from './cache.ts'
+import cache from './cache.ts'
 import config from './config.ts'
 import logger from './logger.ts'
 import { users } from './schema.ts'
-
-const neonClient = neon(config.db_url!)
-export const db = drizzle(neonClient)
-const cache = defineCache(
-  cloudflareKVBindingDriver({
-    binding: 'DB',
-  }),
-)
+import { captureException } from './utils.ts'
 
 function returningFields(): Record<keyof UserSelect, any> {
   return {
@@ -31,6 +25,13 @@ function returningFields(): Record<keyof UserSelect, any> {
   }
 }
 
+export const dbInterface = createDatabase(
+  postgresql({
+    url: config.db_url,
+  }),
+)
+export const db = drizzle(dbInterface)
+
 /**
  * @export
  * @async
@@ -38,11 +39,12 @@ function returningFields(): Record<keyof UserSelect, any> {
  */
 export async function isCacheUp(): Promise<boolean> {
   try {
-    await cache.getItem('random')
+    await cache.get(uuid())
     return true
   }
   catch (err) {
     logger.error(err)
+    captureException(err)
     return false
   }
 }
@@ -54,11 +56,12 @@ export async function isCacheUp(): Promise<boolean> {
  */
 export async function isDBUp(): Promise<boolean> {
   try {
-    await db.execute(sql`select 1`)
+    await dbInterface.exec(`select 1`)
     return true
   }
   catch (err) {
     logger.error(err)
+    captureException(err)
     return false
   }
 }
@@ -81,7 +84,6 @@ export async function getUsers(): Promise<UserSelect[]> {
   return result
 }
 
-/* User Queries - Start */
 /**
  * @export
  * @async
@@ -135,14 +137,11 @@ export async function updateUser(id: string, user: Omit<UserInput, 'password'>):
  * @export
  * @async
  * @param {string} id
- * @returns Promise<void>
+ * @returns Promise<UserSelect>
  */
-export async function deleteUser(id: string): Promise<{ id: string }> {
-  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning({
-    id: users.id,
-  })
+export async function deleteUser(id: string): Promise<UserSelect> {
+  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning(returningFields())
   await cache.del(`user_${id}`)
   await cache.del('all_users')
   return deletedUser
 }
-/* User Queries - Start */

@@ -81,10 +81,6 @@ export interface IMetaData {
   /**
    * @type {string}
    */
-  description: string
-  /**
-   * @type {string}
-   */
   license: string
   /**
    * @type {string}

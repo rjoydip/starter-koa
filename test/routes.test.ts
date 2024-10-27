@@ -2,8 +2,9 @@ import type { UserInput } from '../src/schema.ts'
 import { faker } from '@faker-js/faker/locale/en'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
+
 import { createApplication } from '../src/app.ts'
-import { db } from '../src/db.ts'
+import * as db from '../src/db.ts'
 import resolvers from '../src/resolvers.ts'
 
 const {
@@ -100,7 +101,6 @@ describe('⬢ Validate routes', () => {
       expect(body.message).toStrictEqual('Request successful')
       expect(body.data).toBeDefined()
       expect(Object.keys(body.data)).toStrictEqual([
-        'description',
         'name',
         'license',
         'version',
@@ -151,7 +151,6 @@ describe('⬢ Validate routes', () => {
 
   describe('⬢ Validate user routes', () => {
     let id: string
-
     it('● GET /api/users', async () => {
       const { headers, status, body } = await request(app$)
         .get('/api/users')
@@ -188,10 +187,10 @@ describe('⬢ Validate routes', () => {
         'email',
         'phone',
         'address',
-        'isVerified',
+        'is_verified',
         'role',
-        'createdAt',
-        'updatedAt',
+        'created_at',
+        'updated_at',
       ])
     })
 
@@ -257,18 +256,17 @@ describe('⬢ Validate routes', () => {
 
     it.sequential('● DELETE /api/user:/:wrong-id', async () => {
       const deleteUserResponse = await request(app$)
-        .delete('/api/user/wrong-id')
+        .delete(`/api/user/${string.uuid()}`)
         .set('Accept', 'application/json')
       expect(deleteUserResponse.headers['content-type']).toMatch(/json/)
-      expect(deleteUserResponse.status).toEqual(500)
+      expect(deleteUserResponse.status).toEqual(422)
     })
   })
 
   describe('⬢ Validate routing when DB error', () => {
-    const id: string = string.uuid()
-
-    it('● GET /api/users 500', async () => {
-      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('Error'))
+    let id: string
+    it.sequential('● GET /api/users 500', async () => {
+      vi.spyOn(db, 'getUsers').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .get('/api/users')
         .set('Accept', 'application/json')
@@ -276,8 +274,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● GET /api/user 500', async () => {
-      vi.spyOn(db, 'select').mockRejectedValueOnce(new Error('Error'))
+    it.sequential('● GET /api/user 500', async () => {
+      vi.spyOn(db, 'getUser').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .get(`/api/user/${id}`)
         .set('Accept', 'application/json')
@@ -285,8 +283,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● POST /api/user 500', async () => {
-      vi.spyOn(db, 'insert').mockRejectedValueOnce(new Error('Error'))
+    it.sequential('● POST /api/user 500', async () => {
+      vi.spyOn(db, 'createUser').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
         .post('/api/user/')
         .send(testUser)
@@ -295,8 +293,9 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● PUT /api/user/:id 500', async () => {
-      vi.spyOn(db, 'update').mockRejectedValueOnce(new Error('Error'))
+    it.sequential('● PUT /api/user/:id 500', async () => {
+      vi.spyOn(db, 'updateUser').mockRejectedValueOnce(new Error('Error'))
+      vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(testUser)
       const { headers, status } = await request(app$)
         .put(`/api/user/${id}`)
         .send({
@@ -308,8 +307,8 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it('● DELETE /api/user:/:id 500', async () => {
-      vi.spyOn(db, 'delete').mockRejectedValueOnce(new Error('DB error'))
+    it.sequential('● DELETE /api/user:/:id 500', async () => {
+      vi.spyOn(db, 'deleteUser').mockRejectedValueOnce(new Error('DB error'))
       vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(testUser)
       vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(
         new Error('DB error'),

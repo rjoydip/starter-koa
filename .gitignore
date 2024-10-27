@@ -13,6 +13,4 @@ temp
 *.env.*
 *.env
 !*.env.example
-drizzle/**/*.json
-drizzle/**/*.sql
-wrangler.toml
+drizzle/

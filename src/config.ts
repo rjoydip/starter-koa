@@ -1,5 +1,4 @@
 import type { LogLevel } from 'consola'
-import type { Storage } from 'unstorage'
 import type { Runtime } from './types.ts'
 import { env } from 'node:process'
 
@@ -46,9 +45,9 @@ export interface IConfig {
    */
   db_url?: string
   /**
-   * @type {?Storage}
+   * @type {?string}
    */
-  cache?: Storage
+  cache_url?: string
 }
 
 const {
@@ -61,6 +60,7 @@ const {
   RUNTIME = 'node',
   MONITOR_DNS = '',
   DATABASE_URL = '',
+  CACHE_URL = '',
 } = env
 
 export default {
@@ -73,4 +73,5 @@ export default {
   monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
   db_url: DATABASE_URL,
+  cache_url: CACHE_URL,
 }
