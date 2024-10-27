@@ -1,5 +1,5 @@
-import type { Database } from 'db0'
 import type { UserInput, UserSelect } from './schema.ts'
+import { v4 as uuid } from '@lukeed/uuid/secure'
 import { createDatabase } from 'db0'
 import postgresql from 'db0/connectors/postgresql'
 import { drizzle } from 'db0/integrations/drizzle'
@@ -9,6 +9,7 @@ import cache from './cache.ts'
 import config from './config.ts'
 import logger from './logger.ts'
 import { users } from './schema.ts'
+import { captureException } from './utils.ts'
 
 function returningFields(): Record<keyof UserSelect, any> {
   return {
@@ -24,14 +25,12 @@ function returningFields(): Record<keyof UserSelect, any> {
   }
 }
 
-export function dbInterface(): Database {
-  return createDatabase(
-    postgresql({
-      url: config.db_url,
-    }),
-  )
-}
-export const db = drizzle(dbInterface())
+export const dbInterface = createDatabase(
+  postgresql({
+    url: config.db_url,
+  }),
+)
+export const db = drizzle(dbInterface)
 
 /**
  * @export
@@ -40,11 +39,12 @@ export const db = drizzle(dbInterface())
  */
 export async function isCacheUp(): Promise<boolean> {
   try {
-    await cache.getItem('random')
+    await cache.get(uuid())
     return true
   }
   catch (err) {
     logger.error(err)
+    captureException(err)
     return false
   }
 }
@@ -56,12 +56,12 @@ export async function isCacheUp(): Promise<boolean> {
  */
 export async function isDBUp(): Promise<boolean> {
   try {
-    await dbInterface().exec(`select 1`)
+    await dbInterface.exec(`select 1`)
     return true
   }
   catch (err) {
-    console.warn(err)
     logger.error(err)
+    captureException(err)
     return false
   }
 }
@@ -84,7 +84,6 @@ export async function getUsers(): Promise<UserSelect[]> {
   return result
 }
 
-/* User Queries - Start */
 /**
  * @export
  * @async
@@ -146,4 +145,3 @@ export async function deleteUser(id: string): Promise<UserSelect> {
   await cache.del('all_users')
   return deletedUser
 }
-/* User Queries - Start */

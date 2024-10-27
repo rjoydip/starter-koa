@@ -1,13 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import cache from '../src/cache'
-
-vi.mock('unstorage/drivers/redis', () => ({
-  default: (options: any) => ({
-    getItem: async (key: string) => options.store.get(key),
-    setItem: async (key: string, value: any) => options.store.set(key, value),
-    removeItem: async (key: string) => options.store.delete(key),
-  }),
-}))
 
 describe('⬢ Validate cache', () => {
   it('● should set and retrieve a cache item', async () => {

@@ -32,9 +32,15 @@ describe('⬢ Validate db', () => {
     role: 'admin',
   }
 
+  it('● should check if the database connector', async () => {
+    expect(dbInterface.dialect).toBe('postgresql')
+  })
+
   it('● should check if the database is not up', async () => {
-    vi.spyOn(dbInterface(), 'exec').mockRejectedValueOnce(new Error('Error'))
-    expect(await isDBUp()).toBeFalsy()
+    const mockError = new Error('Database connection failed')
+    vi.spyOn(dbInterface, 'exec').mockRejectedValueOnce(mockError)
+    const result = await isDBUp()
+    expect(result).toBe(false)
   })
 
   it('● should check if the cache is not up', async () => {
@@ -50,32 +56,34 @@ describe('⬢ Validate db', () => {
     expect(await isCacheUp()).toBeTruthy()
   })
 
-  it.sequential('● should insert and retrieve a user', async () => {
-    const result = await createUser(testUser)
-    expect(result).toBeDefined()
-    expect(result?.name).toBe(testUser.name)
-    expect(result?.email).toBe(testUser.email)
-    if (result) {
-      id = result.id
-    }
-  })
+  describe('⬢ Validate db user', () => {
+    it.sequential('● should insert and retrieve a user', async () => {
+      const result = await createUser(testUser)
+      expect(result).toBeDefined()
+      expect(result?.name).toBe(testUser.name)
+      expect(result?.email).toBe(testUser.email)
+      if (result) {
+        id = result.id
+      }
+    })
 
-  it.sequential('● should fetch all users', async () => {
-    const users = await getUsers()
-    expect(users.length).toBeGreaterThan(0)
-  })
+    it.sequential('● should fetch all users', async () => {
+      const users = await getUsers()
+      expect(users.length).toBeGreaterThan(0)
+    })
 
-  it.sequential('● should fetch all users multiple times', async () => {
-    const users1 = await getUsers()
-    const users2 = await getUsers()
-    const users3 = await getUsers()
-    expect(users1.length).toBeGreaterThan(0)
-    expect(users2.length).toBeGreaterThan(0)
-    expect(users3.length).toBeGreaterThan(0)
-  })
+    it.sequential('● should fetch all users multiple times', async () => {
+      const users1 = await getUsers()
+      const users2 = await getUsers()
+      const users3 = await getUsers()
+      expect(users1.length).toBeGreaterThan(0)
+      expect(users2.length).toBeGreaterThan(0)
+      expect(users3.length).toBeGreaterThan(0)
+    })
 
-  it.sequential('● should delete user', async () => {
-    const deletedUser = await deleteUser(id)
-    expect(deletedUser.id).toStrictEqual(id)
+    it.sequential('● should delete user', async () => {
+      const deletedUser = await deleteUser(id)
+      expect(deletedUser.id).toStrictEqual(id)
+    })
   })
 })
