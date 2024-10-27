@@ -13,11 +13,8 @@ Koa application starter. A simple and single file logic separation.
 ✅ Drizzle <br>
 ✅ GraphQL Yoga <br>
 ✅ Unstorage <br>
-  ✅ Cache <br>
-    ✅ Upstash <br>
-  ✅ DB <br>
-    ✅ PostgreSQL <br>
-      ✅ NeonDB <br>
+✅ DB0 <br>
+  ✅ PostgreSQL <br>
 ✅ tRPC <br>
 ✅ Cossws <br>
 ✅ Scalar <br>
@@ -61,7 +58,7 @@ pnpm run lint # or nr lint
 For test
 
 ```sh
-pnpm test # or nr test
+npx dotenvx run -- test # or npx dotenvx run -- nr test
 ```
 
 For setup and verify
@@ -120,14 +117,12 @@ method=deleteUser&id=<USER_ID>
   - [x] Actions
     - [x] Parallel
 - [x] Cache
-  - [x] Upstash
-    - [x] Redis
+  - [x] Redis
 - [x] Password
   - [x] Encryption
   - [x] Exclude from return
 - [] DB
-  - [x] DB0
-    - [x] PostgresSQL
+  - [x] PostgresSQL
   - [ ] Seed
 - [ ] Features
   - [ ] Filtering
