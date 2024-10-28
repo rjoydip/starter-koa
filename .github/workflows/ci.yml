@@ -39,30 +39,29 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - uses: ikalnytskyi/action-setup-postgres@v7
+        id: postgres
 
       - run: npm i -g @antfu/ni
       - run: nci
       - run: nr build
 
-      - name: Get git branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v8
+      - name: DB Initialize
+        env:
+          PGSERVICE: ${{ steps.postgres.outputs.service-name }}
+        run: |
+          createuser starter
+          createdb --owner starter koadb
+          psql -c "ALTER USER starter WITH PASSWORD 'starter'"
 
-      - uses: neondatabase/create-branch-action@v5
-        id: create-branch
-        with:
-          project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch_name: testing/${{ matrix.platform }}/${{ steps.branch-name.outputs.current_branch }}
-          username: koadb_owner
-          database: koadb
-          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: DB Checking
+        env:
+          PGSERVICE: ${{ steps.postgres.outputs.service-name }}
+        run: |
+          psql ${{ steps.postgres.outputs.connection-uri }} -c "SELECT 1"
+          psql service=${{ steps.postgres.outputs.service-name }} -c "SELECT 1"
+          psql -c "SELECT 1"
 
       - run: nr test
         env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
-
-      - uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch: testing/${{ matrix.platform }}/${{ steps.branch-name.outputs.current_branch }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+          DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
