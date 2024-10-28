@@ -62,6 +62,9 @@ jobs:
           psql service=${{ steps.postgres.outputs.service-name }} -c "SELECT 1"
           psql -c "SELECT 1"
 
-      - run: nr test
+      - run: |
+          npx drizzle-kit generate
+          npx drizzle-kit migrate
+          nr test
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
