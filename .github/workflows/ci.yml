@@ -40,9 +40,11 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Set up Docker
+      - name: SetUP Choco
         if: matrix.platform == 'windows-latest'
-        uses: crazy-max/ghaction-setup-docker@v3
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
 
       - uses: ikalnytskyi/action-setup-postgres@v7
         id: postgres
@@ -57,8 +59,7 @@ jobs:
 
       - name: Set up Redis on Windows using Docker
         if: matrix.platform == 'windows-latest'
-        run: |
-          docker run -d -p 6379:6379 --name redis redis
+        run: choco install redis
 
       - run: npm i -g @antfu/ni
       - run: nci
