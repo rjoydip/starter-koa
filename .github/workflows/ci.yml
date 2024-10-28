@@ -41,11 +41,19 @@ jobs:
           node-version: '18'
       - uses: ikalnytskyi/action-setup-postgres@v7
         id: postgres
-      - uses: shogo82148/actions-setup-redis@v1
+      
+      - name: Set up Redis on Ubuntu and macOS
+        if: matrix.platform != 'windows-latest'
+        uses: shogo82148/actions-setup-redis@v1
         id: redis
         with:
           redis-version: '7'
           redis-port: '6379'
+
+      - name: Set up Redis on Windows using Docker
+        if: matrix.platform == 'windows-latest'
+        run: |
+          docker run -d -p 6379:6379 --name redis redis
 
       - run: npm i -g @antfu/ni
       - run: nci
@@ -68,7 +76,7 @@ jobs:
           psql -c "SELECT 1"
 
       - run: |
-          redis-cli -h 127.0.0.1 -p "${{ steps.redis.outputs.redis-port }}" ping
+          redis-cli -h 127.0.0.1 -p 6379 ping
 
       - name: Unit testing
         run: |
@@ -77,4 +85,4 @@ jobs:
           nr test
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
-          CACHE_URL: 'redis://127.0.0.1:${{ steps.redis.outputs.redis-port }}'
+          CACHE_URL: 'redis://127.0.0.1:6379'
