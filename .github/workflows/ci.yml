@@ -44,7 +44,6 @@ jobs:
       - uses: shogo82148/actions-setup-redis@v1
         id: redis
         with:
-          distribution: koacache
           redis-version: '7'
           redis-port: '0'
           redis-tls-port: '6379'
