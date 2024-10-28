@@ -27,7 +27,7 @@ jobs:
 
   test:
     runs-on: ${{ matrix.platform }}
-    concurrency: ${{ matrix.platform }}-${{ github.ref }}
+
     strategy:
       matrix:
         node: [lts/*]
