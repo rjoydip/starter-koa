@@ -26,6 +26,7 @@ Koa application starter. A simple and single file logic separation.
 - ✅ Sentry
 - ✅ Zod
 - ✅ Vitest
+- ✅ Autocannon
 
 ## Development
 
