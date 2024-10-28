@@ -1,29 +1,11 @@
-import type { UserInput, UserSelect } from '../src/schema.ts'
-import { faker } from '@faker-js/faker/locale/en'
+import type { UserSelect } from '../src/schema.ts'
 import { describe, expect, it } from 'vitest'
 import resolvers from '../src/resolvers.ts'
-
-const {
-  person,
-  internet,
-  phone,
-  datatype,
-  location,
-} = faker
+import { getTestUser } from './_seed.ts'
 
 describe('⬢ Validate resolvers', () => {
   const query = resolvers.Query
   const mutation = resolvers.Mutation
-
-  const testUser: UserInput = {
-    name: person.fullName(),
-    email: internet.email(),
-    phone: phone.number({ style: 'international' }),
-    isVerified: datatype.boolean(),
-    password: internet.password(),
-    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
-    role: 'admin',
-  }
 
   describe('⬢ Validate main resolvers', () => {
     it('● should validate query health', async () => {
@@ -72,7 +54,7 @@ describe('⬢ Validate resolvers', () => {
 
     it.sequential('● should validate mutation createUser', async () => {
       const { createUser } = mutation
-      const $ = await createUser(null, { input: { ...testUser } })
+      const $ = await createUser(null, { input: { ...getTestUser() } })
       expect($).toBeDefined()
       expect($?.id).toBeDefined()
       if ($.id) {
@@ -85,12 +67,13 @@ describe('⬢ Validate resolvers', () => {
       const { updateUser } = mutation
       const user: UserSelect = await getUser(null, { id })
       if (id === user.id) {
+        const { name, email } = getTestUser()
         const $ = await updateUser(null, {
           id,
           input: {
             ...user[0],
-            name: person.fullName(),
-            email: internet.email(),
+            name,
+            email,
           },
         })
         expect($).toBeDefined()

@@ -1,5 +1,3 @@
-import type { UserInput } from '../src/schema.ts'
-import { faker } from '@faker-js/faker/locale/en'
 import { describe, expect, it, vi } from 'vitest'
 import cache from '../src/cache.ts'
 import {
@@ -10,27 +8,10 @@ import {
   isCacheUp,
   isDBUp,
 } from '../src/db.ts'
-
-const {
-  person,
-  internet,
-  phone,
-  datatype,
-  location,
-} = faker
+import { getTestUser } from './_seed.ts'
 
 describe('⬢ Validate db', () => {
   let id: string
-
-  const testUser: UserInput = {
-    name: person.fullName(),
-    email: internet.email(),
-    phone: phone.number({ style: 'international' }),
-    isVerified: datatype.boolean(),
-    password: internet.password(),
-    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
-    role: 'admin',
-  }
 
   it('● should check if the database connector', async () => {
     expect(dbInterface.dialect).toBe('postgresql')
@@ -58,6 +39,7 @@ describe('⬢ Validate db', () => {
 
   describe('⬢ Validate db user', () => {
     it.sequential('● should insert and retrieve a user', async () => {
+      const testUser = getTestUser()
       const result = await createUser(testUser)
       expect(result).toBeDefined()
       expect(result?.name).toBe(testUser.name)

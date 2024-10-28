@@ -48,6 +48,10 @@ export interface IConfig {
    * @type {?string}
    */
   cache_url?: string
+  /**
+   * @type {?string}
+   */
+  cache_ttl?: number
 }
 
 const {
@@ -61,6 +65,7 @@ const {
   MONITOR_DNS = '',
   DATABASE_URL = '',
   CACHE_URL = '',
+  CACHE_TTL = 0,
 } = env
 
 export default {
@@ -74,4 +79,5 @@ export default {
   runtime: RUNTIME as Runtime,
   db_url: DATABASE_URL,
   cache_url: CACHE_URL,
+  cache_ttl: Number(CACHE_TTL),
 }
