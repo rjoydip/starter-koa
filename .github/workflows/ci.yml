@@ -41,6 +41,13 @@ jobs:
           node-version: '18'
       - uses: ikalnytskyi/action-setup-postgres@v7
         id: postgres
+      - uses: shogo82148/actions-setup-redis@v1
+        id: redis
+        with:
+          distribution: koacache
+          redis-version: '7'
+          redis-port: '0'
+          redis-tls-port: '6379'
 
       - run: npm i -g @antfu/ni
       - run: nci
@@ -63,8 +70,17 @@ jobs:
           psql -c "SELECT 1"
 
       - run: |
+          redis-cli -h 127.0.0.1 -p "${{ steps.redis.outputs.redis-tls-port }}" \
+            --tls \
+            --cert "${{ steps.redis.outputs.redis-tls-dir }}/redis.crt" \
+            --key "${{ steps.redis.outputs.redis-tls-dir }}/redis.key" \
+            --cacert "${{ steps.redis.outputs.redis-tls-dir }}/ca.crt" \
+            ping
+
+      - run: |
           npx drizzle-kit generate
           npx drizzle-kit migrate
           nr test
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
+          CACHE_URL: 'rediss://127.0.0.1:${{ steps.redis.outputs.redis-tls-port }}'
