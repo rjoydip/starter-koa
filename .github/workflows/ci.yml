@@ -45,8 +45,7 @@ jobs:
         id: redis
         with:
           redis-version: '7'
-          redis-port: '0'
-          redis-tls-port: '6379'
+          redis-port: '6379'
 
       - run: npm i -g @antfu/ni
       - run: nci
@@ -69,12 +68,7 @@ jobs:
           psql -c "SELECT 1"
 
       - run: |
-          redis-cli -h 127.0.0.1 -p "${{ steps.redis.outputs.redis-tls-port }}" \
-            --tls \
-            --cert "${{ steps.redis.outputs.redis-tls-dir }}/redis.crt" \
-            --key "${{ steps.redis.outputs.redis-tls-dir }}/redis.key" \
-            --cacert "${{ steps.redis.outputs.redis-tls-dir }}/ca.crt" \
-            ping
+          redis-cli -h 127.0.0.1 -p "${{ steps.redis.outputs.redis-port }}" ping
 
       - run: |
           npx drizzle-kit generate
