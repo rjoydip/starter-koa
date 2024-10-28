@@ -16,9 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - run: bun i -g @antfu/ni
+      - run: npm i -g @antfu/ni
       - run: nci
       - run: nr lint
       - run: nr typecheck
@@ -34,9 +36,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - run: bun i -g @antfu/ni
+      - run: npm i -g @antfu/ni
       - run: nci
       - run: nr build
 

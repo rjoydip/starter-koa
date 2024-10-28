@@ -9,20 +9,20 @@ Koa application starter. A simple and single file logic separation.
 > is being used as package manager but application and some other script are
 > working through node.
 
-✅ Koa <br>
-✅ Drizzle <br>
-✅ GraphQL Yoga <br>
-✅ Unstorage <br>
-✅ DB0 <br>
-  ✅ PostgreSQL <br>
-✅ tRPC <br>
-✅ Cossws <br>
-✅ Scalar <br>
-✅ OpenAPI <br>
-✅ Sentry <br>
-✅ Zod <br>
-✅ Vitest <br>
-✅ Unbuild <br>
+- ✅ Koa
+- ✅ Drizzle
+- ✅ GraphQL Yoga
+- ✅ Unstorage
+- ✅ DB0
+  - ✅ PostgreSQL
+- ✅ tRPC
+- ✅ Cossws
+- ✅ Scalar
+- ✅ OpenAPI
+- ✅ Sentry
+- ✅ Zod
+- ✅ Vitest
+- ✅ Unbuild
 
 ## Development
 
@@ -55,7 +55,7 @@ For lint
 pnpm run lint # or nr lint
 ```
 
-For test
+For test, dotenvx will pick `.env` file
 
 ```sh
 npx dotenvx run -- test # or npx dotenvx run -- nr test
