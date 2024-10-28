@@ -57,7 +57,7 @@ jobs:
           redis-version: '7'
           redis-port: '6379'
 
-      - name: Set up Redis on Windows using Docker
+      - name: Set up Redis on Windows
         if: matrix.platform == 'windows-latest'
         run: choco install redis
 
@@ -80,9 +80,14 @@ jobs:
           psql ${{ steps.postgres.outputs.connection-uri }} -c "SELECT 1"
           psql service=${{ steps.postgres.outputs.service-name }} -c "SELECT 1"
           psql -c "SELECT 1"
-
-      - run: |
-          redis-cli -h 127.0.0.1 -p 6379 ping
+      
+      - name: Run Redis on Ubuntu and macOS
+        if: matrix.platform != 'windows-latest'
+        run: redis-cli -h 127.0.0.1 -p 6379 ping
+      
+      - name: Run Redis on Windows
+        if: matrix.platform == 'windows-latest'
+        run: redis-server
 
       - name: Unit testing
         run: |
