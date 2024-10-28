@@ -80,14 +80,16 @@ jobs:
           psql ${{ steps.postgres.outputs.connection-uri }} -c "SELECT 1"
           psql service=${{ steps.postgres.outputs.service-name }} -c "SELECT 1"
           psql -c "SELECT 1"
-      
+
       - name: Run Redis on Ubuntu and macOS
         if: matrix.platform != 'windows-latest'
         run: redis-cli -h 127.0.0.1 -p 6379 ping
-      
+
       - name: Run Redis on Windows
         if: matrix.platform == 'windows-latest'
-        run: redis-server
+        run: |
+          redis-server --daemonize yes # Run in background
+          redis-cli ping
 
       - name: Unit testing
         run: |
@@ -97,3 +99,7 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
           CACHE_URL: 'redis://127.0.0.1:6379'
+
+      - name: Shutdown
+        run: |
+          redis-cli shutdown
