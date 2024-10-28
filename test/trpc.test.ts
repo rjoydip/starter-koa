@@ -1,34 +1,15 @@
-import type { UserInput } from '../src/schema'
-import { faker } from '@faker-js/faker/locale/en'
 import { initTRPC } from '@trpc/server'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import { createApplication } from '../src/app'
 import { tRPCRouter } from '../src/trpc'
-
-const {
-  person,
-  internet,
-  phone,
-  datatype,
-  location,
-} = faker
+import { getTestUser } from './_seed'
 
 const app = createApplication()
 const app$ = app.callback()
 
 describe('⬢ Validate tRPC', () => {
   let _id: string
-
-  const testUser: UserInput = {
-    name: person.fullName(),
-    email: internet.email(),
-    phone: phone.number({ style: 'international' }),
-    isVerified: datatype.boolean(),
-    password: internet.password(),
-    address: `${location.streetAddress()}, ${location.city()}, ${location.state()}, ${location.zipCode()}, ${location.country()}`,
-    role: 'admin',
-  }
 
   describe('⬢ Validate routes', () => {
     it.sequential('● should get response form getUsers', async () => {
@@ -45,7 +26,7 @@ describe('⬢ Validate tRPC', () => {
       const { createCallerFactory } = t
       const createCaller = createCallerFactory(tRPCRouter)
       const caller = createCaller({})
-      const r = await caller.createUser(testUser)
+      const r = await caller.createUser(getTestUser())
       if (r.id) {
         _id = String(r.id)
       }
@@ -69,7 +50,7 @@ describe('⬢ Validate tRPC', () => {
       const r = await caller.updateUser({
         id: _id,
         payload: {
-          ...testUser,
+          ...getTestUser(),
           address: 'Skolspåret 81, 533 18 LUNDSBRUNN, United States',
         },
       })

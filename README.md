@@ -58,7 +58,7 @@ pnpm run lint # or nr lint
 For test, dotenvx will pick `.env` file
 
 ```sh
-npx dotenvx run -- test # or npx dotenvx run -- nr test
+npx dotenvx run -- pnpm run test # or npx dotenvx run -- nr test
 ```
 
 For setup and verify
@@ -120,9 +120,9 @@ method=deleteUser&id=<USER_ID>
 - [x] Password
   - [x] Encryption
   - [x] Exclude from return
-- [] DB
+- [x] DB
   - [x] PostgresSQL
-  - [ ] Seed
+  - [x] Seed
 - [ ] Features
   - [ ] Filtering
   - [ ] Authentication
