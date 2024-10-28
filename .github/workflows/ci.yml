@@ -70,10 +70,11 @@ jobs:
       - run: |
           redis-cli -h 127.0.0.1 -p "${{ steps.redis.outputs.redis-port }}" ping
 
-      - run: |
+      - name: Unit testing
+        run: |
           npx drizzle-kit generate
           npx drizzle-kit migrate
           nr test
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
-          CACHE_URL: 'rediss://127.0.0.1:${{ steps.redis.outputs.redis-tls-port }}'
+          CACHE_URL: 'rediss://127.0.0.1:${{ steps.redis.outputs.redis-port }}'
