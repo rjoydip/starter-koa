@@ -67,7 +67,7 @@ For setup and verify
 pnpm run _setup # or nr _setup
 ```
 
-For benchmarking
+For benchmarking. For in-depth diagnosis use [clinic](https://github.com/clinicjs/node-clinic) `doctor` & `flame`.
 
 ```sh
 pnpm run benchmark # or nr benchmark
