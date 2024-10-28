@@ -67,6 +67,12 @@ For setup and verify
 pnpm run _setup # or nr _setup
 ```
 
+For benchmarking
+
+```sh
+pnpm run benchmark # or nr benchmark
+```
+
 ## API
 
 After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client.
@@ -127,7 +133,7 @@ method=deleteUser&id=<USER_ID>
 - [ ] Features
   - [ ] Filtering
   - [ ] Authentication
-  - [ ] Benchmarking
+  - [x] Benchmarking
 
 ## License
 
