@@ -77,4 +77,4 @@ jobs:
           nr test
         env:
           DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
-          CACHE_URL: 'rediss://127.0.0.1:${{ steps.redis.outputs.redis-port }}'
+          CACHE_URL: 'redis://127.0.0.1:${{ steps.redis.outputs.redis-port }}'
