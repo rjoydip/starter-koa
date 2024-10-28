@@ -12,17 +12,20 @@ Koa application starter. A simple and single file logic separation.
 - ✅ Koa
 - ✅ Drizzle
 - ✅ GraphQL Yoga
-- ✅ Unstorage
-- ✅ DB0
-  - ✅ PostgreSQL
+- ✅ UnJS
+  - ✅ Unbuild
+  - ✅ Unstorage
+    - ✅ Cache
+      - ✅ Redis
+  - ✅ DB0
+    - ✅ PostgreSQL
+  - ✅ Cossws
 - ✅ tRPC
-- ✅ Cossws
 - ✅ Scalar
 - ✅ OpenAPI
 - ✅ Sentry
 - ✅ Zod
 - ✅ Vitest
-- ✅ Unbuild
 
 ## Development
 
@@ -58,7 +61,7 @@ pnpm run lint # or nr lint
 For test, dotenvx will pick `.env` file
 
 ```sh
-npx dotenvx run -- test # or npx dotenvx run -- nr test
+npx dotenvx run -- pnpm run test # or npx dotenvx run -- nr test
 ```
 
 For setup and verify
@@ -112,11 +115,10 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Testing
-  - [ ] Unit test
-    - [ ] Mock
-      - [ ] DB
-      - [x] Cache
+- [x] Testing
+  - [x] Unit test
+    - [x] DB
+    - [x] Cache
     - [x] Websocket
   - [ ] StepCI
 - [x] CI
@@ -127,9 +129,9 @@ method=deleteUser&id=<USER_ID>
 - [x] Password
   - [x] Encryption
   - [x] Exclude from return
-- [] DB
+- [x] DB
   - [x] PostgresSQL
-  - [ ] Seed
+  - [x] Seed
 - [ ] Features
   - [ ] Filtering
   - [ ] Authentication

@@ -40,29 +40,62 @@ jobs:
         with:
           node-version: '18'
 
+      - name: SetUP Choco
+        if: matrix.platform == 'windows-latest'
+        uses: crazy-max/ghaction-chocolatey@v3
+        with:
+          args: -h
+
+      - uses: ikalnytskyi/action-setup-postgres@v7
+        id: postgres
+
+      - name: Set up Redis on Ubuntu and macOS
+        if: matrix.platform != 'windows-latest'
+        uses: shogo82148/actions-setup-redis@v1
+        id: redis
+        with:
+          redis-version: '7'
+          redis-port: '6379'
+
+      - name: Set up Redis on Windows
+        if: matrix.platform == 'windows-latest'
+        run: choco install redis
+
       - run: npm i -g @antfu/ni
       - run: nci
       - run: nr build
 
-      - name: Get git branch name
-        id: branch-name
-        uses: tj-actions/branch-names@v8
-
-      - uses: neondatabase/create-branch-action@v5
-        id: create-branch
-        with:
-          project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch_name: testing/${{ matrix.platform }}/${{ steps.branch-name.outputs.current_branch }}
-          username: koadb_owner
-          database: koadb
-          api_key: ${{ secrets.NEON_API_KEY }}
-
-      - run: nr test
+      - name: DB Initialize
         env:
-          DATABASE_URL: ${{ steps.create-branch.outputs.db_url }}
+          PGSERVICE: ${{ steps.postgres.outputs.service-name }}
+        run: |
+          createuser starter
+          createdb --owner starter koadb
+          psql -c "ALTER USER starter WITH PASSWORD 'starter'"
 
-      - uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ secrets.NEON_PROJ_ID }}
-          branch: testing/${{ matrix.platform }}/${{ steps.branch-name.outputs.current_branch }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+      - name: DB Checking
+        env:
+          PGSERVICE: ${{ steps.postgres.outputs.service-name }}
+        run: |
+          psql ${{ steps.postgres.outputs.connection-uri }} -c "SELECT 1"
+          psql service=${{ steps.postgres.outputs.service-name }} -c "SELECT 1"
+          psql -c "SELECT 1"
+
+      - name: Run Redis on Ubuntu and macOS
+        if: matrix.platform != 'windows-latest'
+        run: redis-cli -h 127.0.0.1 -p 6379 ping
+
+      - name: Run Redis on Windows
+        if: matrix.platform == 'windows-latest'
+        run: |
+          redis-server --daemonize yes # Run in background
+          redis-cli ping
+
+      - name: Unit testing
+        run: |
+          npx drizzle-kit generate
+          npx drizzle-kit migrate
+          nr test
+        env:
+          DATABASE_URL: ${{ steps.postgres.outputs.connection-uri }}
+          CACHE_URL: 'redis://127.0.0.1:6379'
