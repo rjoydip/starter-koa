@@ -39,9 +39,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+      - name: Set up Docker
+        if: matrix.platform == 'windows-latest'
+        uses: crazy-max/ghaction-setup-docker@v3
+
       - uses: ikalnytskyi/action-setup-postgres@v7
         id: postgres
-      
+
       - name: Set up Redis on Ubuntu and macOS
         if: matrix.platform != 'windows-latest'
         uses: shogo82148/actions-setup-redis@v1
