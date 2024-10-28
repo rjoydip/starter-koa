@@ -106,11 +106,10 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Testing
-  - [ ] Unit test
-    - [ ] Mock
-      - [ ] DB
-      - [x] Cache
+- [x] Testing
+  - [x] Unit test
+    - [x] DB
+    - [x] Cache
     - [x] Websocket
   - [ ] StepCI
 - [x] CI
