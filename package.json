@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@9.12.3",
-  "description": "Koa application starter. A simple and single file logic separation.",
+  "description": "Koa application starter. Simple & logical separation on single file",
   "author": "Joydip Roy <joydipand@gmail.com>",
   "license": "MIT",
   "funding": "https://github.com/sponsors/rjoydip",
@@ -52,7 +52,7 @@
     "start": "node --env-file=.env dist/index.mjs",
     "dev": "tsx watch --env-file=.env src/index.ts",
     "test": "vitest run --typecheck --coverage",
-    "benchmark": "tsx --env-file=.env src/benchmark.ts",
+    "benchmark": "tsx --env-file=.env scripts/_benchmark.ts",
     "prepare": "simple-git-hooks",
     "typecheck": "tsc --noEmit --skipLibCheck"
   },

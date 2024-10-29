@@ -1,10 +1,13 @@
-openapi: 3.0.0
+openapi: 3.1.0
+
 info:
   title: API Spec
   version: 0.0.0
   description: API Spec
+
 servers:
   - url: http://127.0.0.1:3000/api
+
 paths:
   /users:
     get:
@@ -32,6 +35,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
   /user/{id}:
     get:
       summary: Get user by ID
@@ -111,6 +115,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
   /user:
     post:
       summary: Create a new user
@@ -133,12 +138,76 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update user
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User details stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '500':
+          description: Failed to store user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: Delete user
+      operationId: deleteUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User details stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '500':
+          description: Failed to store user details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        summary: Delete user
+        operationId: deleteUser
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        responses:
+          '200':
+            description: User details stored successfully
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/SuccessResponse'
+          '500':
+            description: Failed to store user details
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     User:
       type: object
       properties:
-        _id:
+        id:
           type: string
         name:
           type: string

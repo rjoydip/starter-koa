@@ -5,10 +5,9 @@ import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
 import { createError, createSuccess } from './message.ts'
-import resolvers from './resolvers.ts'
+import { resolvers } from './resolvers.ts'
 import { apiDocs } from './scalar.ts'
 import { graphqlSchema, insertUserSchema } from './schema.ts'
-
 import {
   API_PREFIX,
   captureException,
@@ -20,10 +19,8 @@ import { wsTemplete } from './ws.ts'
 
 const yoga = createYoga({
   landingPage: true,
-  schema: graphqlSchema,
+  schema: graphqlSchema(),
 })
-
-const { Mutation, Query } = resolvers
 
 /**
  * Main application routes
@@ -60,7 +57,7 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await Query.health()
+      const payload = await resolvers.Query.health()
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
@@ -71,7 +68,7 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await Query._metrics()
+      const payload = await resolvers.Query._metrics()
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
@@ -82,7 +79,7 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await Query._meta()
+      const payload = await resolvers.Query._meta()
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
@@ -154,7 +151,7 @@ const userRoutes: IRouter[] = [
     middleware: [],
     defineHandler: async (ctx: Context) => {
       try {
-        const data = await Query.getUsers()
+        const data = await resolvers.Query.getUsers()
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           status: HTTP_STATUS_CODE[200],
@@ -195,7 +192,7 @@ const userRoutes: IRouter[] = [
     middleware: [requestValidator<UserInput>(insertUserSchema)],
     defineHandler: async (ctx: Context) => {
       try {
-        const data = await Mutation.createUser(null, { input: ctx.request.body })
+        const data = await resolvers.Mutation.createUser(null, { input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details stored successfully',
@@ -219,7 +216,7 @@ const userRoutes: IRouter[] = [
     middleware: [requestValidator<UserInput>(insertUserSchema), userValidator()],
     defineHandler: async (ctx: Context) => {
       try {
-        const data = await Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
+        const data = await resolvers.Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User details updates successfully',
@@ -244,7 +241,7 @@ const userRoutes: IRouter[] = [
     middleware: [userValidator()],
     defineHandler: async (ctx: Context) => {
       try {
-        await Mutation.deleteUser(null, { id: ctx.params.id })
+        await resolvers.Mutation.deleteUser(null, { id: ctx.params.id })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           message: 'User delete successfully',

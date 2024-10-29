@@ -2,12 +2,10 @@
 
 [![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
 
-Koa application starter. A simple and single file logic separation.
+Koa application starter. Simple & logical separation on single file.
 
 > [!NOTE]
-> This project is in the early stages and under development. Although the pnpm
-> is being used as package manager but application and some other script are
-> working through node.
+> This project is in the early stages and under development.
 
 - ✅ Koa
 - ✅ Drizzle

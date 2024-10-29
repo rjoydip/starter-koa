@@ -12,7 +12,7 @@ import {
   updateUser,
 } from './db.ts'
 
-export default {
+export const resolvers = {
   Query: {
     _metrics(): {
       data: IMetrics

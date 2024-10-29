@@ -1,10 +1,8 @@
 import { initTRPC } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import { z } from 'zod'
-import resolvers from './resolvers'
+import { resolvers } from './resolvers'
 import { insertUserSchema } from './schema'
-
-const { Mutation, Query } = resolvers
 
 const t = initTRPC.create()
 const { procedure, router } = t
@@ -18,28 +16,28 @@ export const tRPCRouter = router({
   getUsers: procedure
     .meta({ openapi: { method: 'GET', path: '/users' } })
     .query(async () => {
-      return await Query.getUsers()
+      return await resolvers.Query.getUsers()
     }),
   getUser: procedure
     .input(z.string())
     .query(async ({ input }) => {
-      return await Query.getUser(null, { id: input })
+      return await resolvers.Query.getUser(null, { id: input })
     }),
   createUser: procedure
     .meta({ openapi: { method: 'POST', path: '/user' } })
     .input(insertUserSchema)
     .mutation(async ({ input }) => {
-      return await Mutation.createUser(null, { input })
+      return await resolvers.Mutation.createUser(null, { input })
     }),
   updateUser: procedure
     .input(z.object({ id: z.string(), payload: insertUserSchema }))
     .mutation(async ({ input }) => {
-      return await Mutation.updateUser(null, { id: input.id, input: input.payload })
+      return await resolvers.Mutation.updateUser(null, { id: input.id, input: input.payload })
     }),
   deleteUser: procedure
     .input(z.string())
     .mutation(async ({ input }) => {
-      return await Mutation.deleteUser(null, { id: input })
+      return await resolvers.Mutation.deleteUser(null, { id: input })
     }),
 })
 export type TRPCRouter = typeof tRPCRouter
