@@ -138,69 +138,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    put:
-      summary: Update user
-      operationId: updateUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: User details stored successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '500':
-          description: Failed to store user details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    delete:
-      summary: Delete user
-      operationId: deleteUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: User details stored successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '500':
-          description: Failed to store user details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-        summary: Delete user
-        operationId: deleteUser
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        responses:
-          '200':
-            description: User details stored successfully
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/SuccessResponse'
-          '500':
-            description: Failed to store user details
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
 
 components:
   schemas:
