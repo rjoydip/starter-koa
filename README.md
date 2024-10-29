@@ -75,9 +75,17 @@ For benchmarking. For in-depth diagnosis use [clinic](https://github.com/clinicj
 pnpm run benchmark # or nr benchmark
 ```
 
+For drizzle migrations, `drizzle-kit` already installed as dev dependency.
+
+```sh
+npx dotenvx run -- drizzle-kit generate
+npx dotenvx run -- drizzle-kit migrate
+npx dotenvx run -- drizzle-kit studio
+```
+
 ## API
 
-After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client.
+After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client. For get users (pagination and filtering) pass query params (e.g. `?page=0&pageSize20`)
 
 ## GraphQL
 
