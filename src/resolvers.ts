@@ -1,4 +1,4 @@
-import type { UserInput, UserSelect } from './schema.ts'
+import type { IUserParams, UserInput, UserSelect } from './schema.ts'
 import type { IMetaData, IMetrics } from './types.ts'
 import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
@@ -45,8 +45,8 @@ export const resolvers = {
         },
       }
     },
-    async getUsers(): Promise<UserSelect[]> {
-      return await getUsers()
+    async getUsers(params?: IUserParams): Promise<UserSelect[]> {
+      return await getUsers(params)
     },
     async getUser(_: unknown, { id }: { id: string }): Promise<UserSelect> {
       return await getUser(id)

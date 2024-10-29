@@ -39,6 +39,15 @@ export type UserSelect = z.infer<typeof selectUserSchema>
  */
 export type UserInput = z.infer<typeof insertUserSchema>
 
+/**
+ * @export
+ * @typedef {IUserParams}
+ */
+export interface IUserParams {
+  page?: number
+  pageSize?: number
+}
+
 export function graphqlSchema(): GraphQLSchemaWithContext<any> {
   return createSchema({
     typeDefs,

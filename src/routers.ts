@@ -1,5 +1,5 @@
 import type { Context } from 'koa'
-import type { UserInput } from './schema.ts'
+import type { IUserParams, UserInput } from './schema.ts'
 import type { IRouter } from './types.ts'
 import { parseYAML } from 'confbox/yaml'
 import { createYoga } from 'graphql-yoga'
@@ -151,7 +151,8 @@ const userRoutes: IRouter[] = [
     middleware: [],
     defineHandler: async (ctx: Context) => {
       try {
-        const data = await resolvers.Query.getUsers()
+        const { page, pageSize }: IUserParams = ctx.request.query
+        const data = await resolvers.Query.getUsers({ page, pageSize })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
           status: HTTP_STATUS_CODE[200],

@@ -67,21 +67,40 @@ export async function isDBUp(): Promise<boolean> {
 }
 
 /**
- * @export
- * @async
- * @returns Promise<UserSelect[]>
+ * Retrieves a list of users from the database with optional pagination and filtering.
+ * Results are cached based on the specified page, page size, and filter criteria.
+ *
+ * @param {object} [options] - Options for pagination and filtering.
+ * @param {number} [options.page] - The page number for pagination (default is 1).
+ * @param {number} [options.pageSize] - The number of users per page (default is 10).
+ *        Each key should correspond to a valid user field, and the value represents the filtering criteria.
+ * @returns {Promise<UserSelect[]>} A promise that resolves to an array of users matching the criteria.
+ *
+ * @example
+ * // Retrieve first page of users with default page size
+ * await getUsers()
+ *
+ * @example
+ * // Retrieve second page of users with a page size of 20
+ * await getUsers({ page: 2, pageSize: 20 })
  */
-export async function getUsers(): Promise<UserSelect[]> {
-  const cacheKey = 'all_users'
+export async function getUsers({
+  page = 1,
+  pageSize = 10,
+}: { page?: number, pageSize?: number } = {}): Promise<UserSelect[]> {
+  const offset = (page - 1) * pageSize
 
+  const cacheKey = `users_page_${page}_size_${pageSize}`
   const cachedUsers = await cache.get<UserSelect[]>(cacheKey)
   if (cachedUsers) {
     return cachedUsers
   }
 
-  const result = await db.select(returningFields()).from(users)
-  await cache.set(cacheKey, result)
-  return result
+  const query = db.select(returningFields()).from(users).offset(offset).limit(pageSize)
+  const results = await query.execute()
+
+  await cache.set(cacheKey, results)
+  return results
 }
 
 /**
@@ -115,6 +134,7 @@ export async function createUser(user: UserInput): Promise<UserSelect> {
     ...user,
     password: sha256(user.password),
   }).returning(returningFields())
+  await cache.set(`user_${newUser.id}`, newUser)
   await cache.del('all_users')
   return newUser
 }

@@ -114,7 +114,7 @@ method=deleteUser&id=<USER_ID>
 
 ## TODO
 
-- [ ] Testing
+- [x] Testing
   - [x] Unit test
     - [x] Cache
     - [x] DB
@@ -133,7 +133,8 @@ method=deleteUser&id=<USER_ID>
   - [x] PostgresSQL
   - [x] Seed
 - [ ] Features
-  - [ ] Filtering
+  - [ ] JSDoc
+  - [x] Paginated
   - [ ] Authentication
   - [x] Benchmarking
 
