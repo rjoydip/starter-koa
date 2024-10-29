@@ -1,6 +1,6 @@
 # starter-koa
 
-[![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
+[![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href] [![code style][code-style-src]][code-style-url]
 
 Koa application starter. Simple & logical separation on single file.
 
@@ -148,3 +148,5 @@ method=deleteUser&id=<USER_ID>
 [license-href]: https://github.com/rjoydip/starter-koa/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
 [jsdocs-href]: https://www.jsdocs.io/package/starter-koa
+[code-style-src]: https://antfu.me/badge-code-style.svg
+[code-style-url]: https://github.com/antfu/eslint-config
