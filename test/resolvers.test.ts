@@ -1,7 +1,7 @@
 import type { UserSelect } from '../src/schema.ts'
 import { describe, expect, it } from 'vitest'
-import resolvers from '../src/resolvers.ts'
-import { getTestUser } from './_seed.ts'
+import { getTestUser } from '../scripts/_seed.ts'
+import { resolvers } from '../src/resolvers.ts'
 
 describe('⬢ Validate resolvers', () => {
   const query = resolvers.Query

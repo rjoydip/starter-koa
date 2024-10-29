@@ -51,7 +51,7 @@
     "lint": "eslint . --fix",
     "start": "node --env-file=.env dist/index.mjs",
     "dev": "tsx watch --env-file=.env src/index.ts",
-    "test": "vitest run --typecheck --coverage",
+    "test": "vitest run --typecheck --coverage --coverage.include=src",
     "benchmark": "tsx --env-file=.env scripts/_benchmark.ts",
     "prepare": "simple-git-hooks",
     "typecheck": "tsc --noEmit --skipLibCheck"

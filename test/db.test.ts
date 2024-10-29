@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { getTestUser } from '../scripts/_seed.ts'
 import cache from '../src/cache.ts'
 import {
   createUser,
@@ -8,7 +9,6 @@ import {
   isCacheUp,
   isDBUp,
 } from '../src/db.ts'
-import { getTestUser } from './_seed.ts'
 
 describe('⬢ Validate db', () => {
   let id: string
