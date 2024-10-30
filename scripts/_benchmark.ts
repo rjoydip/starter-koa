@@ -1,8 +1,8 @@
 import { exit } from 'node:process'
 import autocannon from 'autocannon'
 import getPort from 'get-port'
-import logger from './logger'
-import { createServer } from './server'
+import logger from '../src/logger'
+import { createServer } from '../src/server'
 
 (async () => {
   const port = await getPort()

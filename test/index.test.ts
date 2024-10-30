@@ -1,3 +1,6 @@
+import type {
+  Mock,
+} from 'vitest'
 import * as Sentry from '@sentry/node'
 import {
   beforeEach,
@@ -57,5 +60,20 @@ describe('⬢ Validate main', () => {
       tracesSampleRate: 1.0,
       profilesSampleRate: 1.0,
     })
+  })
+
+  it('● should capture an error if Sentry initialization fails', () => {
+    const errorMessage = 'Failed to initialize Sentry'
+    ;(Sentry.init as Mock).mockImplementation(() => {
+      throw new Error(errorMessage)
+    })
+
+    const captureExceptionSpy = vi.spyOn(utils, 'captureException')
+
+    // Call the function that creates the server
+    main()
+
+    // Assert that the captureException was called with the correct error message
+    expect(captureExceptionSpy).toHaveBeenCalledWith(`Error starting server: Error: ${errorMessage}`)
   })
 })

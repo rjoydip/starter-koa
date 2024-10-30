@@ -37,12 +37,12 @@ describe('⬢ Validate types', () => {
       duration: 0,
     }).toMatchTypeOf<IConfig>()
 
-    expectTypeOf<IMessage>({
+    expectTypeOf<IMessage<object>>({
       statusCode: 200,
       message: 'Request success',
       data: {},
     }).toMatchTypeOf()
-    expectTypeOf<IMessage>({
+    expectTypeOf<IMessage<object>>({
       status: 200,
       statusMessage: 'Request success',
       data: {},

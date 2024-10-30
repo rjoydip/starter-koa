@@ -7,9 +7,12 @@ import { resolvers } from './resolvers.ts'
 import { captureException, HTTP_STATUS_CODE } from './utils.ts'
 
 /**
+ * Middleware to validate the request body against a Zod schema.
+ *
  * @export
- * @param {ZodSchema} schema
- * @returns (ctx: Context, next: Next) => Promise<void>
+ * @template T - The type of the schema.
+ * @param {ZodSchema<T>} schema - The Zod schema to validate the request body against.
+ * @returns {(ctx: Context, next: Next) => Promise<void>} The middleware function.
  */
 export function requestValidator<T>(schema: ZodSchema<T>) {
   return async function (ctx: Context, next: Next): Promise<void> {
@@ -37,8 +40,10 @@ export function requestValidator<T>(schema: ZodSchema<T>) {
 }
 
 /**
+ * Middleware to validate the user based on the provided ID in the request parameters.
+ *
  * @export
- * @returns (ctx: Context, next: Next) => Promise<void>
+ * @returns {(ctx: Context, next: Next) => Promise<void>} The middleware function.
  */
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
@@ -69,9 +74,12 @@ export function userValidator() {
 }
 
 /**
+ * Validates the router object for necessary properties and valid HTTP method.
+ *
  * @export
- * @param {(IRouter | null)} [router]
- * @returns boolean
+ * @param {(IRouter | null)} [router] - The router object to validate. Defaults to null.
+ * @returns {boolean} True if the router is valid; otherwise, throws an error.
+ * @throws {Error} If the router is invalid or any required properties are missing.
  */
 export function validateRouter(router: IRouter | null = null): boolean {
   if (!router) {
@@ -97,7 +105,7 @@ export function validateRouter(router: IRouter | null = null): boolean {
     throw new Error('Router method must be a valid HTTP method')
   }
 
-  if (!router.middleware && !Array.isArray(router.middleware)) {
+  if (!router.middleware || !Array.isArray(router.middleware)) {
     throw new Error('Router middleware must be an array')
   }
 
