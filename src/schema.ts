@@ -1,9 +1,10 @@
+import type { GraphQLSchemaWithContext } from 'graphql-yoga'
 import { v4 as uuid } from '@lukeed/uuid/secure'
 import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { createSchema } from 'graphql-yoga'
 import { z } from 'zod'
-import resolvers from './resolvers.ts'
+import { resolvers } from './resolvers.ts'
 import typeDefs from './typedefs.ts'
 
 export const users = pgTable('users', {
@@ -38,7 +39,18 @@ export type UserSelect = z.infer<typeof selectUserSchema>
  */
 export type UserInput = z.infer<typeof insertUserSchema>
 
-export const graphqlSchema = createSchema({
-  typeDefs,
-  resolvers,
-})
+/**
+ * @export
+ * @typedef {IUserParams}
+ */
+export interface IUserParams {
+  page?: number
+  pageSize?: number
+}
+
+export function graphqlSchema(): GraphQLSchemaWithContext<any> {
+  return createSchema({
+    typeDefs,
+    resolvers,
+  })
+}

@@ -1,11 +1,15 @@
 import type { UserSelect } from '../src/schema.ts'
-import { describe, expect, it } from 'vitest'
-import resolvers from '../src/resolvers.ts'
-import { getTestUser } from './_seed.ts'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getTestUser, getUUID } from '../scripts/_seed.ts'
+import { resolvers } from '../src/resolvers.ts'
 
 describe('⬢ Validate resolvers', () => {
   const query = resolvers.Query
   const mutation = resolvers.Mutation
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
 
   describe('⬢ Validate main resolvers', () => {
     it('● should validate query health', async () => {
@@ -39,7 +43,8 @@ describe('⬢ Validate resolvers', () => {
   })
 
   describe('⬢ Validate user resolvers', () => {
-    let id: string = ''
+    let id: string
+
     it('● should validate query getUsers', async () => {
       const { getUsers } = query
       const $ = await getUsers()
@@ -48,7 +53,7 @@ describe('⬢ Validate resolvers', () => {
 
     it('● should validate query getUser', async () => {
       const { getUser } = query
-      const $ = await getUser(null, { id: '111' })
+      const $ = await getUser(null, { id: getUUID() })
       expect($).toBeUndefined()
     })
 
@@ -80,13 +85,13 @@ describe('⬢ Validate resolvers', () => {
       }
     })
 
-    it('● should validate mutation deleteUser', async () => {
-      const { getUsers } = query
+    it.sequential('● should validate mutation deleteUser', async () => {
+      const { getUser } = query
       const { deleteUser } = mutation
-      const users: UserSelect[] = await getUsers()
-      if (users && users[0].id) {
+      const user: UserSelect = await getUser(null, { id })
+      if (user && user.id) {
         await deleteUser(null, {
-          id: users[0].id,
+          id: user.id,
         })
       }
     })

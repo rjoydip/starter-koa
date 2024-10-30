@@ -3,10 +3,8 @@ import type { ZodSchema } from 'zod'
 import type { IRouter } from './types.ts'
 import { HttpMethodEnum } from 'koa-body'
 import { createError } from './message.ts'
-import resolvers from './resolvers.ts'
+import { resolvers } from './resolvers.ts'
 import { captureException, HTTP_STATUS_CODE } from './utils.ts'
-
-const { Query } = resolvers
 
 /**
  * @export
@@ -45,7 +43,7 @@ export function requestValidator<T>(schema: ZodSchema<T>) {
 export function userValidator() {
   return async function (ctx: Context, next: Next): Promise<void> {
     try {
-      const user = await Query.getUser(null, { id: ctx.params.id })
+      const user = await resolvers.Query.getUser(null, { id: ctx.params.id })
       if (user) {
         ctx.state.user = user
         await next()

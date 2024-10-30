@@ -1,9 +1,9 @@
 import { initTRPC } from '@trpc/server'
 import request from 'supertest'
 import { describe, expect, it } from 'vitest'
+import { getTestUser } from '../scripts/_seed'
 import { createApplication } from '../src/app'
 import { tRPCRouter } from '../src/trpc'
-import { getTestUser } from './_seed'
 
 const app = createApplication()
 const app$ = app.callback()

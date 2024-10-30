@@ -1,14 +1,18 @@
 import request from 'supertest'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { getTestUser, getUUID } from '../scripts/_seed.ts'
 import { createApplication } from '../src/app.ts'
 import * as db from '../src/db.ts'
-import resolvers from '../src/resolvers.ts'
-import { getTestUser, getUUID } from './_seed.ts'
+import { resolvers } from '../src/resolvers.ts'
 
 const app = createApplication()
 const app$ = app.callback()
 
 describe('⬢ Validate routes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   describe('⬢ Validate main routes', () => {
     it('● GET /invalid', async () => {
       const { headers, status } = await request(app$)

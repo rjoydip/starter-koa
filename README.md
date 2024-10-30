@@ -1,13 +1,11 @@
 # starter-koa
 
-[![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href]
+[![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href] [![code style][code-style-src]][code-style-url]
 
-Koa application starter. A simple and single file logic separation.
+Koa application starter. Simple & logical separation on single file.
 
 > [!NOTE]
-> This project is in the early stages and under development. Although the pnpm
-> is being used as package manager but application and some other script are
-> working through node.
+> This project is in the early stages and under development.
 
 - ✅ Koa
 - ✅ Drizzle
@@ -26,6 +24,7 @@ Koa application starter. A simple and single file logic separation.
 - ✅ Sentry
 - ✅ Zod
 - ✅ Vitest
+- ✅ Autocannon
 
 ## Development
 
@@ -70,9 +69,23 @@ For setup and verify
 pnpm run _setup # or nr _setup
 ```
 
+For benchmarking. For in-depth diagnosis use [clinic](https://github.com/clinicjs/node-clinic) `doctor` & `flame`.
+
+```sh
+pnpm run benchmark # or nr benchmark
+```
+
+For drizzle migrations, `drizzle-kit` already installed as dev dependency.
+
+```sh
+npx dotenvx run -- drizzle-kit generate
+npx dotenvx run -- drizzle-kit migrate
+npx dotenvx run -- drizzle-kit studio
+```
+
 ## API
 
-After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client.
+After running dev command visit `/references` endpoint. Play around with endpoints with full fledged api client. For get users (pagination and filtering) pass query params (e.g. `?page=0&pageSize20`)
 
 ## GraphQL
 
@@ -111,8 +124,9 @@ method=deleteUser&id=<USER_ID>
 
 - [x] Testing
   - [x] Unit test
-    - [x] DB
     - [x] Cache
+    - [x] DB
+    - [x] OpenAPI
     - [x] Websocket
   - [ ] StepCI
 - [x] CI
@@ -127,9 +141,10 @@ method=deleteUser&id=<USER_ID>
   - [x] PostgresSQL
   - [x] Seed
 - [ ] Features
-  - [ ] Filtering
+  - [ ] JSDoc
+  - [x] Paginated
   - [ ] Authentication
-  - [ ] Benchmarking
+  - [x] Benchmarking
 
 ## License
 
@@ -141,3 +156,5 @@ method=deleteUser&id=<USER_ID>
 [license-href]: https://github.com/rjoydip/starter-koa/blob/main/LICENSE
 [jsdocs-src]: https://img.shields.io/badge/jsdocs-reference-080f12?style=flat&colorA=080f12&colorB=1fa669
 [jsdocs-href]: https://www.jsdocs.io/package/starter-koa
+[code-style-src]: https://antfu.me/badge-code-style.svg
+[code-style-url]: https://github.com/antfu/eslint-config

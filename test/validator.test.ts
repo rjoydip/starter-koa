@@ -2,11 +2,11 @@ import type { UserSelect } from '../src/schema.ts'
 import { HttpMethodEnum } from 'koa-body'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
+import { getDate, getName, getTestUser, getUUID } from '../scripts/_seed.ts'
 import { createApplication } from '../src/app.ts'
-import resolvers from '../src/resolvers.ts'
+import { resolvers } from '../src/resolvers.ts'
 import { getRouter } from '../src/routers.ts'
 import { validateRouter } from '../src/validator.ts'
-import { getDate, getName, getTestUser, getUUID } from './_seed.ts'
 
 const { Query } = resolvers
 const app = createApplication()

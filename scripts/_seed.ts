@@ -25,9 +25,7 @@ function testUser(): UserInput {
 }
 
 export function getTestUsers(number_of_users: number = 0): UserInput[] {
-  return Array.from({ length: number_of_users }).map(() => {
-    return testUser()
-  })
+  return Array.from({ length: number_of_users }).map(() => testUser())
 }
 export function getTestUser(): UserInput {
   return testUser()

@@ -4,7 +4,7 @@ import { defineHooks } from 'crossws'
 import crossws from 'crossws/adapters/node'
 import queryString from 'query-string'
 import logger from './logger.ts'
-import resolvers from './resolvers.ts'
+import { resolvers } from './resolvers.ts'
 import { captureException } from './utils.ts'
 
 const { Mutation, Query } = resolvers
