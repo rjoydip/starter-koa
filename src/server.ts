@@ -9,9 +9,10 @@ import { captureException } from './utils.ts'
 import { ws } from './ws.ts'
 
 /**
- * @export
- * @sync
- * @param {Server} server
+ * Handles graceful shutdown of the server.
+ *
+ * @param {Server} server - The HTTP/HTTPS server to close gracefully.
+ * @returns {void}
  */
 export function handleGracefulShutdown(server: Server): void {
   closeWithGrace(
@@ -29,8 +30,9 @@ export function handleGracefulShutdown(server: Server): void {
 }
 
 /**
- * @export
- * @returns Server
+ * Creates and returns an HTTP/HTTPS server instance.
+ *
+ * @returns {Server} The created HTTP/HTTPS server.
  */
 export function createServer(): Server {
   const app = createApplication()
@@ -38,7 +40,7 @@ export function createServer(): Server {
   const server = config?.isHTTPs
     ? https.createServer(app.callback())
     : http.createServer(app.callback())
-    /* v8 ignore stop */
+  /* v8 ignore stop */
 
   server
     .on('upgrade', ws.handleUpgrade)

@@ -11,6 +11,11 @@ import logger from './logger.ts'
 import { users } from './schema.ts'
 import { captureException } from './utils.ts'
 
+/**
+ * Returns a record of fields for User selection from the database.
+ *
+ * @returns {Record<keyof UserSelect, any>} A record of user fields for selection.
+ */
 function returningFields(): Record<keyof UserSelect, any> {
   return {
     id: users.id,
@@ -25,17 +30,30 @@ function returningFields(): Record<keyof UserSelect, any> {
   }
 }
 
+/**
+ * Database interface for PostgreSQL using `db0`.
+ *
+ * @type {any}
+ */
 export const dbInterface = createDatabase(
   postgresql({
-    url: config.db_url,
+    url: config.db_url!,
   }),
 )
+
+/**
+ * Drizzle ORM database instance.
+ *
+ * @type {any}
+ */
 export const db = drizzle(dbInterface)
 
 /**
- * @export
+ * Checks if the cache storage is operational.
+ *
  * @async
- * @returns Promise<boolean>
+ * @export
+ * @returns {Promise<boolean>} Returns true if cache is accessible, false otherwise.
  */
 export async function isCacheUp(): Promise<boolean> {
   try {
@@ -50,13 +68,15 @@ export async function isCacheUp(): Promise<boolean> {
 }
 
 /**
- * @export
+ * Checks if the database connection is operational.
+ *
  * @async
- * @returns Promise<boolean>
+ * @export
+ * @returns {Promise<boolean>} Returns true if the database is accessible, false otherwise.
  */
 export async function isDBUp(): Promise<boolean> {
   try {
-    await dbInterface.exec(`select 1`)
+    await dbInterface.exec('SELECT 1')
     return true
   }
   catch (err) {
@@ -67,100 +87,117 @@ export async function isDBUp(): Promise<boolean> {
 }
 
 /**
- * Retrieves a list of users from the database with optional pagination and filtering.
- * Results are cached based on the specified page, page size, and filter criteria.
+ * Retrieves a paginated list of users from the database, with optional caching.
  *
- * @param {object} [options] - Options for pagination and filtering.
- * @param {number} [options.page] - The page number for pagination (default is 1).
- * @param {number} [options.pageSize] - The number of users per page (default is 10).
- *        Each key should correspond to a valid user field, and the value represents the filtering criteria.
- * @returns {Promise<UserSelect[]>} A promise that resolves to an array of users matching the criteria.
- *
- * @example
- * // Retrieve first page of users with default page size
- * await getUsers()
- *
- * @example
- * // Retrieve second page of users with a page size of 20
- * await getUsers({ page: 2, pageSize: 20 })
+ * @async
+ * @export
+ * @param {object} [options] - Optional pagination parameters.
+ * @param {number} [options.page] - Page number for pagination.
+ * @param {number} [options.pageSize] - Number of users per page.
+ * @returns {Promise<UserSelect[]>} A promise resolving to an array of users.
  */
 export async function getUsers({
   page = 1,
   pageSize = 10,
 }: { page?: number, pageSize?: number } = {}): Promise<UserSelect[]> {
   const offset = (page - 1) * pageSize
-
   const cacheKey = `users_page_${page}_size_${pageSize}`
+
+  // Attempt to retrieve cached results
   const cachedUsers = await cache.get<UserSelect[]>(cacheKey)
-  if (cachedUsers) {
+  if (cachedUsers)
     return cachedUsers
-  }
 
-  const query = db.select(returningFields()).from(users).offset(offset).limit(pageSize)
-  const results = await query.execute()
+  // Fetch users from database if no cache exists
+  const results = await db.select(returningFields()).from(users).offset(offset).limit(pageSize).execute()
 
+  // Cache the results for future requests
   await cache.set(cacheKey, results)
   return results
 }
 
 /**
- * @export
+ * Retrieves a single user by ID, with optional caching.
+ *
  * @async
- * @param {string} id
- * @returns Promise<UserSelect>
+ * @export
+ * @param {string} id - The ID of the user to retrieve.
+ * @returns {Promise<UserSelect>} A promise resolving to the retrieved user data.
  */
 export async function getUser(id: string): Promise<UserSelect> {
   const cacheKey = `user_${id}`
 
+  // Attempt to retrieve cached user data
   const cachedUser = await cache.get<UserSelect>(cacheKey)
-  if (cachedUser) {
+  if (cachedUser)
     return cachedUser
-  }
 
-  const result = await db.select(returningFields()).from(users).where(eq(users.id, id))
+  // Fetch user data from database if no cache exists
+  const result = await db.select(returningFields()).from(users).where(eq(users.id, id)).execute()
   const user = result[0]
+
+  // Cache the result for future requests
   await cache.set(cacheKey, user)
   return user
 }
 
 /**
- * @export
+ * Creates a new user and stores the result in the cache.
+ *
  * @async
- * @param {UserInput} user
- * @returns Promise<UserInput>
+ * @export
+ * @param {UserInput} user - The user data to insert into the database.
+ * @returns {Promise<UserSelect>} A promise resolving to the created user data.
  */
 export async function createUser(user: UserInput): Promise<UserSelect> {
   const [newUser] = await db.insert(users).values({
     ...user,
-    password: sha256(user.password),
-  }).returning(returningFields())
+    password: sha256(user.password), // Hashes password before storage
+  }).returning(returningFields()).execute()
+
+  // Update cache with the new user data and reset all-users cache
   await cache.set(`user_${newUser.id}`, newUser)
   await cache.del('all_users')
   return newUser
 }
 
 /**
- * @export
+ * Updates a user's data by ID, excluding password, and refreshes the cache.
+ *
  * @async
- * @param {string} id
- * @param {UserInput} user
- * @returns Promise<UserInput>
+ * @export
+ * @param {string} id - The ID of the user to update.
+ * @param {Omit<UserInput, 'password'>} user - Updated user data, excluding password.
+ * @returns {Promise<UserSelect>} A promise resolving to the updated user data.
  */
 export async function updateUser(id: string, user: Omit<UserInput, 'password'>): Promise<UserSelect> {
-  const [updatedUser] = await db.update(users).set({ updatedAt: sql`NOW()`, ...user }).where(eq(users.id, id)).returning(returningFields())
+  const [updatedUser] = await db.update(users)
+    .set({ updatedAt: sql`NOW()`, ...user })
+    .where(eq(users.id, id))
+    .returning(returningFields())
+    .execute()
+
+  // Refresh user cache and reset all-users cache
   await cache.set(`user_${id}`, updatedUser)
   await cache.del('all_users')
   return updatedUser
 }
 
 /**
- * @export
+ * Deletes a user by ID and removes the user from cache.
+ *
  * @async
- * @param {string} id
- * @returns Promise<UserSelect>
+ * @export
+ * @param {string} id - The ID of the user to delete.
+ * @returns {Promise<UserSelect>} A promise resolving to the deleted user data.
  */
 export async function deleteUser(id: string): Promise<UserSelect> {
-  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning(returningFields())
+  const [deletedUser] = await db.delete(users)
+    .where(eq(users.id, id))
+    .returning(returningFields())
+    .execute()
+
+  // Remove deleted user from cache and reset all-users cache
   await cache.del(`user_${id}`)
   await cache.del('all_users')
   return deletedUser

@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import WebSocket from 'ws'
 import config from '../src/config.ts'
 import { createServer } from '../src/server.ts'
-import { ws, wsTemplete } from '../src/ws.ts'
+import { ws, wsTemplate } from '../src/ws.ts'
 
 describe('⬢ Validate ws', () => {
   let server: Server
@@ -22,8 +22,8 @@ describe('⬢ Validate ws', () => {
   })
 
   it('● should validated wsTemplate', () => {
-    expect(wsTemplete()).toBeDefined()
-    expect(wsTemplete({ sse: true })).toBeDefined()
+    expect(wsTemplate()).toBeDefined()
+    expect(wsTemplate({ sse: true })).toBeDefined()
   })
 
   it('● should peers connected', async () => {
@@ -55,10 +55,6 @@ describe('⬢ Validate ws', () => {
   })
 
   it('● should validate close connection', async () => {
-    /* _ws.dispatchEvent(new Event('error'))
-    _ws.send(new Uint8Array(10 ** 6))
-    const error = await new Promise((_, reject) => _ws.addEventListener('error', reject))
-    expect(error).toBeDefined() */
     _ws.close()
     const result = await new Promise(resolve => _ws.addEventListener('close', resolve))
     expect(result).toBeDefined()

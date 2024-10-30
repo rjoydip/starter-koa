@@ -141,7 +141,7 @@ method=deleteUser&id=<USER_ID>
   - [x] PostgresSQL
   - [x] Seed
 - [ ] Features
-  - [ ] JSDoc
+  - [x] JSDoc
   - [x] Paginated
   - [ ] Authentication
   - [x] Benchmarking

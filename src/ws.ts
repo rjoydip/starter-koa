@@ -7,11 +7,11 @@ import logger from './logger.ts'
 import { resolvers } from './resolvers.ts'
 import { captureException } from './utils.ts'
 
+// Resolvers for mutations and queries
 const { Mutation, Query } = resolvers
 
-const hooksMapper: {
-  [x in THooksMapper]: (id: string, input: UserInput) => Promise<any>
-} = {
+// Mapper for hooks that maps actions to corresponding functions
+const hooksMapper: Record<THooksMapper, (id: string, input: UserInput) => Promise<any>> = {
   health: async () => await Query.health(),
   _metrics: async () => await Query._metrics(),
   _meta: async () => await Query._meta(),
@@ -22,6 +22,7 @@ const hooksMapper: {
   deleteUser: async id => await Mutation.deleteUser(null, { id }),
 }
 
+// WebSocket server instance
 export const ws = crossws({
   hooks: defineHooks({
     open(peer) {
@@ -40,21 +41,15 @@ export const ws = crossws({
       })
       const { action, id, ...input } = qs
       if (action === 'ping') {
-        peer.send('pong', {
-          compress: true,
-        })
+        peer.send('pong', { compress: true })
       }
       else if (Object.keys(hooksMapper).includes(action as THooksMapper)) {
         logger.log('Hook matched:', action)
-        peer.send(await hooksMapper[action as THooksMapper](id as string, input as unknown as UserInput), {
-          compress: true,
-        })
+        peer.send(await hooksMapper[action as THooksMapper](id as string, input as unknown as UserInput), { compress: true })
       }
       else {
         logger.log(`Hooks not matched: ${action}`)
-        peer.send('invalid', {
-          compress: true,
-        })
+        peer.send('invalid', { compress: true })
       }
     },
 
@@ -69,7 +64,14 @@ export const ws = crossws({
   }),
 })
 
-export function wsTemplete(opts: { sse?: boolean } = { sse: false }): string {
+/**
+ * Generates an HTML template for the WebSocket playground.
+ *
+ * @export
+ * @param {{ sse?: boolean }} [opts] - Options for the template.
+ * @returns {string} HTML template
+ */
+export function wsTemplate(opts: { sse?: boolean } = { sse: false }): string {
   return /* html */ `
   <!doctype html>
   <html lang="en" data-theme="dark">
@@ -184,19 +186,19 @@ export function wsTemplete(opts: { sse?: boolean } = { sse: false }): string {
             });
 
             fetch(url, {
-               method: 'POST',
-               duplex: 'half',
-               headers: {
+              method: 'POST',
+              duplex: 'half',
+              headers: {
                 'content-type': 'application/octet-stream',
                 'x-ws-id': event.data
-               },
-               body: new ReadableStream({
-                  start(controller) {
-                    _send = (message) => {
-                      controller.enqueue(message);
-                    }
-                  },
-               }).pipeThrough(new TextEncoderStream()),
+              },
+              body: new ReadableStream({
+                start(controller) {
+                  _send = (message) => {
+                    controller.enqueue(message);
+                  }
+                },
+              }).pipeThrough(new TextEncoderStream()),
             }).catch((error) => {
               _send = sendWithFetch;
             });
