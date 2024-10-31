@@ -128,7 +128,7 @@ const mainRoutes: IRouter[] = [
     },
   },
   {
-    name: 'WSTest',
+    name: 'WSPlayground',
     path: '/_ws',
     method: HttpMethodEnum.GET,
     middleware: [],
@@ -205,6 +205,7 @@ const userRoutes: IRouter[] = [
         ctx.body = createError({
           message: 'User details stored failed',
           status: HTTP_STATUS_CODE[500],
+          data: error,
         })
         captureException(error)
       }

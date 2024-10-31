@@ -128,7 +128,7 @@ method=deleteUser&id=<USER_ID>
     - [x] DB
     - [x] OpenAPI
     - [x] Websocket
-  - [ ] StepCI
+  - [x] StepCI
 - [x] CI
   - [x] Actions
     - [x] Parallel

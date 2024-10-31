@@ -23,6 +23,7 @@ export function requestValidator<T>(schema: ZodSchema<T>) {
         ctx.body = createError({
           message: 'Invalid request data',
           status: HTTP_STATUS_CODE[422],
+          data: result.error,
         })
       }
     }
