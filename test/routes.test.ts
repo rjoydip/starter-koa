@@ -91,9 +91,9 @@ describe('⬢ Validate routes', () => {
       ])
     })
 
-    it('● GET /openapi', async () => {
+    it('● GET /openapi.json', async () => {
       const { headers, status, body } = await request(app$)
-        .get('/openapi')
+        .get('/openapi.json')
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)

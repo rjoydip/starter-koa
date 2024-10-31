@@ -81,7 +81,7 @@ const mainRoutes: IRouter[] = [
   },
   {
     name: 'OpenAPI',
-    path: '/openapi',
+    path: '/openapi.json',
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {

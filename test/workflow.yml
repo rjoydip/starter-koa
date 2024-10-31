@@ -55,9 +55,9 @@ tests:
             headers:
               Content-Type: application/json; charset=utf-8
 
-      - name: openapi
+      - name: openapi_data
         http:
-          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/openapi
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/openapi.json
           method: GET
           check:
             status: 200
