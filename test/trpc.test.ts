@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { getTestUser } from '../scripts/_seed'
 import { createApplication } from '../src/app'
 import { tRPCRouter } from '../src/trpc'
+import { API_PREFIX } from '../src/utils'
 
 const app = createApplication()
 const app$ = app.callback()
@@ -79,7 +80,7 @@ describe('⬢ Validate tRPC', () => {
   describe('⬢ Validate handler', () => {
     it('● should get response form welcome', async () => {
       const { status, body } = await request(app$)
-        .get('/api/trpc/welcome')
+        .get(`/${API_PREFIX}/trpc/welcome`)
         .set('Accept', 'application/json')
       expect(status).toEqual(200)
       expect(body.result.data).toEqual('Welcome to Koa Starter')

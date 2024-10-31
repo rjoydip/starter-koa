@@ -73,7 +73,7 @@ tests:
 
       - name: graphql
         http:
-          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/graphql
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/graphql
           method: GET
           check:
             status: 200

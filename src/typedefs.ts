@@ -1,6 +1,6 @@
 export default /* GraphQL */ `
 type Query {
-  index: Message
+  welcome: Message
   status: StatusData
   _metrics: MetricsData
   _meta: MetaData

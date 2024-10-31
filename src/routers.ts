@@ -2,12 +2,11 @@ import type { Context } from 'koa'
 import type { IUserParams, UserInput } from './schema.ts'
 import type { IRouter } from './types.ts'
 import { parseYAML } from 'confbox/yaml'
-import { createYoga } from 'graphql-yoga'
 import { HttpMethodEnum } from 'koa-body'
 import { createError, createSuccess } from './message.ts'
 import { resolvers } from './resolvers.ts'
 import { apiDocs } from './scalar.ts'
-import { graphqlSchema, insertUserSchema } from './schema.ts'
+import { insertUserSchema } from './schema.ts'
 import {
   API_PREFIX,
   captureException,
@@ -16,16 +15,6 @@ import {
 } from './utils.ts'
 import { requestValidator, userValidator } from './validator.ts'
 import { wsTemplate } from './ws.ts'
-
-/**
- * GraphQL yoga server configuration with the application schema.
- *
- * @type {ReturnType<typeof createYoga>}
- */
-const yoga = createYoga({
-  landingPage: true,
-  schema: graphqlSchema(),
-})
 
 /**
  * Defines the main application routes.
@@ -117,23 +106,6 @@ const mainRoutes: IRouter[] = [
     },
   },
   {
-    name: 'GraphQL',
-    path: '/graphql',
-    method: HttpMethodEnum.GET,
-    middleware: [],
-    defineHandler: async (ctx: Context) => {
-      const response = await yoga.handleNodeRequestAndResponse(
-        ctx.req,
-        ctx.res,
-      )
-      ctx.status = response.status
-      response.headers.forEach((value, key) => {
-        ctx.append(key, value)
-      })
-      ctx.body = response.body
-    },
-  },
-  {
     name: 'WSPlayground',
     path: '/_ws',
     method: HttpMethodEnum.GET,
@@ -154,7 +126,7 @@ const mainRoutes: IRouter[] = [
 const userRoutes: IRouter[] = [
   {
     name: 'GetUsers',
-    path: `${API_PREFIX}/users`,
+    path: `/${API_PREFIX}/users`,
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
@@ -180,7 +152,7 @@ const userRoutes: IRouter[] = [
   },
   {
     name: 'GetUser',
-    path: `${API_PREFIX}/user/:id`,
+    path: `/${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.GET,
     middleware: [userValidator()],
     defineHandler: (ctx: Context) => {
@@ -196,7 +168,7 @@ const userRoutes: IRouter[] = [
   },
   {
     name: 'PostUser',
-    path: `${API_PREFIX}/user`,
+    path: `/${API_PREFIX}/user`,
     method: HttpMethodEnum.POST,
     middleware: [requestValidator<UserInput>(insertUserSchema)],
     defineHandler: async (ctx: Context) => {
@@ -221,7 +193,7 @@ const userRoutes: IRouter[] = [
   },
   {
     name: 'PutUser',
-    path: `${API_PREFIX}/user/:id`,
+    path: `/${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.PUT,
     middleware: [requestValidator<UserInput>(insertUserSchema), userValidator()],
     defineHandler: async (ctx: Context) => {
@@ -246,7 +218,7 @@ const userRoutes: IRouter[] = [
   },
   {
     name: 'PatchUser',
-    path: `${API_PREFIX}/user/:id`,
+    path: `/${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.PATCH,
     middleware: [userValidator()],
     defineHandler: async (ctx: Context) => {
@@ -271,7 +243,7 @@ const userRoutes: IRouter[] = [
   },
   {
     name: 'DeleteUser',
-    path: `${API_PREFIX}/user/:id`,
+    path: `/${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.DELETE,
     middleware: [userValidator()],
     defineHandler: async (ctx: Context) => {

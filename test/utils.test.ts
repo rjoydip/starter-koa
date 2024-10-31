@@ -42,7 +42,7 @@ describe('⬢ Validate utils', () => {
   })
 
   it('● should validated exported value', () => {
-    expect(API_PREFIX).toStrictEqual('/api')
+    expect(API_PREFIX).toStrictEqual('api')
   })
 
   it('● should return the content of the openapi.yaml file as a string', async () => {

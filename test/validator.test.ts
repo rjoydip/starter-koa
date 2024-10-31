@@ -6,6 +6,7 @@ import { getDate, getName, getTestUser, getUUID } from '../scripts/_seed.ts'
 import { createApplication } from '../src/app.ts'
 import { resolvers } from '../src/resolvers.ts'
 import { getRouter } from '../src/routers.ts'
+import { API_PREFIX } from '../src/utils.ts'
 import { validateRouter } from '../src/validator.ts'
 
 const { Query } = resolvers
@@ -14,9 +15,9 @@ const app$ = app.callback()
 
 describe('⬢ Validate validator', () => {
   describe('⬢ Validate middleware', () => {
-    it('● should validated requestValidator POST /api/user', async () => {
+    it(`● should validated requestValidator POST /${API_PREFIX}/user`, async () => {
       const { headers, status, body } = await request(app$)
-        .post('/api/user')
+        .post(`/${API_PREFIX}/user`)
         .send()
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(422)
@@ -26,9 +27,9 @@ describe('⬢ Validate validator', () => {
       })
     })
 
-    it('● should validated requestValidator invalid data POST /api/user', async () => {
+    it(`● should validated requestValidator invalid data POST /${API_PREFIX}/user`, async () => {
       const { headers, status, body } = await request(app$)
-        .post('/api/user')
+        .post(`/${API_PREFIX}/user`)
         .send({
           ...getTestUser(),
           name: null,
@@ -42,7 +43,7 @@ describe('⬢ Validate validator', () => {
       })
     })
 
-    it('● should validated userValidator GET /api/user/200', async () => {
+    it(`● should validated userValidator GET /${API_PREFIX}/user/200`, async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue({
         ...getTestUser(),
         createdAt: getDate(),
@@ -51,17 +52,17 @@ describe('⬢ Validate validator', () => {
         isVerified: true,
       } as UserSelect)
       const { headers, status } = await request(app$)
-        .get('/api/user/200')
+        .get(`/${API_PREFIX}/user/200`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
       expect(getUserMock).toBeCalledTimes(1)
     })
 
-    it('● should validated userValidator GET /api/user/422', async () => {
+    it(`● should validated userValidator GET /${API_PREFIX}/user/422`, async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockResolvedValue(undefined as unknown as UserSelect)
       const { headers, status, body } = await request(app$)
-        .get('/api/user/422')
+        .get(`/${API_PREFIX}/user/422`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(422)
@@ -72,12 +73,12 @@ describe('⬢ Validate validator', () => {
       expect(getUserMock).toBeCalledTimes(1)
     })
 
-    it('● should validated userValidator GET /api/user/500', async () => {
+    it(`● should validated userValidator GET /${API_PREFIX}/user/500`, async () => {
       const getUserMock = vi.spyOn(Query, 'getUser').mockRejectedValue(
         new Error('query fetching error'),
       )
       const { headers, status, body } = await request(app$)
-        .get(`/api/user/500`)
+        .get(`/${API_PREFIX}/user/500`)
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toBe(500)
       expect(body).toStrictEqual({
@@ -121,7 +122,7 @@ describe('⬢ Validate validator', () => {
       expect(() =>
         validateRouter({
           name: '',
-          path: '/api/user',
+          path: `/${API_PREFIX}/user`,
           method: HttpMethodEnum.GET,
           middleware: [],
           defineHandler: () => Promise.resolve(),
@@ -145,7 +146,7 @@ describe('⬢ Validate validator', () => {
       expect(() =>
         validateRouter({
           name: getName(),
-          path: '/api/user',
+          path: `/${API_PREFIX}/user`,
           method: 'FOO' as any,
           middleware: [],
           defineHandler: () => Promise.resolve(),
@@ -157,7 +158,7 @@ describe('⬢ Validate validator', () => {
       expect(() =>
         validateRouter({
           name: getName(),
-          path: '/api/user',
+          path: `/${API_PREFIX}/user`,
           method: HttpMethodEnum.GET,
           middleware: null as any,
           defineHandler: () => Promise.resolve(),

@@ -45,7 +45,7 @@
     "typescript": ">=5.5"
   },
   "scripts": {
-    "_setup": "nr _update && nr lint && nr typecheck && nr build",
+    "_setup": "nr _update && nr lint && nr typecheck && nr build && nr test",
     "_update": "taze -w -f -w -i",
     "build": "unbuild",
     "lint": "eslint . --fix",
@@ -58,8 +58,8 @@
   },
   "dependencies": {
     "@lukeed/uuid": "^2.0.1",
-    "@sentry/node": "^8.35.0",
-    "@sentry/profiling-node": "^8.35.0",
+    "@sentry/node": "^8.36.0",
+    "@sentry/profiling-node": "^8.36.0",
     "@trpc/server": "^10.45.2",
     "close-with-grace": "^2.1.0",
     "confbox": "^0.1.8",
@@ -93,7 +93,7 @@
     "@types/koa": "^2.15.0",
     "@types/koa-ratelimit": "^5.0.5",
     "@types/koa-router": "^7.4.8",
-    "@types/node": "^22.8.4",
+    "@types/node": "^22.8.5",
     "@types/supertest": "^6.0.2",
     "@vitest/coverage-v8": "^2.1.4",
     "autocannon": "^7.15.0",
