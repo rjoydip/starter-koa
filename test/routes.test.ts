@@ -1,6 +1,6 @@
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getTestUser, getUUID } from '../scripts/_seed.ts'
+import { getSelectedTestUser, getTestUser, getUUID } from '../scripts/_seed.ts'
 import { createApplication } from '../src/app.ts'
 import * as db from '../src/db.ts'
 import { resolvers } from '../src/resolvers.ts'
@@ -187,7 +187,7 @@ describe('⬢ Validate routes', () => {
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body.message).toStrictEqual('User details updates successfully')
+      expect(body.message).toStrictEqual('User details updated successfully')
       expect(body.data).toBeDefined()
     })
 
@@ -197,7 +197,7 @@ describe('⬢ Validate routes', () => {
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(200)
-      expect(body.message).toStrictEqual('User delete successfully')
+      expect(body.message).toStrictEqual('User deleted successfully')
       expect(body.data).toBeDefined()
     })
 
@@ -246,7 +246,7 @@ describe('⬢ Validate routes', () => {
     })
   })
 
-  describe('⬢ Validate routing when DB error', () => {
+  describe('⬢ Validate routing when got error', () => {
     let id: string
     it.sequential('● GET /api/users 500', async () => {
       vi.spyOn(db, 'getUsers').mockRejectedValueOnce(new Error('Error'))
@@ -285,6 +285,30 @@ describe('⬢ Validate routes', () => {
           ...getTestUser(),
           id,
         })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(500)
+    })
+
+    it.sequential('● PUT /api/user/:id 500 when getting mutation', async () => {
+      vi.spyOn(resolvers.Query, 'getUser').mockResolvedValueOnce(getSelectedTestUser())
+      vi.spyOn(resolvers.Mutation, 'updateUser').mockRejectedValueOnce(new Error('Error'))
+      const { headers, status } = await request(app$)
+        .put(`/api/user/${id}`)
+        .send({
+          ...getTestUser(),
+          id,
+        })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(500)
+    })
+
+    it.sequential('● DELETE /api/user/:id 500 when getting mutation', async () => {
+      vi.spyOn(resolvers.Query, 'getUser').mockResolvedValueOnce(getSelectedTestUser())
+      vi.spyOn(resolvers.Mutation, 'deleteUser').mockRejectedValueOnce(new Error('Error'))
+      const { headers, status } = await request(app$)
+        .delete(`/api/user/${id}`)
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
       expect(status).toEqual(500)

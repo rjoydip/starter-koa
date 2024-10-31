@@ -15,15 +15,21 @@ import {
   HTTP_STATUS_CODE,
 } from './utils.ts'
 import { requestValidator, userValidator } from './validator.ts'
-import { wsTemplete } from './ws.ts'
+import { wsTemplate } from './ws.ts'
 
+/**
+ * GraphQL yoga server configuration with the application schema.
+ *
+ * @type {ReturnType<typeof createYoga>}
+ */
 const yoga = createYoga({
   landingPage: true,
   schema: graphqlSchema(),
 })
 
 /**
- * Main application routes
+ * Defines the main application routes.
+ *
  * @type {IRouter[]}
  */
 const mainRoutes: IRouter[] = [
@@ -135,12 +141,14 @@ const mainRoutes: IRouter[] = [
     defineHandler: (ctx: Context) => {
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.type = 'html'
-      ctx.body = wsTemplete()
+      ctx.body = wsTemplate()
     },
   },
 ]
+
 /**
- * User routes
+ * Defines the user-related routes.
+ *
  * @type {IRouter[]}
  */
 const userRoutes: IRouter[] = [
@@ -221,7 +229,7 @@ const userRoutes: IRouter[] = [
         const data = await resolvers.Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
-          message: 'User details updates successfully',
+          message: 'User details updated successfully',
           status: HTTP_STATUS_CODE[200],
           data,
         })
@@ -229,7 +237,7 @@ const userRoutes: IRouter[] = [
       catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
-          message: 'User details updates failed',
+          message: 'User details update failed',
           status: HTTP_STATUS_CODE[500],
         })
         captureException(error)
@@ -246,14 +254,14 @@ const userRoutes: IRouter[] = [
         await resolvers.Mutation.deleteUser(null, { id: ctx.params.id })
         ctx.status = HTTP_STATUS_CODE[200]
         ctx.body = createSuccess({
-          message: 'User delete successfully',
+          message: 'User deleted successfully',
           data: ctx.state.user,
         })
       }
       catch (error) {
         ctx.status = HTTP_STATUS_CODE[500]
         ctx.body = createError({
-          message: 'User data deletetion failed',
+          message: 'User data deletion failed',
           status: HTTP_STATUS_CODE[500],
         })
         captureException(error)
@@ -261,17 +269,21 @@ const userRoutes: IRouter[] = [
     },
   },
 ]
+
 /**
+ * Combines all main and user routes into a single array for the application router.
+ *
  * @type {IRouter[]}
  */
 export const routers: IRouter[] = [...mainRoutes, ...userRoutes]
 
 /**
+ * Retrieves a route configuration by its name.
+ *
  * @export
- * @param {string} route
- * @returns (IRouter | null)
+ * @param {string} route - The name of the route to retrieve.
+ * @returns {IRouter | null} - The matching route configuration or null if not found.
  */
 export function getRouter(route: string): IRouter | null {
-  return routers.find(i => i.name.toLowerCase() === route.toLowerCase())
-    ?? null
+  return routers.find(i => i.name.toLowerCase() === route.toLowerCase()) ?? null
 }

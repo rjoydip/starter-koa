@@ -2,114 +2,82 @@ import type { Context, Middleware, Next } from 'koa'
 import type { HttpMethodEnum } from 'koa-body/lib/types'
 
 /**
- * @export
+ * Represents the application structure.
  * @interface TApplication
- * @typedef {TApplication}
  */
 export interface TApplication {}
 
 /**
- * @export
+ * Represents a registered route.
  * @interface IRegisteredRoutes
- * @typedef {IRegisteredRoutes}
+ * @property {string} path - The path of the route.
+ * @property {RegExp} regexp - The regular expression to match the route.
  */
 export interface IRegisteredRoutes {
-  /**
-   * @type {string}
-   */
   path: string
-  /**
-   * @type {RegExp}
-   */
   regexp: RegExp
 }
+
 /**
- * @export
+ * Represents the health status of various components.
  * @interface IHealth
- * @typedef {IHealth}
+ * @property {boolean} db - Indicates if the database is healthy.
+ * @property {boolean} cache - Indicates if the cache is healthy.
  */
 export interface IHealth {
-  /**
-   * @type {boolean}
-   */
   db: boolean
-  /**
-   * @type {boolean}
-   */
   cache: boolean
 }
+
 /**
- * @export
+ * Represents a route in the application.
  * @interface IRouter
- * @typedef {IRouter}
+ * @property {string} name - The name of the route.
+ * @property {string} path - The path of the route.
+ * @property {HttpMethodEnum} method - The HTTP method used for the route.
+ * @property {Middleware[]} middleware - An array of middleware functions for the route.
+ * @property {(ctx: Context, next: Next) => Promise<void> | void} defineHandler - The function to handle the route.
  */
 export interface IRouter {
-  /**
-   * @type {string}
-   */
   name: string
-  /**
-   * @type {string}
-   */
   path: string
-  /**
-   * @type {HttpMethodEnum}
-   */
   method: HttpMethodEnum
-  /**
-   * @type {Middleware[]}
-   */
   middleware: Middleware[]
-  /**
-   * @type {(ctx: Context, next: Next) => Promise<void> | void}
-   */
   defineHandler: (ctx: Context, next: Next) => Promise<void> | void
 }
 
 /**
- * @export
- * @typedef {Runtime}
+ * Defines the runtime environment.
+ * @typedef {'node' | 'bun' | 'deno'} Runtime
  */
 export type Runtime = 'node' | 'bun' | 'deno'
 
 /**
- * @export
+ * Represents metadata information.
  * @interface IMetaData
- * @typedef {IMetaData}
+ * @property {string} license - The license of the application.
+ * @property {string} name - The name of the application.
+ * @property {string} version - The version of the application.
  */
 export interface IMetaData {
-  /**
-   * @type {string}
-   */
   license: string
-  /**
-   * @type {string}
-   */
   name: string
-  /**
-   * @type {string}
-   */
   version: string
 }
 
 /**
- * @export
+ * Represents performance metrics.
  * @interface IMetrics
- * @typedef {IMetrics}
+ * @property {NodeJS.MemoryUsage} memoryUsage - Memory usage information.
+ * @property {number[]} loadAverage - An array of load averages.
  */
 export interface IMetrics {
-  /**
-   * @type {NodeJS.MemoryUsage}
-   */
   memoryUsage: NodeJS.MemoryUsage
-  /**
-   * @type {number[]}
-   */
   loadAverage: number[]
 }
 
 /**
- * @export
- * @typedef {THooksMapper}
+ * Maps various hooks to their respective identifiers.
+ * @typedef {'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'} THooksMapper
  */
 export type THooksMapper = 'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'

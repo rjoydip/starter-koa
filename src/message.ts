@@ -1,6 +1,8 @@
 /**
- * Make sure the status message is safe to use in a response.
- * @returns string
+ * Sanitizes a status message to ensure it is safe for use in a response.
+ *
+ * @param {string} [statusMessage] - The status message to sanitize.
+ * @returns {string} The sanitized status message.
  */
 export function sanitizeStatusMessage(statusMessage = ''): string {
   return statusMessage
@@ -12,7 +14,11 @@ export function sanitizeStatusMessage(statusMessage = ''): string {
 }
 
 /**
- * Make sure the status code is a valid HTTP status code.
+ * Validates and sanitizes a status code, ensuring it is a valid HTTP status code.
+ *
+ * @param {string | number} [statusCode] - The status code to validate.
+ * @param {number} [defaultStatusCode] - The default status code to return if validation fails.
+ * @returns {number} A valid HTTP status code.
  */
 export function sanitizeStatusCode(
   statusCode?: string | number,
@@ -31,10 +37,11 @@ export function sanitizeStatusCode(
 }
 
 /**
- * Checks if a certain input has a given property.
- * @param obj - The input to check.
- * @param prop - The property to check for.
- * @returns A boolean indicating whether the input is an object and has the property.
+ * Checks if an object has a specified property.
+ *
+ * @param {any} obj - The object to check.
+ * @param {string | symbol} prop - The property name to check for.
+ * @returns {boolean} True if the object has the specified property; otherwise, false.
  */
 export function hasProp(obj: any, prop: string | symbol): boolean {
   try {
@@ -46,49 +53,27 @@ export function hasProp(obj: any, prop: string | symbol): boolean {
 }
 
 /**
- * Runtime Error
+ * Custom error class extending the built-in Error class.
+ * This class is used to represent runtime errors with additional properties.
+ *
  * @class
- * @extends Error
- * @property {number} statusCode - An integer indicating the HTTP response status code.
- * @property {string} statusMessage - A string representing the HTTP status message.
- * @property {boolean} fatal - Indicates if the error is a fatal error.
- * @property {boolean} unhandled - Indicates if the error was unhandled and auto captured.
- * @property {DataT} data - An extra data that will be included in the response.
- *                         This can be used to pass additional information about the error.
- * @property {boolean} internal - Setting this property to `true` will mark the error as an internal error.
+ * @extends {Error}
+ * @template DataT - The type of extra data included with the error.
  */
 class _Error<DataT = unknown> extends Error {
-  /**
-   * @type {number}
-   */
   statusCode = 500
-  /**
-   * @type {boolean}
-   */
   fatal = false
-  /**
-   * @type {boolean}
-   */
   unhandled = false
-  /**
-   * @type {?string}
-   */
   statusMessage?: string
-  /**
-   * @type {?DataT}
-   */
   data?: DataT
-  /**
-   * @type {?unknown}
-   */
   cause?: unknown
 
   /**
    * Creates an instance of _Error.
    *
    * @constructor
-   * @param {string} message
-   * @param {{ cause?: unknown }\} [opts]
+   * @param {string} message - The error message.
+   * @param {{ cause?: unknown }} [opts] - Optional parameters including the cause of the error.
    */
   constructor(message: string, opts: { cause?: unknown } = {}) {
     super(message, opts)
@@ -100,7 +85,9 @@ class _Error<DataT = unknown> extends Error {
   }
 
   /**
-   * @returns (Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>)
+   * Converts the error instance to a JSON representation.
+   *
+   * @returns {Pick<_Error<DataT>, 'message' | 'statusCode' | 'statusMessage' | 'data'>} The JSON representation of the error.
    */
   toJSON(): Pick<
     _Error<DataT>,
@@ -127,10 +114,10 @@ class _Error<DataT = unknown> extends Error {
 }
 
 /**
- * Creates a new `Error` that can be used to handle both internal and runtime errors.
+ * Creates a new instance of _Error to handle both internal and runtime errors.
  *
- * @param input {string | (Partial<_Error> & { status?: number statusText?: string })} - The error message or an object containing error properties.
- * If a string is provided, it will be used as the error `message`.
+ * @param {string | (Partial<_Error> & { status?: number, statusText?: string })} input - The error message or an object containing error properties.
+ * @returns {_Error} An instance of _Error.
  *
  * @example
  * // String error where `statusCode` defaults to `500`
@@ -143,14 +130,10 @@ class _Error<DataT = unknown> extends Error {
  *   data: { field: 'email' }
  * })
  *
- * @return {_Error} - An instance of _Error.
- *
  * @remarks
- * - Typically, `message` contains a brief, human-readable description of the error, while `statusMessage` is specific to HTTP responses and describes
- * the status text related to the response status code.
- * - In a client-server context, using a short `statusMessage` is recommended because it can be accessed on the client side. Otherwise, a `message`
- * passed to `createError` on the server will not propagate to the client.
- * - Consider avoiding putting dynamic user input in the `message` to prevent potential security issues.
+ * - `message` contains a brief, human-readable description of the error.
+ * - `statusMessage` is specific to HTTP responses, describing the status text related to the status code.
+ * - Avoid including dynamic user input in `message` to prevent potential security issues.
  */
 export function createError<DataT = unknown>(
   input:
@@ -176,6 +159,7 @@ export function createError<DataT = unknown>(
     ?? input.status
     ?? (cause as _Error)?.statusCode
     ?? (cause as { status?: number })?.status
+
   if (typeof statusCode === 'number') {
     err.statusCode = sanitizeStatusCode(statusCode)
   }
@@ -184,6 +168,7 @@ export function createError<DataT = unknown>(
     ?? input.statusText
     ?? (cause as _Error)?.statusMessage
     ?? (cause as { statusText?: string })?.statusText
+
   if (statusMessage) {
     err.message = sanitizeStatusMessage(statusMessage)
   }
@@ -202,54 +187,39 @@ export function createError<DataT = unknown>(
 }
 
 /**
+ * Interface representing a message with optional properties for status and data.
+ *
  * @export
  * @interface IMessage
- * @typedef {IMessage}
- * @template [T=unknown]
+ * @template T - The type of the data included in the message.
  */
 export interface IMessage<T = unknown> {
-  /**
-   * @type {?T}
-   */
   data?: T
-  /**
-   * @type {?number}
-   */
   status?: number
-  /**
-   * @type {?number}
-   */
   statusCode?: number
-  /**
-   * @type {?string}
-   */
   statusMessage?: string
-  /**
-   * @type {?string}
-   */
   message?: string
 }
 
 /**
- * Creates a new `Success` that can be used to handle both internal and runtime.
+ * Creates a new success message to indicate a successful operation.
  *
- * @param input {string | (Partial<DataT> & { status?: number statusText?: string })} - The message or an object containing properties.
- * If a string is provided, it will be used as the success `message`.
+ * @param {string | (Partial<DataT> & { status?: number, statusText?: string })} input - The success message or an object containing properties.
+ * @returns {IMessage} An instance of success message.
  *
  * @example
  * // String success where `status` defaults to `200`
- * createSuccess('An success message')
+ * createSuccess('A success message')
  * // Object success
  * createSuccess({
  *   status: 200,
- *   message: 'Invalid input',
+ *   message: 'Operation completed successfully',
  *   data: { field: 'email' }
  * })
  *
- * @return {IMessage} - An instance of success message.
- *
  * @remarks
- * - Typically, `message` contains a brief, human-readable description of the success, while `statusMessage` is specific to HTTP responses and describes
+ * - The `message` contains a brief, human-readable description of the success.
+ * - The `statusMessage` is specific to HTTP responses and describes the status of the request.
  */
 export function createSuccess<DataT extends IMessage>(
   input:

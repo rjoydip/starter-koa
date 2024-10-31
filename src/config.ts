@@ -1,66 +1,89 @@
 import type { LogLevel } from 'consola'
-import type { Runtime } from './types.ts'
+import type { Runtime } from './types'
 import { env } from 'node:process'
 
 /**
+ * Configuration options for the application, including server, logging, rate limiting, and caching settings.
+ *
  * @export
  * @interface IConfig
- * @typedef {IConfig}
  */
 export interface IConfig {
   /**
-   * @type {?number}
+   * The port number the server listens on.
+   * @type {number}
    */
   port?: number
+
   /**
-   * @type {?boolean}
+   * Whether the server should use HTTPS.
+   * @type {boolean}
    */
   isHTTPs?: boolean
+
   /**
-   * @type {?LogLevel}
+   * Logging level for application logs.
+   * @type {LogLevel}
    */
   log_level?: LogLevel
+
   /**
-   * @type {?number}
+   * Maximum number of requests allowed per rate duration.
+   * @type {number}
    */
   ratelimit?: number
+
   /**
-   * @type {?number}
+   * Rate limit duration in milliseconds.
+   * @type {number}
    */
   duration?: number
+
   /**
-   * @type {?number}
+   * Delay in milliseconds before graceful shutdown.
+   * @type {number}
    */
   graceful_delay?: number
+
   /**
-   * @type {?Runtime}
+   * Runtime environment for the application (e.g., "node", "browser").
+   * @type {Runtime}
    */
   runtime?: Runtime
+
   /**
-   * @type {?string}
+   * Data source name (DSN) for the monitoring service.
+   * @type {string}
    */
   monitor_dsn?: string
+
   /**
-   * @type {?string}
+   * Database connection URL.
+   * @type {string}
    */
   db_url?: string
+
   /**
-   * @type {?string}
+   * Redis or other cache service connection URL.
+   * @type {string}
    */
   cache_url?: string
+
   /**
-   * @type {?string}
+   * Time-to-live for cached items in seconds.
+   * @type {number}
    */
   cache_ttl?: number
 }
 
+// Destructuring environment variables with default values.
 const {
-  LOG_LEVEL = 3,
-  ENABLE_HTTPS = false,
-  PORT = 3000,
-  RATE_LIMIT = 70000,
-  RATE_DURATION = 6000,
-  GRACEFUL_DELAY = 500,
+  LOG_LEVEL = '3',
+  ENABLE_HTTPS = 'false',
+  PORT = '3000',
+  RATE_LIMIT = '70000',
+  RATE_DURATION = '6000',
+  GRACEFUL_DELAY = '500',
   RUNTIME = 'node',
   MONITOR_DNS = '',
   DATABASE_URL = '',
@@ -68,16 +91,23 @@ const {
   CACHE_TTL = 1,
 } = env
 
-export default {
+/**
+ * Application configuration loaded from environment variables.
+ *
+ * @type {IConfig}
+ */
+const config: IConfig = {
   port: Number(PORT),
-  isHTTPs: Boolean(ENABLE_HTTPS),
+  isHTTPs: ENABLE_HTTPS === 'true',
   ratelimit: Number(RATE_LIMIT),
   duration: Number(RATE_DURATION),
-  log_level: LOG_LEVEL as LogLevel,
+  log_level: Number.parseInt(LOG_LEVEL, 10) as LogLevel,
   graceful_delay: Number(GRACEFUL_DELAY),
-  monitor_dsn: MONITOR_DNS,
   runtime: RUNTIME as Runtime,
+  monitor_dsn: MONITOR_DNS,
   db_url: DATABASE_URL,
   cache_url: CACHE_URL,
   cache_ttl: Number(CACHE_TTL),
 }
+
+export default config
