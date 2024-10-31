@@ -8,7 +8,7 @@ import logger from './logger.ts'
 const prefix: string = 'Invariant failed'
 
 // API prefix constant
-export const API_PREFIX = '/api' as const
+export const API_PREFIX = 'api' as const
 
 /**
  * Throws an error if the given condition is false.

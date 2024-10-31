@@ -88,7 +88,7 @@ const {
   MONITOR_DNS = '',
   DATABASE_URL = '',
   CACHE_URL = '',
-  CACHE_TTL = '0',
+  CACHE_TTL = '1',
 } = env
 
 /**

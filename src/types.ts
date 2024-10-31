@@ -78,6 +78,6 @@ export interface IMetrics {
 
 /**
  * Maps various hooks to their respective identifiers.
- * @typedef {'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'} THooksMapper
+ * @typedef {'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'} THooksMapper
  */
-export type THooksMapper = 'health' | '_metrics' | '_meta' | 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'
+export type THooksMapper = 'getUsers' | 'getUser' | 'createUser' | 'updateUser' | 'deleteUser'

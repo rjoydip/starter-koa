@@ -1,0 +1,179 @@
+version: '1.1'
+name: API Testing
+
+env:
+  host: 127.0.0.1
+  port: 3000
+  prefix: api
+  protocal: http
+
+tests:
+  /{*}:
+    steps:
+      - name: welcome
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: status
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/status
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: health
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/health
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: metrics
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_metrics
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: meta
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_meta
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: openapi_data
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/openapi.json
+          method: GET
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: references
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/references
+          method: GET
+          check:
+            status: 200
+
+      - name: graphql
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/graphql
+          method: GET
+          check:
+            status: 200
+
+      - name: ws_playground
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
+          method: GET
+          check:
+            status: 200
+
+  /api/user{*}:
+    steps:
+      - name: get_users
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/users
+          method: GET
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: post_user
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user
+          method: POST
+          headers:
+            Content-Type: application/json
+          json:
+            name: testusername
+            email: test.email@example.com
+            phone: '+1234567890'
+            isVerified: true
+            password: testpassword
+            address: testaddress
+            role: user
+          captures:
+            id:
+              jsonpath: $.data.id
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: get_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: GET
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: update_user_details
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: PUT
+          json:
+            name: testusername
+            email: test.email@example.com
+            phone: '+1234567890'
+            isVerified: false
+            password: testpassword
+            address: testaddress
+            role: user
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: update_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: PATCH
+          json:
+            isVerified: false
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: delete_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: DELETE
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8

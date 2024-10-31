@@ -12,9 +12,6 @@ const { Mutation, Query } = resolvers
 
 // Mapper for hooks that maps actions to corresponding functions
 const hooksMapper: Record<THooksMapper, (id: string, input: UserInput) => Promise<any>> = {
-  health: async () => await Query.health(),
-  _metrics: async () => await Query._metrics(),
-  _meta: async () => await Query._meta(),
   getUsers: async () => await Query.getUsers(),
   getUser: async id => await Query.getUser(null, { id }),
   createUser: async (_, input) => await Mutation.createUser(null, { input }),

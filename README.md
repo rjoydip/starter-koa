@@ -89,7 +89,7 @@ After running dev command visit `/references` endpoint. Play around with endpoin
 
 ## GraphQL
 
-For showing graphql playground visit `/graphql`.
+For showing graphql playground visit `/api/graphql`.
 
 ## tRPC
 
@@ -120,6 +120,29 @@ method=updateUser&id=<USER_ID>&<FIELD_1>:<VALUE_1>&<FIELD_2>:<VALUE_2> ...
 method=deleteUser&id=<USER_ID>
 ```
 
+## StepCI
+
+The package is installed as dev depedency so by executing `npx stepci run ./test/workflow.yml` locally APIs can be tested.
+
+## Endpoints
+
+Here are list of endpoints available in application.
+
+- Basic API
+  - `/` - Welcome
+  - `/status` - Status
+  - `/health` - Application health
+  - `/_meta` - Metadata
+  - `/_metrices` - Server metrices (limited)
+  - `/references` - OpenAPI documentaion
+  - `/openapi.json` - OpenAPI spec information
+  - `/_ws` - Websocket Playground
+- API
+  - `/api/trpc` - tRPC entrypoint
+  - `/api/graphql` - GraphQL
+  - `/users` - Get list of users
+  - `/user/:id` - Get/Post/Put/Delete user details
+
 ## TODO
 
 - [x] Testing
@@ -128,7 +151,7 @@ method=deleteUser&id=<USER_ID>
     - [x] DB
     - [x] OpenAPI
     - [x] Websocket
-  - [ ] StepCI
+  - [x] StepCI
 - [x] CI
   - [x] Actions
     - [x] Parallel
