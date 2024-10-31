@@ -1,6 +1,6 @@
 import { exit } from 'node:process'
 import autocannon from 'autocannon'
-import getPort from 'get-port'
+import config from '../src/config'
 import logger from '../src/logger'
 import { createServer } from '../src/server'
 
@@ -10,7 +10,7 @@ import { createServer } from '../src/server'
  */
 (async () => {
   // Dynamically assigns an available port for the server
-  const port = await getPort()
+  const port = config.port
 
   // Creates and starts the server
   const server = createServer()

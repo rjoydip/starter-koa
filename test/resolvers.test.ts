@@ -21,25 +21,6 @@ describe('⬢ Validate resolvers', () => {
         },
       })
     })
-
-    it('● should validate query _metrics', () => {
-      const { _metrics } = query
-      const $ = _metrics()
-      expect($).toBeDefined()
-      expect($.data).toBeDefined()
-      expect($.data.memoryUsage).toBeDefined()
-      expect($.data.loadAverage).toBeDefined()
-    })
-
-    it('● should validate query _meta', async () => {
-      const { _meta } = query
-      const $ = await _meta()
-      expect($).toBeDefined()
-      expect($.data).toBeDefined()
-      expect($.data.name).toBeDefined()
-      expect($.data.license).toBeDefined()
-      expect($.data.version).toBeDefined()
-    })
   })
 
   describe('⬢ Validate user resolvers', () => {

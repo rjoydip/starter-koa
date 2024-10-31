@@ -1,7 +1,4 @@
 import type { IUserParams, UserInput, UserSelect } from './schema.ts'
-import type { IMetaData, IMetrics } from './types.ts'
-import { loadavg } from 'node:os'
-import { memoryUsage } from 'node:process'
 import {
   createUser,
   deleteUser,
@@ -18,20 +15,6 @@ import {
 export const resolvers = {
   Query: {
     /**
-     * Provides system metrics such as memory usage and load average.
-     *
-     * @returns {{ data: IMetrics }} System metrics data.
-     */
-    _metrics(): { data: IMetrics } {
-      return {
-        data: {
-          memoryUsage: memoryUsage(),
-          loadAverage: loadavg(),
-        },
-      }
-    },
-
-    /**
      * Checks the health status of the database and cache.
      *
      * @returns {Promise<{ data: { db: boolean; cache: boolean } }>} Health status of the DB and cache.
@@ -43,22 +26,6 @@ export const resolvers = {
         data: {
           db: dbStatus,
           cache: cacheStatus,
-        },
-      }
-    },
-
-    /**
-     * Fetches application metadata including name, license, and version from package.json.
-     *
-     * @returns {Promise<{ data: { name: string; license: string; version: string } }>} Application metadata.
-     */
-    async _meta(): Promise<{ data: { name: string, license: string, version: string } }> {
-      const { license, name, version }: IMetaData = await import('../package.json')
-      return {
-        data: {
-          name,
-          license,
-          version,
         },
       }
     },

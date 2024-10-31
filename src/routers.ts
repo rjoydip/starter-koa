@@ -1,6 +1,8 @@
 import type { Context } from 'koa'
 import type { IUserParams, UserInput } from './schema.ts'
-import type { IRouter } from './types.ts'
+import type { IMetaData, IRouter } from './types.ts'
+import { loadavg } from 'node:os'
+import { memoryUsage } from 'node:process'
 import { parseYAML } from 'confbox/yaml'
 import { HttpMethodEnum } from 'koa-body'
 import { createError, createSuccess } from './message.ts'
@@ -63,7 +65,12 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await resolvers.Query._metrics()
+      const payload = {
+        data: {
+          memoryUsage: memoryUsage(),
+          loadAverage: loadavg(),
+        },
+      }
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
@@ -74,7 +81,14 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await resolvers.Query._meta()
+      const { license, name, version }: IMetaData = await import('../package.json')
+      const payload = {
+        data: {
+          name,
+          license,
+          version,
+        },
+      }
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },
