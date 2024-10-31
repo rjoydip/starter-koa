@@ -17,7 +17,7 @@ import { captureException, HTTP_STATUS_CODE } from './utils.ts'
 export function requestValidator<T>(schema: ZodSchema<T>) {
   return async function (ctx: Context, next: Next): Promise<void> {
     if (ctx.request.body) {
-      const result = schema.safeParse(ctx.request.body)
+      const result = await schema.safeParseAsync(ctx.request.body)
       if (result.success) {
         await next()
       }

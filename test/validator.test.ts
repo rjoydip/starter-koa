@@ -38,6 +38,7 @@ describe('⬢ Validate validator', () => {
       expect(body).toStrictEqual({
         statusCode: 422,
         message: 'Invalid request data',
+        data: expect.anything(),
       })
     })
 

@@ -5,106 +5,91 @@ env:
   host: 127.0.0.1
   port: 3000
   prefix: api
+  protocal: http
 
 tests:
-  welcome:
+  /{*}:
     steps:
-      - name: Welcome
+      - name: welcome
         http:
-          url: http://${{env.host}}:${{env.port}}/
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  status:
-    steps:
-      - name: Status
+      - name: status
         http:
-          url: http://${{env.host}}:${{env.port}}/status
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/status
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  health:
-    steps:
-      - name: Health
+      - name: health
         http:
-          url: http://${{env.host}}:${{env.port}}/health
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/health
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  _metrics:
-    steps:
-      - name: Metrics
+      - name: metrics
         http:
-          url: http://${{env.host}}:${{env.port}}/_metrics
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_metrics
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  _meta:
-    steps:
-      - name: Meta
+      - name: meta
         http:
-          url: http://${{env.host}}:${{env.port}}/_meta
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_meta
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  openapi:
-    steps:
-      - name: OpenAPI
+      - name: openapi
         http:
-          url: http://${{env.host}}:${{env.port}}/openapi
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/openapi
           method: GET
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-  references:
-    steps:
-      - name: API Docs
+      - name: references
         http:
-          url: http://${{env.host}}:${{env.port}}/references
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/references
           method: GET
           check:
             status: 200
 
-  graphql:
-    steps:
-      - name: GraphQL Playground
+      - name: graphql
         http:
-          url: http://${{env.host}}:${{env.port}}/graphql
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/graphql
           method: GET
           check:
             status: 200
 
-  _ws:
-    steps:
-      - name: WS Playground
+      - name: ws_playground
         http:
-          url: http://${{env.host}}:${{env.port}}/_ws
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
           method: GET
           check:
             status: 200
 
   /api/user{*}:
     steps:
-      - name: GetUsers
+      - name: get_users
         http:
-          url: http://${{env.host}}:${{env.port}}/${{env.prefix}}/users
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/users
           method: GET
           headers:
             Content-Type: application/json
@@ -113,9 +98,9 @@ tests:
             headers:
               Content-Type: application/json; charset=utf-8
 
-      - name: PostUser
+      - name: post_user
         http:
-          url: http://${{env.host}}:${{env.port}}/${{env.prefix}}/user
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user
           method: POST
           headers:
             Content-Type: application/json
@@ -129,16 +114,16 @@ tests:
             role: user
           captures:
             id:
-              jsonpath: $.id
+              jsonpath: $.data.id
           check:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
 
-      - name: GetUser
-      - delay: 5s
+      - name: get_user
+        if: captures.id
         http:
-          url: http://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: GET
           headers:
             Content-Type: application/json
@@ -147,9 +132,44 @@ tests:
             headers:
               Content-Type: application/json; charset=utf-8
 
-      - name: DeleteUser
+      - name: update_user_details
+        if: captures.id
         http:
-          url: http://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: PUT
+          json:
+            name: testusername
+            email: test.email@example.com
+            phone: '+1234567890'
+            isVerified: false
+            password: testpassword
+            address: testaddress
+            role: user
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: update_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
+          method: PATCH
+          json:
+            isVerified: false
+          headers:
+            Content-Type: application/json
+          check:
+            status: 200
+            headers:
+              Content-Type: application/json; charset=utf-8
+
+      - name: delete_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: DELETE
           headers:
             Content-Type: application/json

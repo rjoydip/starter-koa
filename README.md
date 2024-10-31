@@ -120,6 +120,10 @@ method=updateUser&id=<USER_ID>&<FIELD_1>:<VALUE_1>&<FIELD_2>:<VALUE_2> ...
 method=deleteUser&id=<USER_ID>
 ```
 
+## StepCI
+
+The package is installed as dev depedency so by executing `npx stepci run ./test/workflow.yml` locally APIs can be tested.
+
 ## TODO
 
 - [x] Testing

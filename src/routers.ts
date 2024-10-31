@@ -245,6 +245,31 @@ const userRoutes: IRouter[] = [
     },
   },
   {
+    name: 'PatchUser',
+    path: `${API_PREFIX}/user/:id`,
+    method: HttpMethodEnum.PATCH,
+    middleware: [userValidator()],
+    defineHandler: async (ctx: Context) => {
+      try {
+        const data = await resolvers.Mutation.updateUser(null, { id: ctx.params.id, input: ctx.request.body })
+        ctx.status = HTTP_STATUS_CODE[200]
+        ctx.body = createSuccess({
+          message: 'User details updated successfully',
+          status: HTTP_STATUS_CODE[200],
+          data,
+        })
+      }
+      catch (error) {
+        ctx.status = HTTP_STATUS_CODE[500]
+        ctx.body = createError({
+          message: 'User details update failed',
+          status: HTTP_STATUS_CODE[500],
+        })
+        captureException(error)
+      }
+    },
+  },
+  {
     name: 'DeleteUser',
     path: `${API_PREFIX}/user/:id`,
     method: HttpMethodEnum.DELETE,

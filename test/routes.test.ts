@@ -191,6 +191,19 @@ describe('⬢ Validate routes', () => {
       expect(body.data).toBeDefined()
     })
 
+    it.sequential('● PATCH /api/user:/:id', async () => {
+      const { headers, status, body } = await request(app$)
+        .patch(`/api/user/${id}`)
+        .send({
+          isVerified: false,
+        })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(200)
+      expect(body.message).toStrictEqual('User details updated successfully')
+      expect(body.data.isVerified).toBeFalsy()
+    })
+
     it.sequential('● DELETE /api/user:/:id', async () => {
       const { headers, status, body } = await request(app$)
         .delete(`/api/user/${id}`)
@@ -290,7 +303,20 @@ describe('⬢ Validate routes', () => {
       expect(status).toEqual(500)
     })
 
-    it.sequential('● PUT /api/user/:id 500 when getting mutation', async () => {
+    it.sequential('● PATCH /api/user/:id 500', async () => {
+      vi.spyOn(db, 'updateUser').mockRejectedValueOnce(new Error('Error'))
+      vi.spyOn(resolvers.Query, 'getUser').mockRejectedValueOnce(getTestUser())
+      const { headers, status } = await request(app$)
+        .patch(`/api/user/${id}`)
+        .send({
+          isVerified: false,
+        })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(500)
+    })
+
+    it.sequential('● PUT /api/user/:id 500 when mutated', async () => {
       vi.spyOn(resolvers.Query, 'getUser').mockResolvedValueOnce(getSelectedTestUser())
       vi.spyOn(resolvers.Mutation, 'updateUser').mockRejectedValueOnce(new Error('Error'))
       const { headers, status } = await request(app$)
@@ -298,6 +324,19 @@ describe('⬢ Validate routes', () => {
         .send({
           ...getTestUser(),
           id,
+        })
+        .set('Accept', 'application/json')
+      expect(headers['content-type']).toMatch(/json/)
+      expect(status).toEqual(500)
+    })
+
+    it.sequential('● PATCH /api/user/:id 500 when mutated', async () => {
+      vi.spyOn(resolvers.Query, 'getUser').mockResolvedValueOnce(getSelectedTestUser())
+      vi.spyOn(resolvers.Mutation, 'updateUser').mockRejectedValueOnce(new Error('Error'))
+      const { headers, status } = await request(app$)
+        .patch(`/api/user/${id}`)
+        .send({
+          isVerified: false,
         })
         .set('Accept', 'application/json')
       expect(headers['content-type']).toMatch(/json/)
