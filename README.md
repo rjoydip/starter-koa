@@ -89,7 +89,7 @@ After running dev command visit `/references` endpoint. Play around with endpoin
 
 ## GraphQL
 
-For showing graphql playground visit `/api/graphql`.
+For showing graphql playground visit `/api/graphql`. Port will be application port `+ 1` (e.g. If port is 3000 then graphql server port is 3001).
 
 ## tRPC
 

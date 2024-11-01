@@ -5,6 +5,7 @@ import { loadavg } from 'node:os'
 import { memoryUsage } from 'node:process'
 import { parseYAML } from 'confbox/yaml'
 import { HttpMethodEnum } from 'koa-body'
+import { isCacheUp, isDBUp } from './db.ts'
 import { createError, createSuccess } from './message.ts'
 import { resolvers } from './resolvers.ts'
 import { apiDocs } from './scalar.ts'
@@ -54,7 +55,14 @@ const mainRoutes: IRouter[] = [
     method: HttpMethodEnum.GET,
     middleware: [],
     defineHandler: async (ctx: Context) => {
-      const payload = await resolvers.Query.health()
+      const dbStatus = await isDBUp()
+      const cacheStatus = await isCacheUp()
+      const payload = {
+        data: {
+          db: dbStatus,
+          cache: cacheStatus,
+        },
+      }
       ctx.status = HTTP_STATUS_CODE[200]
       ctx.body = createSuccess(payload)
     },

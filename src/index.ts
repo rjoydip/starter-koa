@@ -1,8 +1,9 @@
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import pify from 'pify'
 import config from './config'
 import logger from './logger'
-import { createServer } from './server'
+import { createGraphQLServer, createServer } from './server'
 import { captureException, environment, isProd } from './utils'
 
 /**
@@ -29,10 +30,13 @@ export async function main(): Promise<void> {
 
     // Create and start the server
     const server = createServer()
-    server.listen(config.port)
+    const graphqlServer = createGraphQLServer()
+    await pify(server.listen(config.port))
+    await pify(graphqlServer.listen(config.port + 1))
 
     // Log server readiness and address information
     logger.ready('Server info:', server.address())
+    logger.ready('GraphQl server info:', graphqlServer.address())
   }
   catch (error) {
     // Capture and log initialization errors

@@ -13,67 +13,67 @@ export interface IConfig {
    * The port number the server listens on.
    * @type {number}
    */
-  port?: number
+  port: number
 
   /**
    * Whether the server should use HTTPS.
    * @type {boolean}
    */
-  isHTTPs?: boolean
+  isHTTPs: boolean
 
   /**
    * Logging level for application logs.
    * @type {LogLevel}
    */
-  log_level?: LogLevel
+  log_level: LogLevel
 
   /**
    * Maximum number of requests allowed per rate duration.
    * @type {number}
    */
-  ratelimit?: number
+  ratelimit: number
 
   /**
    * Rate limit duration in milliseconds.
    * @type {number}
    */
-  duration?: number
+  duration: number
 
   /**
    * Delay in milliseconds before graceful shutdown.
    * @type {number}
    */
-  graceful_delay?: number
+  graceful_delay: number
 
   /**
    * Runtime environment for the application (e.g., "node", "browser").
    * @type {Runtime}
    */
-  runtime?: Runtime
+  runtime: Runtime
 
   /**
    * Data source name (DSN) for the monitoring service.
    * @type {string}
    */
-  monitor_dsn?: string
+  monitor_dsn: string
 
   /**
    * Database connection URL.
    * @type {string}
    */
-  db_url?: string
+  db_url: string
 
   /**
    * Redis or other cache service connection URL.
    * @type {string}
    */
-  cache_url?: string
+  cache_url: string
 
   /**
    * Time-to-live for cached items in seconds.
    * @type {number}
    */
-  cache_ttl?: number
+  cache_ttl: number
 }
 
 // Destructuring environment variables with default values.

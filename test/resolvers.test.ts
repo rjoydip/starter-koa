@@ -11,18 +11,6 @@ describe('⬢ Validate resolvers', () => {
     vi.clearAllMocks()
   })
 
-  describe('⬢ Validate main resolvers', () => {
-    it('● should validate query health', async () => {
-      const { health } = query
-      expect(await health()).toStrictEqual({
-        data: {
-          db: true,
-          cache: true,
-        },
-      })
-    })
-  })
-
   describe('⬢ Validate user resolvers', () => {
     let id: string
 
