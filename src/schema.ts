@@ -19,7 +19,7 @@ export const users = pgTable('users', {
   phone: text('phone').notNull().unique(),
   password: text('password').notNull(),
   address: text('address').notNull(),
-  isVerified: boolean('is_verified').default(false),
+  isVerified: boolean('is_verified').notNull().default(false),
   role: text('role', { enum: ['admin', 'user'] }).notNull().default('user'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

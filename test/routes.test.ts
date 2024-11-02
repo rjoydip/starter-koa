@@ -1,9 +1,12 @@
+import getPort from 'get-port'
+import pify from 'pify'
 import request from 'supertest'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getSelectedTestUser, getTestUser, getUUID } from '../scripts/_seed.ts'
 import { createApplication } from '../src/app.ts'
 import * as db from '../src/db.ts'
 import { resolvers } from '../src/resolvers.ts'
+import { createGraphQLServer } from '../src/server.ts'
 import { API_PREFIX } from '../src/utils.ts'
 
 const app = createApplication()
@@ -14,7 +17,7 @@ describe('⬢ Validate routes', () => {
     vi.clearAllMocks()
   })
 
-  describe('⬢ Validate main routes', () => {
+  describe('⬢ Validate base routes', () => {
     it('● GET /invalid', async () => {
       const { headers, status } = await request(app$)
         .get('/invalid')
@@ -119,12 +122,14 @@ describe('⬢ Validate routes', () => {
       expect(type).toStrictEqual('text/html')
     })
 
-    describe('⬢ Validate graphqlQL routes', () => {
-      it('● GET /graphql', async () => {
-        const { status } = await request(app$)
-          .get(`/${API_PREFIX}/graphql`)
-        expect(status).toEqual(200)
-      })
+    it(`● GET /${API_PREFIX}/graphql`, async () => {
+      const port = await getPort()
+      const graphqlServer = createGraphQLServer()
+      await pify(graphqlServer.listen(port))
+      const { status } = await request(`http://127.0.0.1:${port}`)
+        .get(`/${API_PREFIX}/graphql`)
+      expect(status).toEqual(200)
+      await pify(graphqlServer.close())
     })
   })
 

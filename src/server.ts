@@ -1,12 +1,21 @@
 import type { Server } from 'node:http'
+import type { IConfig } from './config.ts'
 import http from 'node:http'
 import https from 'node:https'
 import closeWithGrace from 'close-with-grace'
+import { createYoga } from 'graphql-yoga'
 import { createApplication } from './app.ts'
 import config from './config.ts'
 import logger from './logger.ts'
-import { captureException } from './utils.ts'
+import { graphqlSchema } from './schema.ts'
+import { API_PREFIX, captureException } from './utils.ts'
 import { ws } from './ws.ts'
+
+export function getServerInstance(config: IConfig) {
+  return (app: any) => {
+    return config?.isHTTPs ? https.createServer(app) : http.createServer(app)
+  }
+}
 
 /**
  * Handles graceful shutdown of the server.
@@ -36,19 +45,26 @@ export function handleGracefulShutdown(server: Server): void {
  */
 export function createServer(): Server {
   const app = createApplication()
-  /* v8 ignore start */
-  const server = config?.isHTTPs
-    ? https.createServer(app.callback())
-    : http.createServer(app.callback())
-  /* v8 ignore stop */
+  const server = getServerInstance(config)(app.callback())
 
   server
     .on('upgrade', ws.handleUpgrade)
-    .on('error', () => {
-      ws.closeAll()
-      handleGracefulShutdown(server)
-    })
+    .on('error', () => handleGracefulShutdown(server))
     .on('close', () => ws.closeAll())
 
   return server
+}
+
+/**
+ * Creates and returns an HTTP/HTTPS grahql server instance.
+ *
+ * @returns {Server} The created HTTP/HTTPS server.
+ */
+export function createGraphQLServer(): Server {
+  const yoga = createYoga({
+    graphqlEndpoint: `/${API_PREFIX}/graphql`,
+    schema: graphqlSchema(),
+  })
+  const graphqlServer = getServerInstance(config)(yoga)
+  return graphqlServer
 }

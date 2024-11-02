@@ -4,8 +4,6 @@ import {
   deleteUser,
   getUser,
   getUsers,
-  isCacheUp,
-  isDBUp,
   updateUser,
 } from './db.ts'
 
@@ -14,22 +12,6 @@ import {
  */
 export const resolvers = {
   Query: {
-    /**
-     * Checks the health status of the database and cache.
-     *
-     * @returns {Promise<{ data: { db: boolean; cache: boolean } }>} Health status of the DB and cache.
-     */
-    async health(): Promise<{ data: { db: boolean, cache: boolean } }> {
-      const dbStatus = await isDBUp()
-      const cacheStatus = await isCacheUp()
-      return {
-        data: {
-          db: dbStatus,
-          cache: cacheStatus,
-        },
-      }
-    },
-
     /**
      * Retrieves a list of users based on optional filter parameters.
      *

@@ -2,7 +2,9 @@ import type {
   Mock,
 } from 'vitest'
 import * as Sentry from '@sentry/node'
+import getPort from 'get-port'
 import {
+  afterEach,
   beforeEach,
   describe,
   expect,
@@ -17,17 +19,20 @@ vi.mock(import('@sentry/node'), () => ({
   init: vi.fn(),
 }))
 
-vi.mock(import('../src/config.ts'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    monitor_dsn: 'https://example.com/sentry',
-  }
-})
-
 describe('⬢ Validate main', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    const port = await getPort()
+    vi.spyOn(config, 'port', 'get').mockReturnValue(port)
+  })
+
+  afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  it('● should validate main function not throw error', () => {
+    expect(async () => {
+      await main()
+    }).not.toThrowError()
   })
 
   it('● should initialize Sentry with correct configuration when environemt is testing', async () => {

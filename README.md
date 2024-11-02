@@ -89,7 +89,7 @@ After running dev command visit `/references` endpoint. Play around with endpoin
 
 ## GraphQL
 
-For showing graphql playground visit `/api/graphql`.
+For showing graphql playground visit `/api/graphql`. Port will be application port `+ 1` (e.g. If port is 3000 then graphql server port is 3001).
 
 ## tRPC
 
@@ -146,12 +146,22 @@ Here are list of endpoints available in application.
 ## TODO
 
 - [x] Testing
-  - [x] Unit test
+  - [x] Unit
     - [x] Cache
     - [x] DB
     - [x] OpenAPI
     - [x] Websocket
-  - [x] StepCI
+    - [x] GraphQL
+    - [ ] tRPC
+  - [x] StepCI Automation
+    - [ ] APIs
+      - [x] HTTP
+      - [ ] tRPC
+      - [ ] GraphQL
+    - [ ] Testing
+      - [ ] Performance
+      - [ ] Load
+      - [ ] Contract
 - [x] CI
   - [x] Actions
     - [x] Parallel
@@ -165,6 +175,7 @@ Here are list of endpoints available in application.
   - [x] Seed
 - [ ] Features
   - [x] JSDoc
+  - [ ] HTTPS (self certified)
   - [x] Paginated
   - [ ] Authentication
   - [x] Benchmarking

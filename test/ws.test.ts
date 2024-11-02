@@ -1,7 +1,8 @@
 import type { Server } from 'node:http'
+import getPort from 'get-port'
+import pify from 'pify'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import WebSocket from 'ws'
-import config from '../src/config.ts'
 import { createServer } from '../src/server.ts'
 import { ws, wsTemplate } from '../src/ws.ts'
 
@@ -10,15 +11,16 @@ describe('⬢ Validate ws', () => {
   let _ws: WebSocket
 
   beforeAll(async () => {
+    const port = await getPort()
     server = createServer()
-    server.listen(config.port)
-    _ws = new WebSocket(`ws://127.0.0.1:${config?.port}/`)
+    await pify(server.listen(port))
+    _ws = new WebSocket(`ws://127.0.0.1:${port}/`)
     await new Promise(resolve => _ws.addEventListener('open', resolve))
   })
 
   afterAll(async () => {
     ws.closeAll()
-    server.close()
+    await pify(server.close())
   })
 
   it('● should validated wsTemplate', () => {

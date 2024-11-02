@@ -1,6 +1,4 @@
-import type { ParameterizedContext } from 'koa'
 import type { IRouter, TApplication } from './types.ts'
-import { createYoga } from 'graphql-yoga'
 import Koa from 'koa'
 import { HttpMethodEnum, koaBody } from 'koa-body'
 import helmet from 'koa-helmet'
@@ -10,7 +8,6 @@ import config from './config.ts'
 import logger from './logger.ts'
 import { createSuccess } from './message.ts'
 import { routers } from './routers.ts'
-import { graphqlSchema } from './schema.ts'
 import { defineTRPCHandler } from './trpc.ts'
 import { API_PREFIX, environment, isProd } from './utils.ts'
 
@@ -29,16 +26,6 @@ export function createApplication(_?: TApplication): Koa {
   // Initialize Koa application with the current environment setting
   const app = new Koa({
     env: environment(),
-  })
-
-  /**
-   * GraphQL yoga server configuration with the application schema.
-   *
-   * @type {ReturnType<typeof createYoga>}
-   */
-  const yoga = createYoga<ParameterizedContext>({
-    graphqlEndpoint: `/${API_PREFIX}/graphql`,
-    schema: graphqlSchema(),
   })
 
   // Initialize a new router instance
@@ -135,22 +122,6 @@ export function createApplication(_?: TApplication): Koa {
         ctx.status = 200
         ctx.req.url = ctx.req.url!.replace(`/${API_PREFIX}/trpc`, '')
         await defineTRPCHandler(ctx.req, ctx.res)
-      }
-      if (ctx.req.url!.startsWith(`/${API_PREFIX}/graphql`)) {
-        // Second parameter adds Koa's context into GraphQL Context
-        const response = await yoga.handleNodeRequestAndResponse(
-          ctx.req,
-          ctx.res,
-          ctx,
-        )
-        // Set status code
-        ctx.status = response.status
-        // Set headers
-        response.headers.forEach((value, key) => {
-          ctx.append(key, value)
-        })
-        // Converts ReadableStream to a NodeJS Stream
-        ctx.body = response.body
       }
     })
   // Internal middleware setup [END]
