@@ -17,7 +17,7 @@ describe('⬢ Validate routes', () => {
     vi.clearAllMocks()
   })
 
-  describe('⬢ Validate main routes', () => {
+  describe('⬢ Validate base routes', () => {
     it('● GET /invalid', async () => {
       const { headers, status } = await request(app$)
         .get('/invalid')

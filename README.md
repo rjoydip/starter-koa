@@ -146,12 +146,22 @@ Here are list of endpoints available in application.
 ## TODO
 
 - [x] Testing
-  - [x] Unit test
+  - [x] Unit
     - [x] Cache
     - [x] DB
     - [x] OpenAPI
     - [x] Websocket
-  - [x] StepCI
+    - [x] GraphQL
+    - [ ] tRPC
+  - [x] StepCI Automation
+    - [ ] APIs
+      - [x] HTTP
+      - [ ] tRPC
+      - [ ] GraphQL
+    - [ ] Testing
+      - [ ] Performance
+      - [ ] Load
+      - [ ] Contract
 - [x] CI
   - [x] Actions
     - [x] Parallel
@@ -165,6 +175,7 @@ Here are list of endpoints available in application.
   - [x] Seed
 - [ ] Features
   - [x] JSDoc
+  - [ ] HTTPS (self certified)
   - [x] Paginated
   - [ ] Authentication
   - [x] Benchmarking

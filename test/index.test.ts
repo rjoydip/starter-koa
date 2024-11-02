@@ -29,6 +29,12 @@ describe('⬢ Validate main', () => {
     vi.clearAllMocks()
   })
 
+  it('● should validate main function not throw error', () => {
+    expect(async () => {
+      await main()
+    }).not.toThrowError()
+  })
+
   it('● should initialize Sentry with correct configuration when environemt is testing', async () => {
     vi.spyOn(utils, 'environment').mockReturnValue('testing')
     vi.spyOn(utils, 'isProd').mockReturnValue(false)
