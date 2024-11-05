@@ -19,23 +19,11 @@ const { procedure, router } = t
  */
 export const tRPCRouter = router({
   /**
-   * Welcome endpoint that returns a greeting message.
-   *
-   * @returns {string} A welcome message.
-   */
-  welcome: procedure
-    .meta({ openapi: { method: 'GET', path: '/welcome' } })
-    .input(z.void())
-    .output(z.literal('Welcome to Koa Starter'))
-    .query(() => 'Welcome to Koa Starter' as const),
-
-  /**
    * Retrieves a list of users.
    *
    * @returns {Promise<User[]>} A promise that resolves to an array of users.
    */
   getUsers: procedure
-    .meta({ openapi: { method: 'GET', path: '/users' } })
     .query(async () => {
       return await resolvers.Query.getUsers()
     }),
@@ -59,7 +47,6 @@ export const tRPCRouter = router({
    * @returns {Promise<User>} A promise that resolves to the created user object.
    */
   createUser: procedure
-    .meta({ openapi: { method: 'POST', path: '/user' } })
     .input(insertUserSchema)
     .mutation(async ({ input }) => {
       return await resolvers.Mutation.createUser(null, { input })

@@ -36,7 +36,7 @@ export async function main(): Promise<void> {
 
     // Log server readiness and address information
     logger.ready('Server info:', server.address())
-    logger.ready('GraphQl server info:', graphqlServer.address())
+    logger.ready('GraphQL server info:', graphqlServer.address())
   }
   catch (error) {
     // Capture and log initialization errors
