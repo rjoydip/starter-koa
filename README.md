@@ -122,7 +122,7 @@ method=deleteUser&id=<USER_ID>
 
 ## StepCI
 
-The package is installed as dev depedency so by executing `npx stepci run ./test/workflow.yml` locally APIs can be tested.
+The package is installed as dev depedency so by executing `npx stepci run ./test/workflow.yml` locally APIs can be tested. Otherwise unit test also covered the workflow.
 
 ## Endpoints
 
@@ -152,12 +152,12 @@ Here are list of endpoints available in application.
     - [x] OpenAPI
     - [x] Websocket
     - [x] GraphQL
-    - [ ] tRPC
+    - [x] tRPC
   - [x] StepCI Automation
     - [ ] APIs
       - [x] HTTP
       - [ ] tRPC
-      - [ ] GraphQL
+      - [x] GraphQL
     - [ ] Testing
       - [ ] Performance
       - [ ] Load

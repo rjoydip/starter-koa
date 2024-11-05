@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest'
 import config from '../src/config.ts'
 import { createGraphQLServer, createServer } from '../src/server.ts'
 
-describe('⬢ Validate API test', async () => {
-  it('check Response Status', async () => {
+describe('⬢ Validate StepCI automation', async () => {
+  it('● should validate automation workflow status', async () => {
     const server = createServer()
     const graphqlServer = createGraphQLServer()
     await pify(server.listen(config.port))

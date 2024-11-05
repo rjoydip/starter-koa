@@ -79,6 +79,149 @@ tests:
           check:
             status: 200
 
+      - name: graphql_create_user
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
+          graphql:
+            query: |
+              mutation CreateUser($input: UserInput!) {
+                createUser(input: $input) {
+                  id
+                  name
+                  email
+                  phone
+                  address
+                  role
+                  is_verified
+                  created_at
+                  updated_at
+                }
+              }
+            variables:
+              input:
+                name: graphqltestusername
+                email: graphql.test.email@example.com
+                phone: '+1234567891'
+                isVerified: true
+                password: teirttiwwruoruwiorouworuworu
+                address: testaddress1
+                role: user
+          captures:
+            id:
+              jsonpath: $.data.createUser.id
+          check:
+            status: 200
+
+      - name: graphql_update_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
+          graphql:
+            query: |
+              mutation UpdateUser($id: ID!, $input: UserInput!) {
+                updateUser(id: $id, input: $input) {
+                  id
+                  name
+                  email
+                  phone
+                  address
+                  role
+                  is_verified
+                  created_at
+                  updated_at
+                }
+              }
+            variables:
+              id: ${{captures.id}}
+              input:
+                name: graphqltestusernameedited
+                email: graphql.test.email@example.com
+                phone: '+1234567891'
+                isVerified: true
+                password: teirttiwwruoruwiorouworuworu
+                address: testaddress1
+                role: user
+          check:
+            status: 200
+            jsonpath:
+              $.data.updateUser.id: ${{captures.id}}
+
+      - name: graphql_get_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
+          graphql:
+            query: |
+              query GetUser($id: ID!) {
+                getUser(id: $id) {
+                  id
+                  name
+                  email
+                  phone
+                  address
+                  role
+                  is_verified
+                  created_at
+                  updated_at
+                }
+              }
+            variables:
+              id: ${{captures.id}}
+          check:
+            status: 200
+            jsonpath:
+              $.data.getUser.id: ${{captures.id}}
+
+      - name: graphql_get_users
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
+          graphql:
+            query: |
+              query {
+                getUsers {
+                  id
+                  name
+                  email
+                  phone
+                  address
+                  role
+                  is_verified
+                  created_at
+                  updated_at
+                }
+              }
+          check:
+            status: 200
+            # jsonpath:
+            #   $.data.getUsers[0].id: ${{captures.id}}
+
+      - name: graphql_delete_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
+          graphql:
+            query: |
+              mutation DeleteUser($id: ID!) {
+                deleteUser(id: $id) {
+                  id
+                  name
+                  email
+                  phone
+                  address
+                  role
+                  is_verified
+                  created_at
+                  updated_at
+                }
+              }
+            variables:
+              id: ${{captures.id}}
+          check:
+            status: 200
+            jsonpath:
+              $.data.deleteUser.id: ${{captures.id}}
+
       - name: ws_playground
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
@@ -110,7 +253,7 @@ tests:
             email: test.email@example.com
             phone: '+1234567890'
             isVerified: true
-            password: testpassword
+            password: kljwoithwiotwothwiurryurruiw
             address: testaddress
             role: user
           captures:
@@ -143,7 +286,7 @@ tests:
             email: test.email@example.com
             phone: '+1234567890'
             isVerified: false
-            password: testpassword
+            password: kljwoithwiotwothwiurryurruiw
             address: testaddress
             role: user
           headers:

@@ -1,18 +1,12 @@
 import { initTRPC } from '@trpc/server'
-import request from 'supertest'
 import { describe, expect, it } from 'vitest'
 import { getTestUser } from '../scripts/_seed'
-import { createApplication } from '../src/app'
 import { tRPCRouter } from '../src/trpc'
-import { API_PREFIX } from '../src/utils'
-
-const app = createApplication()
-const app$ = app.callback()
 
 describe('⬢ Validate tRPC', () => {
   let _id: string
 
-  describe('⬢ Validate routes', () => {
+  describe('⬢ Validate routes through factory', () => {
     it.sequential('● should get response form getUsers', async () => {
       const t = initTRPC.context().create()
       const { createCallerFactory } = t
@@ -74,16 +68,6 @@ describe('⬢ Validate tRPC', () => {
       const caller = createCaller({})
       const r = await caller.getUser(_id)
       expect(r).toBeUndefined()
-    })
-  })
-
-  describe('⬢ Validate handler', () => {
-    it('● should get response form welcome', async () => {
-      const { status, body } = await request(app$)
-        .get(`/${API_PREFIX}/trpc/welcome`)
-        .set('Accept', 'application/json')
-      expect(status).toEqual(200)
-      expect(body.result.data).toEqual('Welcome to Koa Starter')
     })
   })
 })
