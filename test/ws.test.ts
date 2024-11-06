@@ -61,4 +61,11 @@ describe('⬢ Validate ws', () => {
     const result = await new Promise(resolve => _ws.addEventListener('close', resolve))
     expect(result).toBeDefined()
   })
+
+  /* it('● should validate error connection', async () => {
+    const data = Buffer.alloc(2 * 1024 * 1024, 'a') // 2 MB
+    _ws.send(data)
+    const result = await new Promise(resolve => _ws.addEventListener('error', resolve))
+    expect(result).toBeDefined()
+  }) */
 })

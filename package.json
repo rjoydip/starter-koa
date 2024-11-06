@@ -40,9 +40,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=9",
-    "typescript": ">=5.5"
+    "node": ">=20"
   },
   "scripts": {
     "_setup": "nr _update && nr lint && nr typecheck && nr build && nr test",

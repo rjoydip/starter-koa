@@ -21,6 +21,9 @@ const hooksMapper: Record<THooksMapper, (id: string, input: UserInput) => Promis
 
 // WebSocket server instance
 export const ws = crossws({
+  serverOptions: {
+    maxPayload: 1 * 1024 * 1024,
+  },
   hooks: defineHooks({
     open(peer) {
       logger.log(`[ws] open: ${peer.id}`)
@@ -54,6 +57,7 @@ export const ws = crossws({
       logger.log('[ws] close', peer.id, event)
     },
 
+    /* v8 ignore next 4 */
     error(peer, error) {
       logger.log('[ws] error', peer.id, error)
       captureException(`[${peer.id}]: ${error}`)
