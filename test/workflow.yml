@@ -82,6 +82,8 @@ tests:
           check:
             status: 200
 
+  /api/graphql{*}:
+    steps:
       - name: graphql
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
@@ -227,6 +229,81 @@ tests:
           check:
             status: 200
 
+  /api/trpc{*}:
+    steps:
+      - name: trpc_ping
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            query:
+              ping:
+          check:
+            status: /^200/
+            jsonpath:
+              $.result.data: Pong
+
+      - name: trpc_create_user
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            mutation:
+              createUser:
+                $ref: '#/components/input_data'
+          captures:
+            id:
+              jsonpath: $.result.data.id
+          check:
+            status: /^200/
+
+      - name: trpc_update_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            mutation:
+              updateUser:
+                id: ${{captures.id}}
+                payload:
+                  $ref: '#/components/input_data'
+          check:
+            status: /^200/
+            jsonpath:
+              $.result.data.id: ${{captures.id}}
+
+      - name: trpc_get_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            query:
+              getUser: ${{captures.id}}
+          check:
+            status: /^200/
+            jsonpath:
+              $.result.data.id: ${{captures.id}}
+
+      - name: trpc_get_users
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            query:
+              getUsers:
+          check:
+            status: /^200/
+
+      - name: trpc_delete_user
+        if: captures.id
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
+          trpc:
+            mutation:
+              deleteUser: ${{captures.id}}
+          check:
+            status: /^200/
+            jsonpath:
+              $.result.data.id: ${{captures.id}}
+
   /api/user{*}:
     steps:
       - name: get_users
@@ -255,6 +332,8 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            jsonpath:
+              $.result.data.id: ${{captures.id}}
 
       - name: get_user
         if: captures.id
@@ -267,6 +346,8 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            jsonpath:
+              $.data.id: ${{captures.id}}
 
       - name: update_user_details
         if: captures.id
@@ -281,6 +362,8 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            jsonpath:
+              $.data.id: ${{captures.id}}
 
       - name: update_user
         if: captures.id
@@ -295,6 +378,8 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            jsonpath:
+              $.data.id: ${{captures.id}}
 
       - name: delete_user
         if: captures.id
@@ -307,3 +392,5 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            jsonpath:
+              $.data.id: ${{captures.id}}
