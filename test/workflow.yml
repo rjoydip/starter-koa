@@ -8,6 +8,16 @@ env:
   prefix: api
   protocal: http
 
+components:
+  input_data:
+    name: ${{ person.fullName | fake}}
+    email: ${{ internet.email | fake}}
+    phone: ${{ phone.number | fake}}
+    isVerified: ${{ datatype.boolean | fake }}
+    password: ${{ internet.password | fake }}
+    address: ${{ location.city | fake }}
+    role: user
+
 tests:
   /{*}:
     steps:
@@ -99,13 +109,7 @@ tests:
               }
             variables:
               input:
-                name: graphqltestusername
-                email: graphql.test.email@example.com
-                phone: '+1234567891'
-                isVerified: true
-                password: teirttiwwruoruwiorouworuworu
-                address: testaddress1
-                role: user
+                $ref: '#/components/input_data'
           captures:
             id:
               jsonpath: $.data.createUser.id
@@ -134,13 +138,7 @@ tests:
             variables:
               id: ${{captures.id}}
               input:
-                name: graphqltestusernameedited
-                email: graphql.test.email@example.com
-                phone: '+1234567891'
-                isVerified: true
-                password: teirttiwwruoruwiorouworuworu
-                address: testaddress1
-                role: user
+                $ref: '#/components/input_data'
           check:
             status: 200
             jsonpath:
@@ -249,13 +247,7 @@ tests:
           headers:
             Content-Type: application/json
           json:
-            name: testusername
-            email: test.email@example.com
-            phone: '+1234567890'
-            isVerified: true
-            password: kljwoithwiotwothwiurryurruiw
-            address: testaddress
-            role: user
+            $ref: '#/components/input_data'
           captures:
             id:
               jsonpath: $.data.id
@@ -282,13 +274,7 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: PUT
           json:
-            name: testusername
-            email: test.email@example.com
-            phone: '+1234567890'
-            isVerified: false
-            password: kljwoithwiotwothwiurryurruiw
-            address: testaddress
-            role: user
+            $ref: '#/components/input_data'
           headers:
             Content-Type: application/json
           check:
@@ -302,7 +288,7 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: PATCH
           json:
-            isVerified: false
+            $ref: '#/components/input_data'
           headers:
             Content-Type: application/json
           check:

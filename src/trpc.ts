@@ -19,6 +19,12 @@ const { procedure, router } = t
  */
 export const tRPCRouter = router({
   /**
+   * Check status.
+   *
+   * @returns {string} - Return Pong.
+   */
+  ping: procedure.query(() => 'Pong'),
+  /**
    * Retrieves a list of users.
    *
    * @returns {Promise<User[]>} A promise that resolves to an array of users.
@@ -92,6 +98,7 @@ export type TRPCRouter = typeof tRPCRouter
  */
 export const defineTRPCHandler = createHTTPHandler({
   router: tRPCRouter,
+  /* v8 ignore next 2 */
   createContext() {
     return {}
   },

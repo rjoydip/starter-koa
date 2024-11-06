@@ -122,6 +122,18 @@ describe('⬢ Validate routes', () => {
       expect(type).toStrictEqual('text/html')
     })
 
+    it(`● GET /${API_PREFIX}/trpc/ping`, async () => {
+      const { headers, status, body } = await request(app$)
+        .get(`/${API_PREFIX}/trpc/ping`)
+      expect(headers['content-type']).toMatch('application/json')
+      expect(status).toEqual(200)
+      expect(body).toEqual({
+        result: {
+          data: 'Pong',
+        },
+      })
+    })
+
     it(`● GET /${API_PREFIX}/graphql`, async () => {
       const port = await getPort()
       const graphqlServer = createGraphQLServer()
