@@ -23,14 +23,14 @@ export const tRPCRouter = router({
    *
    * @returns {string} - Return Pong.
    */
-  ping: procedure.input(z.null()).query(() => 'Pong'),
+  ping: procedure.input(z.void()).query(() => 'Pong'),
   /**
    * Retrieves a list of users.
    *
    * @returns {Promise<User[]>} A promise that resolves to an array of users.
    */
   getUsers: procedure
-    .input(z.null())
+    .input(z.void())
     .query(async () => {
       return await resolvers.Query.getUsers()
     }),

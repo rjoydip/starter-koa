@@ -233,10 +233,7 @@ tests:
     steps:
       - name: trpc_ping
         http:
-          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
-          trpc:
-            query:
-              ping:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/ping
           check:
             status: /^200/
             jsonpath:
@@ -285,10 +282,7 @@ tests:
       - name: trpc_get_users
         if: captures.id
         http:
-          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc
-          trpc:
-            query:
-              getUsers:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/getUsers
           check:
             status: /^200/
 

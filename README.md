@@ -156,7 +156,7 @@ Here are list of endpoints available in application.
   - [x] StepCI Automation
     - [ ] APIs
       - [x] HTTP
-      - [ ] tRPC
+      - [x] tRPC
       - [x] GraphQL
     - [ ] Testing
       - [ ] Performance
