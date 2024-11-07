@@ -2,6 +2,7 @@ import type { Runtime } from './types.ts'
 import { readFile } from 'node:fs/promises'
 import { env } from 'node:process'
 import { captureException as sentryCaptureException } from '@sentry/node'
+import selfsigned from 'selfsigned'
 import logger from './logger.ts'
 
 // Error prefix used in invariant checks
@@ -130,4 +131,17 @@ export const HTTP_STATUS_CODE = {
  */
 export async function getOpenAPISpec(): Promise<string> {
   return await readFile('./src/openapi.yaml', { encoding: 'utf8' })
+}
+
+/**
+ * Function to generate a self-signed certificate with dynamic attributes.
+ *
+ * @export
+ * @param {string} namespace - A namespace.
+ * @param {number} days - Number of days the key will valid.
+ * @returns {selfsigned.GenerateResult} - Signed key.
+ */
+export function createCertificate(namespace: string, days: number): selfsigned.GenerateResult {
+  const attrs = [{ name: 'commonName', value: namespace }]
+  return selfsigned.generate(attrs, { days })
 }

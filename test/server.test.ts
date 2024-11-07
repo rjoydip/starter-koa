@@ -3,23 +3,9 @@ import Koa from 'koa'
 import pify from 'pify'
 import { describe, expect, it, vi } from 'vitest'
 import config from '../src/config.ts'
-import logger from '../src/logger.ts'
-import { createGraphQLServer, createServer, getServerInstance, handleGracefulShutdown } from '../src/server.ts'
-import * as utils from '../src/utils.ts'
-
-vi.mock('close-with-grace', () => ({
-  default: (_, callback) => {
-    callback({ err: new Error('Test error') })
-  },
-}))
+import { createGraphQLServer, createServer, getServerInstance } from '../src/server.ts'
 
 describe('⬢ Validate server', () => {
-  const mockErrorLogger = vi.spyOn(logger, 'error').mockImplementation(
-    () => {},
-  )
-  const mockCaptureException = vi.spyOn(utils, 'captureException')
-    .mockImplementation(() => {})
-
   it('● should validated http server instance', async () => {
     vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(false)
     const app = new Koa({})
@@ -49,7 +35,8 @@ describe('⬢ Validate server', () => {
     }
   })
 
-  it('● should validated server instance', async () => {
+  it('● should validated http server & graphql server', async () => {
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(false)
     const port = await getPort()
 
     const server = createServer()
@@ -63,33 +50,18 @@ describe('⬢ Validate server', () => {
     await pify(graphqlServer.close())
   })
 
-  it('● should log an error, capture exception, and close the app server', () => {
-    process.env.GRACEFUL_DELAY = '0'
-    vi.useFakeTimers()
+  it('● should validated https server & graphql server', async () => {
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(true)
+    const port = await getPort()
+
     const server = createServer()
-    handleGracefulShutdown(server)
-    vi.advanceTimersByTime(0)
-    server.close()
-    expect(mockErrorLogger).toHaveBeenCalledWith(
-      '[close-with-grace] Error: Test error',
-    )
-    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
+    await pify(server.listen(port))
+    expect(server.listening).toBeTruthy()
+    await pify(server.close())
 
-    vi.useRealTimers()
-  })
-
-  it('● should log an error, capture exception, and close the server after 500ms', () => {
-    process.env.GRACEFUL_DELAY = '500'
-    vi.useFakeTimers()
-    const server = createServer()
-    handleGracefulShutdown(server)
-    vi.advanceTimersByTime(500)
-    server.close()
-    expect(mockErrorLogger).toHaveBeenCalledWith(
-      '[close-with-grace] Error: Test error',
-    )
-    expect(mockCaptureException).toHaveBeenCalledWith(new Error('Test error'))
-
-    vi.useRealTimers()
+    const graphqlServer = createGraphQLServer()
+    await pify(graphqlServer.listen(port + 1))
+    expect(graphqlServer.listening).toBeTruthy()
+    await pify(graphqlServer.close())
   })
 })

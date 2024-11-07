@@ -9,7 +9,6 @@ Koa application starter. Simple & logical separation on single file.
 
 - ✅ Koa
 - ✅ Drizzle
-- ✅ GraphQL Yoga
 - ✅ UnJS
   - ✅ Unbuild
   - ✅ Unstorage
@@ -18,13 +17,19 @@ Koa application starter. Simple & logical separation on single file.
   - ✅ DB0
     - ✅ PostgreSQL
   - ✅ Cossws
-- ✅ tRPC
+- ✅ APIs
+  - ✅ tRPC
+  - ✅ GraphQL
+    - ✅ GraphQL Yoga
+  - ✅ OpenAPI
+  - ✅ Websocket
+    - ✅ Cossws
 - ✅ Scalar
-- ✅ OpenAPI
 - ✅ Sentry
 - ✅ Zod
 - ✅ Vitest
 - ✅ Autocannon
+- ✅ StepCI
 
 ## Development
 
@@ -38,41 +43,62 @@ Koa application starter. Simple & logical separation on single file.
 
 ## CLI
 
-For install
+For development mode install
 
 ```sh
-pnpm install # or ni
-pnpm install --production # or nci
+pnpm install
+# or
+ni
+```
+
+For production mode install
+
+```sh
+pnpm install --production
+# or
+nci
 ```
 
 For build
 
 ```sh
-pnpm run build # or nr build
+pnpm run build
+# or
+nr build
 ```
 
 For lint
 
 ```sh
-pnpm run lint # or nr lint
+pnpm run lint
+# or
+nr lint
 ```
 
 For test, dotenvx will pick `.env` file
 
 ```sh
-npx dotenvx run -- pnpm run test # or npx dotenvx run -- nr test
+npx dotenvx run -- pnpm run test
+# or
+npx dotenvx run -- nr test
+# If want to execute a specific test file then
+npx dotenvx run -- vitest run test/index.test.ts
 ```
 
 For setup and verify
 
 ```sh
-pnpm run _setup # or nr _setup
+pnpm run _setup
+# or
+nr _setup
 ```
 
 For benchmarking. For in-depth diagnosis use [clinic](https://github.com/clinicjs/node-clinic) `doctor` & `flame`.
 
 ```sh
-pnpm run benchmark # or nr benchmark
+pnpm run benchmark
+# or
+nr benchmark
 ```
 
 For drizzle migrations, `drizzle-kit` already installed as dev dependency.
@@ -154,9 +180,9 @@ Here are list of endpoints available in application.
     - [x] GraphQL
     - [x] tRPC
   - [x] StepCI Automation
-    - [ ] APIs
+    - [x] APIs
       - [x] HTTP
-      - [ ] tRPC
+      - [x] tRPC
       - [x] GraphQL
     - [ ] Testing
       - [ ] Performance
@@ -175,7 +201,7 @@ Here are list of endpoints available in application.
   - [x] Seed
 - [ ] Features
   - [x] JSDoc
-  - [ ] HTTPS (self certified)
+  - [x] HTTPS (self certified)
   - [x] Paginated
   - [ ] Authentication
   - [x] Benchmarking

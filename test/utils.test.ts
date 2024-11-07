@@ -7,10 +7,12 @@ import {
   captureException as sentryCaptureException,
 } from '@sentry/node'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { getUUID } from '../scripts/_seed.ts'
 import logger from '../src/logger.ts'
 import {
   API_PREFIX,
   captureException,
+  createCertificate,
   environment,
   getOpenAPISpec,
   getRuntime,
@@ -43,6 +45,15 @@ describe('⬢ Validate utils', () => {
 
   it('● should validated exported value', () => {
     expect(API_PREFIX).toStrictEqual('api')
+  })
+
+  it('● should validated createCertificate function', () => {
+    const pem = createCertificate(getUUID(), 30)
+    expect(pem).toMatchObject({
+      private: expect.anything(),
+      public: expect.anything(),
+      cert: expect.anything(),
+    })
   })
 
   it('● should return the content of the openapi.yaml file as a string', async () => {

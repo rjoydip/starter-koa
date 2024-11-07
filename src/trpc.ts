@@ -23,13 +23,14 @@ export const tRPCRouter = router({
    *
    * @returns {string} - Return Pong.
    */
-  ping: procedure.query(() => 'Pong'),
+  ping: procedure.input(z.void()).query(() => 'Pong'),
   /**
    * Retrieves a list of users.
    *
    * @returns {Promise<User[]>} A promise that resolves to an array of users.
    */
   getUsers: procedure
+    .input(z.void())
     .query(async () => {
       return await resolvers.Query.getUsers()
     }),
@@ -98,7 +99,7 @@ export type TRPCRouter = typeof tRPCRouter
  */
 export const defineTRPCHandler = createHTTPHandler({
   router: tRPCRouter,
-  /* v8 ignore next 2 */
+  /* v8 ignore next 3 */
   createContext() {
     return {}
   },

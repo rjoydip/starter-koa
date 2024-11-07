@@ -28,15 +28,17 @@ export async function main(): Promise<void> {
       profilesSampleRate: 1.0, // Capture all profiles
     })
 
-    // Create and start the server
+    // Create server instanceslo
     const server = createServer()
     const graphqlServer = createGraphQLServer()
+
+    // Listen server instances
     await pify(server.listen(config.port))
     await pify(graphqlServer.listen(config.port + 1))
 
     // Log server readiness and address information
-    logger.ready('Server info:', server.address())
-    logger.ready('GraphQL server info:', graphqlServer.address())
+    logger.ready(`${config.isHTTPs ? 'HTTPs' : 'HTTP'} server info:`, server.address())
+    logger.ready(`${config.isHTTPs ? 'GraphQLs' : 'GraphQL'} server info:`, graphqlServer.address())
   }
   catch (error) {
     // Capture and log initialization errors
