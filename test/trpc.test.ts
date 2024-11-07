@@ -84,19 +84,5 @@ describe('⬢ Validate tRPC', () => {
       expect(status).toEqual(200)
       expect(body.result).toBeDefined()
     })
-
-    it.skip('● should get response form createUser', async () => {
-      const testUser = getTestUser()
-      const { headers, status, body } = await request(app$)
-        .get(`/${API_PREFIX}/trpc/createUser?input=${JSON.stringify(testUser)}`)
-        .set('Accept', 'application/json')
-      expect(headers['content-type']).toMatch('application/json')
-      expect(status).toEqual(200)
-      expect(body).toMatchObject({
-        result: {
-          data: testUser,
-        },
-      })
-    })
   })
 })

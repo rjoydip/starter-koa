@@ -59,7 +59,6 @@
     "@sentry/node": "^8.37.0",
     "@sentry/profiling-node": "^8.37.0",
     "@trpc/server": "^10.45.2",
-    "close-with-grace": "^2.1.0",
     "confbox": "^0.1.8",
     "consola": "^3.2.3",
     "crossws": "^0.3.1",

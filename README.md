@@ -9,7 +9,6 @@ Koa application starter. Simple & logical separation on single file.
 
 - ✅ Koa
 - ✅ Drizzle
-- ✅ GraphQL Yoga
 - ✅ UnJS
   - ✅ Unbuild
   - ✅ Unstorage
@@ -18,13 +17,19 @@ Koa application starter. Simple & logical separation on single file.
   - ✅ DB0
     - ✅ PostgreSQL
   - ✅ Cossws
-- ✅ tRPC
+- ✅ APIs
+  - ✅ tRPC
+  - ✅ GraphQL
+    - ✅ GraphQL Yoga
+  - ✅ OpenAPI
+  - ✅ Websocket
+    - ✅ Cossws
 - ✅ Scalar
-- ✅ OpenAPI
 - ✅ Sentry
 - ✅ Zod
 - ✅ Vitest
 - ✅ Autocannon
+- ✅ StepCI
 
 ## Development
 
