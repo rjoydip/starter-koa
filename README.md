@@ -159,7 +159,7 @@ Here are list of endpoints available in application.
     - [x] GraphQL
     - [x] tRPC
   - [x] StepCI Automation
-    - [ ] APIs
+    - [x] APIs
       - [x] HTTP
       - [x] tRPC
       - [x] GraphQL
