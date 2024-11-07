@@ -35,7 +35,23 @@ describe('⬢ Validate server', () => {
     }
   })
 
-  it('● should validated server instance', async () => {
+  it('● should validated http server & graphql server', async () => {
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(false)
+    const port = await getPort()
+
+    const server = createServer()
+    await pify(server.listen(port))
+    expect(server.listening).toBeTruthy()
+    await pify(server.close())
+
+    const graphqlServer = createGraphQLServer()
+    await pify(graphqlServer.listen(port + 1))
+    expect(graphqlServer.listening).toBeTruthy()
+    await pify(graphqlServer.close())
+  })
+
+  it('● should validated https server & graphql server', async () => {
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(true)
     const port = await getPort()
 
     const server = createServer()

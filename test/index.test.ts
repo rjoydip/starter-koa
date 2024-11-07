@@ -38,6 +38,7 @@ describe('⬢ Validate main', () => {
   it('● should initialize Sentry with correct configuration when environemt is testing', async () => {
     vi.spyOn(utils, 'environment').mockReturnValue('testing')
     vi.spyOn(utils, 'isProd').mockReturnValue(false)
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(false)
 
     await main()
 
@@ -54,6 +55,7 @@ describe('⬢ Validate main', () => {
   it('● should initialize Sentry with correct configuration when environemt is production', async () => {
     vi.spyOn(utils, 'environment').mockReturnValue('production')
     vi.spyOn(utils, 'isProd').mockReturnValue(true)
+    vi.spyOn(config, 'isHTTPs', 'get').mockReturnValue(true)
 
     await main()
 

@@ -74,6 +74,12 @@ export interface IConfig {
    * @type {number}
    */
   cache_ttl: number
+
+  /**
+   * Time-to-live for cached items in seconds.
+   * @type {number}
+   */
+  cert_days: number
 }
 
 // Destructuring environment variables with default values.
@@ -89,6 +95,7 @@ const {
   DATABASE_URL = '',
   CACHE_URL = '',
   CACHE_TTL = '1',
+  CERT_DAYS = '365',
 } = env
 
 /**
@@ -97,17 +104,18 @@ const {
  * @type {IConfig}
  */
 const config: IConfig = {
-  port: Number(PORT),
+  port: Number.parseInt(PORT),
   isHTTPs: ENABLE_HTTPS === 'true',
-  ratelimit: Number(RATE_LIMIT),
-  duration: Number(RATE_DURATION),
+  ratelimit: Number.parseInt(RATE_LIMIT),
+  duration: Number.parseInt(RATE_DURATION),
   log_level: Number.parseInt(LOG_LEVEL, 10) as LogLevel,
-  graceful_delay: Number(GRACEFUL_DELAY),
+  graceful_delay: Number.parseInt(GRACEFUL_DELAY),
   runtime: RUNTIME as Runtime,
   monitor_dsn: MONITOR_DNS,
   db_url: DATABASE_URL,
   cache_url: CACHE_URL,
-  cache_ttl: Number(CACHE_TTL),
+  cache_ttl: Number.parseInt(CACHE_TTL),
+  cert_days: Number.parseInt(CERT_DAYS),
 }
 
 export default config

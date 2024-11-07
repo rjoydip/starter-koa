@@ -6,12 +6,19 @@ import { createYoga } from 'graphql-yoga'
 import { createApplication } from './app.ts'
 import config from './config.ts'
 import { graphqlSchema } from './schema.ts'
-import { API_PREFIX, captureException } from './utils.ts'
+import { API_PREFIX, captureException, createCertificate } from './utils.ts'
 import { ws } from './ws.ts'
 
 export function getServerInstance(config: IConfig) {
+  const pems = createCertificate('starter-koa', config.cert_days)
+
+  const options = {
+    key: pems.private,
+    cert: pems.cert,
+  }
+
   return (app: any) => {
-    return config?.isHTTPs ? https.createServer(app) : http.createServer(app)
+    return config?.isHTTPs ? https.createServer(options, app) : http.createServer(app)
   }
 }
 
