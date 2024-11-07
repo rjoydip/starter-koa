@@ -65,6 +65,5 @@ export function createGraphQLServer(): Server {
     graphqlEndpoint: `/${API_PREFIX}/graphql`,
     schema: graphqlSchema(),
   })
-  const graphqlServer = getServerInstance(config)(yoga)
-  return graphqlServer
+  return getServerInstance(config)(yoga)
 }

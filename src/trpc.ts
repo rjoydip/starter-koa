@@ -99,7 +99,7 @@ export type TRPCRouter = typeof tRPCRouter
  */
 export const defineTRPCHandler = createHTTPHandler({
   router: tRPCRouter,
-  /* v8 ignore next 2 */
+  /* v8 ignore next 3 */
   createContext() {
     return {}
   },

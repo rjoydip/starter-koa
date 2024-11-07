@@ -116,8 +116,8 @@ export function createApplication(_?: TApplication): Koa {
       await next()
     })
     .use(async (ctx, next) => {
-      // tRPC integration for API requests to '/api/trpc' endpoint
       await next()
+      // tRPC integration for API requests to '/api/trpc' endpoint
       if (ctx.req.url!.startsWith(`/${API_PREFIX}/trpc`)) {
         ctx.status = 200
         ctx.req.url = ctx.req.url!.replace(`/${API_PREFIX}/trpc`, '')
