@@ -8,6 +8,14 @@ env:
   prefix: api
   protocal: http
 
+config:
+  loadTest:
+    phases:
+      - duration: 2
+        arrivalRate: 1
+      - duration: 10
+        arrivalRate: 2
+
 components:
   input_data:
     name: ${{ person.fullName | fake}}
@@ -29,6 +37,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 350
+              total:
+                - lte: 400
 
       - name: status
         http:
@@ -38,6 +51,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 800
+              total:
+                - lte: 900
 
       - name: health
         http:
@@ -47,6 +65,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
 
       - name: metrics
         http:
@@ -56,6 +79,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
 
       - name: meta
         http:
@@ -65,6 +93,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
 
       - name: openapi_data
         http:
@@ -74,6 +107,11 @@ tests:
             status: 200
             headers:
               Content-Type: application/json; charset=utf-8
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
 
       - name: references
         http:
@@ -81,6 +119,23 @@ tests:
           method: GET
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
+
+      - name: ws_playground
+        http:
+          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
+          method: GET
+          check:
+            status: 200
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
 
   /api/graphql{*}:
     steps:
@@ -90,6 +145,11 @@ tests:
           method: GET
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 300
 
       - name: graphql_create_user
         http:
@@ -117,6 +177,11 @@ tests:
               jsonpath: $.data.createUser.id
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
 
       - name: graphql_update_user
         if: captures.id
@@ -143,6 +208,11 @@ tests:
                 $ref: '#/components/input_data'
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             jsonpath:
               $.data.updateUser.id: ${{captures.id}}
 
@@ -169,6 +239,11 @@ tests:
               id: ${{captures.id}}
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 400
+              total:
+                - lte: 450
             jsonpath:
               $.data.getUser.id: ${{captures.id}}
 
@@ -193,6 +268,11 @@ tests:
               }
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 500
+              total:
+                - lte: 550
             # jsonpath:
             #   $.data.getUsers[0].id: ${{captures.id}}
 
@@ -219,15 +299,13 @@ tests:
               id: ${{captures.id}}
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             jsonpath:
               $.data.deleteUser.id: ${{captures.id}}
-
-      - name: ws_playground
-        http:
-          url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
-          method: GET
-          check:
-            status: 200
 
   /api/trpc{*}:
     steps:
@@ -236,6 +314,11 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/ping
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 500
+              total:
+                - lte: 550
             jsonpath:
               $.result.data: Pong
 
@@ -251,6 +334,11 @@ tests:
               jsonpath: $.result.data.id
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
 
       - name: trpc_update_user
         if: captures.id
@@ -264,6 +352,11 @@ tests:
                   $ref: '#/components/input_data'
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -276,6 +369,11 @@ tests:
               getUser: ${{captures.id}}
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 200
+              total:
+                - lte: 250
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -285,6 +383,11 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/getUsers
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 80
+              total:
+                - lte: 100
 
       - name: trpc_delete_user
         if: captures.id
@@ -295,6 +398,11 @@ tests:
               deleteUser: ${{captures.id}}
           check:
             status: /^200/
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -308,6 +416,11 @@ tests:
             Content-Type: application/json
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 800
+              total:
+                - lte: 850
             headers:
               Content-Type: application/json; charset=utf-8
 
@@ -324,6 +437,11 @@ tests:
               jsonpath: $.data.id
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             headers:
               Content-Type: application/json; charset=utf-8
             jsonpath:
@@ -338,6 +456,11 @@ tests:
             Content-Type: application/json
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 80
+              total:
+                - lte: 100
             headers:
               Content-Type: application/json; charset=utf-8
             jsonpath:
@@ -354,6 +477,11 @@ tests:
             Content-Type: application/json
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 1500
+              total:
+                - lte: 1800
             headers:
               Content-Type: application/json; charset=utf-8
             jsonpath:
@@ -370,6 +498,11 @@ tests:
             Content-Type: application/json
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 500
+              total:
+                - lte: 550
             headers:
               Content-Type: application/json; charset=utf-8
             jsonpath:
@@ -384,6 +517,11 @@ tests:
             Content-Type: application/json
           check:
             status: 200
+            performance:
+              firstByte:
+                - lte: 500
+              total:
+                - lte: 550
             headers:
               Content-Type: application/json; charset=utf-8
             jsonpath:
