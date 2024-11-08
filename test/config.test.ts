@@ -22,7 +22,7 @@ describe('⬢ Validate config', () => {
     expect(defaultConfig?.isHTTPs).toBeDefined()
     expect(defaultConfig?.duration).toBeDefined()
     expect(defaultConfig?.cache_url).toBeDefined()
-    expect(defaultConfig?.cache_ttl).toBe(1)
+    expect(defaultConfig?.cache_ttl).toBe(0)
     expect(defaultConfig?.cert_days).toBe(365)
   })
 
