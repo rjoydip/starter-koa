@@ -179,15 +179,15 @@ Here are list of endpoints available in application.
     - [x] Websocket
     - [x] GraphQL
     - [x] tRPC
-  - [ ] StepCI Automation
+  - [x] StepCI Automation
     - [x] APIs
       - [x] HTTP
       - [x] tRPC
       - [x] GraphQL
-    - [ ] Testing
+    - [x] Testing
       - [x] Performance
       - [x] Load
-      - [ ] Contract
+      - [x] Contract
 - [x] CI
   - [x] Actions
     - [x] Parallel
