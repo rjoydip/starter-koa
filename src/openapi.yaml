@@ -154,6 +154,10 @@ components:
           type: string
         address:
           type: string
+        is_verified:
+          type: boolean
+        role:
+          type: string
     SuccessResponse:
       type: object
       properties:

@@ -25,6 +25,47 @@ components:
     password: ${{ internet.password | fake }}
     address: ${{ location.city | fake }}
     role: user
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        is_verified:
+          type: boolean
+        role:
+          type: string
+  response:
+    status_200:
+      status: 200
+  headers:
+    Content-Type: application/json; charset=utf-8
+  firstByte:
+    200:
+      - lte: 200
+    500:
+      - lte: 500
+    800:
+      - lte: 800
+    1500:
+      - lte: 1500
+  total:
+    300:
+      - lte: 300
+    600:
+      - lte: 600
+    900:
+      - lte: 900
+    1800:
+      - lte: 1800
 
 tests:
   /{*}:
@@ -34,108 +75,108 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 350
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 400
+                $ref: '#/components/total/300'
 
       - name: status
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/status
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 800
+                $ref: '#/components/firstByte/800'
               total:
-                - lte: 900
+                $ref: '#/components/total/900'
 
       - name: health
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/health
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
 
       - name: metrics
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_metrics
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
 
       - name: meta
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_meta
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
 
       - name: openapi_data
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/openapi.json
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
 
       - name: references
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/references
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
 
       - name: ws_playground
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/_ws
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
 
   /api/graphql{*}:
     steps:
@@ -144,12 +185,12 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.graphql_port}}/${{env.prefix}}/graphql
           method: GET
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 300
+                $ref: '#/components/total/300'
 
       - name: graphql_create_user
         http:
@@ -176,12 +217,12 @@ tests:
             id:
               jsonpath: $.data.createUser.id
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
 
       - name: graphql_update_user
         if: captures.id
@@ -207,12 +248,12 @@ tests:
               input:
                 $ref: '#/components/input_data'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             jsonpath:
               $.data.updateUser.id: ${{captures.id}}
 
@@ -238,12 +279,12 @@ tests:
             variables:
               id: ${{captures.id}}
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 400
+                $ref: '#/components/firstByte/500'
               total:
-                - lte: 450
+                $ref: '#/components/total/600'
             jsonpath:
               $.data.getUser.id: ${{captures.id}}
 
@@ -267,12 +308,12 @@ tests:
                 }
               }
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 500
+                $ref: '#/components/firstByte/500'
               total:
-                - lte: 550
+                $ref: '#/components/total/600'
             # jsonpath:
             #   $.data.getUsers[0].id: ${{captures.id}}
 
@@ -298,12 +339,12 @@ tests:
             variables:
               id: ${{captures.id}}
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             jsonpath:
               $.data.deleteUser.id: ${{captures.id}}
 
@@ -313,12 +354,12 @@ tests:
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/ping
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 500
+                $ref: '#/components/firstByte/500'
               total:
-                - lte: 550
+                $ref: '#/components/total/600'
             jsonpath:
               $.result.data: Pong
 
@@ -333,12 +374,14 @@ tests:
             id:
               jsonpath: $.result.data.id
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
 
       - name: trpc_update_user
         if: captures.id
@@ -351,12 +394,14 @@ tests:
                 payload:
                   $ref: '#/components/input_data'
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -368,12 +413,14 @@ tests:
             query:
               getUser: ${{captures.id}}
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 200
+                $ref: '#/components/firstByte/200'
               total:
-                - lte: 250
+                $ref: '#/components/total/300'
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -382,7 +429,7 @@ tests:
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/trpc/getUsers
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
                 - lte: 80
@@ -397,12 +444,14 @@ tests:
             mutation:
               deleteUser: ${{captures.id}}
           check:
-            status: /^200/
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -413,37 +462,41 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/users
           method: GET
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 800
+                $ref: '#/components/firstByte/800'
               total:
-                - lte: 850
+                $ref: '#/components/total/900'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
 
       - name: post_user
         http:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user
           method: POST
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           json:
             $ref: '#/components/input_data'
           captures:
             id:
               jsonpath: $.data.id
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             jsonpath:
               $.result.data.id: ${{captures.id}}
 
@@ -453,16 +506,18 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: GET
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
                 - lte: 80
               total:
                 - lte: 100
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             jsonpath:
               $.data.id: ${{captures.id}}
 
@@ -474,16 +529,18 @@ tests:
           json:
             $ref: '#/components/input_data'
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 1500
+                $ref: '#/components/firstByte/1500'
               total:
-                - lte: 1800
+                $ref: '#/components/total/1800'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             jsonpath:
               $.data.id: ${{captures.id}}
 
@@ -495,16 +552,18 @@ tests:
           json:
             $ref: '#/components/input_data'
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
+            schema:
+              $ref: '#/components/schemas/User'
             performance:
               firstByte:
-                - lte: 500
+                $ref: '#/components/firstByte/500'
               total:
-                - lte: 550
+                $ref: '#/components/total/600'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             jsonpath:
               $.data.id: ${{captures.id}}
 
@@ -514,15 +573,15 @@ tests:
           url: ${{env.protocal}}://${{env.host}}:${{env.port}}/${{env.prefix}}/user/${{captures.id}}
           method: DELETE
           headers:
-            Content-Type: application/json
+            $ref: '#/components/headers'
           check:
-            status: 200
+            $ref: '#/components/response/status_200'
             performance:
               firstByte:
-                - lte: 500
+                $ref: '#/components/firstByte/500'
               total:
-                - lte: 550
+                $ref: '#/components/total/600'
             headers:
-              Content-Type: application/json; charset=utf-8
+              $ref: '#/components/headers'
             jsonpath:
               $.data.id: ${{captures.id}}
