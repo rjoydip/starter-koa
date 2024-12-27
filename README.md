@@ -2,34 +2,32 @@
 
 [![JSDocs][jsdocs-src]][jsdocs-href] [![License][license-src]][license-href] [![code style][code-style-src]][code-style-url]
 
-Koa application starter. Simple & logical separation on single file.
+The starter-koa repository is a Koa application starter template that emphasizes simple and logical separation within a single file. It integrates various tools and frameworks to streamline the development process.
 
-> [!NOTE]
-> This project is in the early stages and under development.
+## Key Features
 
-- ✅ Koa
-- ✅ Drizzle
-- ✅ UnJS
-  - ✅ Unbuild
-  - ✅ Unstorage
+- ✅ Koa - A lightweight and flexible Node.js web application framework.
+- ✅ Drizzle - A lightweight TypeScript ORM for SQL databases.
+- ✅ UnJS Tools
+  - ✅ Unbuild - A unified build system for JavaScript and TypeScript.
+  - ✅ Unstorage - A universal storage layer with support for various backends, including Redis.
     - ✅ Cache
       - ✅ Redis
-  - ✅ DB0
+  - ✅ DB0 - A database toolkit for PostgreSQL.
     - ✅ PostgreSQL
   - ✅ Cossws
 - ✅ APIs
-  - ✅ tRPC
-  - ✅ GraphQL
-    - ✅ GraphQL Yoga
-  - ✅ OpenAPI
-  - ✅ Websocket
+  - ✅ tRPC - End-to-end typesafe APIs.
+  - ✅ GraphQL Yoga - A fully-featured GraphQL server.
+  - ✅ OpenAPI - Standardized API documentation.
+  - ✅ Websocket - Real-time communication capabilities.
     - ✅ Cossws
-- ✅ Scalar
-- ✅ Sentry
-- ✅ Zod
-- ✅ Vitest
-- ✅ Autocannon
-- ✅ StepCI
+- ✅ Scalar - A library for handling complex data types in GraphQL.
+- ✅ Sentry - Application monitoring for error tracking.
+- ✅ Zod - TypeScript-first schema declaration and validation.
+- ✅ Vitest - A blazing-fast unit test framework.
+- ✅ Autocannon - A fast HTTP/1.1 benchmarking tool.
+- ✅ StepCI - API testing and monitoring.
 
 ## Development
 
